@@ -22,15 +22,6 @@ function getAllFiles() {
     var file = fs.readdirSync("doc");
     return file;
 }
-app.post("server/api/etc", function (req, res) {
-    fs.writeFile("doc/document.json", JSON.stringify(req.body), function (err) {
-        if (err) {
-            console.log({msg: err});
-        } else {
-            res.status(200).send({msg: "saved"});
-        }
-    });
-});
 app.post("/getAllDocs", function (req, res) {
     var files = getAllFiles();
     var body = [];
@@ -121,6 +112,40 @@ app.post("/addApi", function (req, res) {
             res.status(200).send({status: false, msg: "Api添加失败"});
         } else {
             res.status(200).send({status: true, msg: "Api添加成功"});
+        }
+    })
+});
+app.post("/delApi",function(req,res){
+    var name=req.body.name;
+    var index=req.body.index;
+    var body=fs.readFile("doc/"+name+".json",function(err,data){
+        if(err){
+            res.status(200).send({status:false,msg:"api删除失败。"});
+        }else{
+            var info=JSON.parse(data);
+            info.apis.splice(index,1);
+            fs.writeFile("doc/"+name+".json",JSON.stringify(info), function(err){
+                if(err){
+                    res.status(200).send({status:false,msg:"api写入失败"});
+                }else{
+                    res.status(200).send({status:true,msg:"api删除成功"});
+                }
+            });
+        }
+    });
+});
+app.post("/editApi",function(req,res){
+    var name=req.body.name;
+    var newInfo=req.body.api;
+    var index=req.body.index;
+    var apiInfo=JSON.parse(fs.readFileSync("doc/"+name+".json"));
+    apiInfo.apis[index]=newInfo;
+    fs.writeFile("doc/"+name+".json",JSON.stringify(apiInfo),function(err){
+        if(err){
+            console.log(err);
+            res.status(200).send({status:false,msg:"编辑失败"});
+        }else{
+            res.status(200).send({status:true,msg:"编辑成功"} );
         }
     })
 });

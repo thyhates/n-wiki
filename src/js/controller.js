@@ -36,7 +36,6 @@ angular.module("app")
                 console.log(titls);
                 return titls;
             }
-
             getDocument();
             $scope.addApi = function () {
                 var addInstance = $uibModal.open({
@@ -97,7 +96,41 @@ angular.module("app")
                 }, function (data) {
                     getDocument();
                 });
-            }
+            };
+            $scope.editApi = function (index) {
+                var editApiInstance = $uibModal.open({
+                    animation: true,
+                    templateUrl: "src/page/form.html",
+                    keyboard: false,
+                    controller: "editApiCtrl",
+                    backdrop: "static",
+                    resolve: {
+                        infos: function () {
+                            return $scope.apis[index];
+                        },
+                        indexs:function(){
+                            return index;
+                        }
+
+                    }
+                });
+            };
+            $scope.delApi = function (index) {
+                console.log(index);
+                $http({
+                    url: "delApi",
+                    method: "POST",
+                    data: {
+                        index: index,
+                        name: $stateParams.docName
+                    }
+                }).then(function (data) {
+                    toastr.success(data.data.msg);
+                    getDocument();
+                }, function (data) {
+                    toastr.warning(data.data.msg);
+                })
+            };
         }])
     .controller("MainController", ["$http", "$scope", function ($http, $scope) {
         $scope.docs = [];
@@ -280,6 +313,102 @@ angular.module("app")
                         data: {
                             name: $stateParams.docName,
                             info: $scope.add_model
+                        }
+                    }).then(function (data) {
+                        if (data.data.status) {
+                            toastr.success(data.data.msg);
+                            $uibModalInstance.close($scope.add_model);
+                        } else {
+                            toastr.warning(data.data.msg);
+                            $uibModalInstance.dismiss();
+                        }
+                    });
+                } else {
+                    toastr.warning("请把表单填完整后在提交")
+                }
+            }
+        }])
+    .controller("editApiCtrl", ["$scope", "infos","indexs", "$uibModalInstance", "$http", "toastr", "$stateParams", "schemaForm",
+        function ($scope, infos,indexs, $uibModalInstance, $http, toastr, $stateParams, schemaForm) {
+            $scope.add_model = infos;
+            $scope.add_schema = {
+                type: "object",
+                properties: {
+                    name: {
+                        type: "string",
+                        required: true,
+                        title: "Name",
+                        description: "name for doc"
+                    },
+                    description: {
+                        type: "string",
+                        description: "description"
+                    },
+                    api: {
+                        type: "string",
+                        title: "Api",
+                        required: true,
+                        description: "api"
+                    },
+                    params: {
+                        type: "array",
+                        items: {
+                            type: "object",
+                            properties: {
+                                apiName: {
+                                    type: "string",
+                                    title: "apiName"
+                                },
+                                apiValue: {
+                                    type: "string",
+                                    title: "apiVlaue"
+                                }
+                            }
+                        }
+                    },
+                    res: {
+                        type: "array",
+                        items: {
+                            type: "object",
+                            properties: {
+                                key: {
+                                    type: "string",
+                                    title: "key"
+                                },
+                                revalue: {
+                                    type: "string",
+                                    title: "revalue"
+                                }
+                            }
+                        }
+                    },
+                    demo: {
+                        type: "string",
+                        title: "demo"
+                    }
+                },
+                required: ["name", "api"]
+            };
+            $scope.add_form = [
+                "*",
+                {
+                    type: "submit",
+                    title: "save"
+                }
+            ];
+            $scope.hideModal = function () {
+                $uibModalInstance.dismiss();
+            };
+            $scope.submitAdd = function (form) {
+                $scope.$broadcast('schemaFormValidate');
+                if (form.$valid && form.$dirty) {
+                    $http({
+                        url: "editApi",
+                        method: "POST",
+                        data: {
+                            index:indexs,
+                            name: $stateParams.docName,
+                            api: $scope.add_model
                         }
                     }).then(function (data) {
                         if (data.data.status) {

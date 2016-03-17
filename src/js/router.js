@@ -26,7 +26,6 @@ angular.module("app").config(["$stateProvider", "$urlRouterProvider",
                         controller:"NewDocumentController"
                     }
                 }
-
             });
         $urlRouterProvider.otherwise("");
     }]);

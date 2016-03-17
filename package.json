@@ -23,10 +23,8 @@
     "body-parser": "^1.15.0",
     "bootstrap": "^3.3.6",
     "express": "^4.13.4",
-    "fs": "0.0.2",
     "gulp": "^3.9.1",
     "gulp-concat": "^2.6.0",
-    "gulp-uglify": "^1.5.3",
-    "jquery": "^1.11.3"
+    "gulp-uglify": "^1.5.3"
   }
 }
