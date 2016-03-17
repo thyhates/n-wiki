@@ -1,0 +1,35 @@
+#top {
+    border-bottom: 1px solid #999;
+}
+
+.document-container {
+    padding: 20px;
+    border: 1px solid #ddd;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;;
+}
+
+.doc_description {
+    color: #888;
+    margin-left: 30px;
+}
+
+.title > h2 {
+    border-bottom: 1px solid #777;
+}
+
+.tools {
+    position: fixed;
+    top: 100px;
+    left: 90%;
+}
+
+.list {
+    padding: 0;
+    list-style: none;
+}
+
+.list > li {
+    cursor: pointer;
+}

@@ -1,0 +1,23 @@
+<header class="navbar navbar-static-top" id="top">
+    <div class="container">
+        <div class="navbar-header">
+            <a class="navbar-brand" ng-href="#">Document</a>
+        </div>
+        <ul class="nav navbar-nav navbar-right">
+            <li>
+                <a ng-href="#/new">新建</a>
+            </li>
+        </ul>
+    </div>
+</header>
+<div class="container" ui-view="main-container">
+    <div class="list" ng-controller="MainController">
+        <ul class="list-group">
+            <li class="list-group-item" ng-repeat="doc in docs">
+                <span class="badge">{{doc.type | docType}}</span>
+                <a ng-href="#/doc/{{doc.name}}">{{doc.name}}</a>
+                <span class="doc_description">{{doc.description}}</span>
+            </li>
+        </ul>
+    </div>
+</div>
