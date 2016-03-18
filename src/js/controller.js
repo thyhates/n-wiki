@@ -360,8 +360,8 @@ angular.module("app")
                 }
             }
         }])
-    .controller("editApiCtrl", ["$scope", "$http", "toastr", "$stateParams", "schemaForm","$state",
-        function ($scope, $http, toastr, $stateParams, schemaForm,$state) {
+    .controller("editApiCtrl", ["$scope", "$http", "toastr","$uibModal", "$stateParams", "schemaForm","$state",
+        function ($scope, $http, toastr,$uibModal, $stateParams, schemaForm,$state) {
             console.log($stateParams);
             $http({
                 url: "getDocument",
@@ -440,7 +440,7 @@ angular.module("app")
                     type: "submit",
                     title: "save"
                 },{
-                    type:"buttom",
+                    type:"button",
                     title:"preview"
                 }
             ];
@@ -466,5 +466,13 @@ angular.module("app")
                 } else {
                     toastr.warning("请把表单填完整后在提交")
                 }
-            }
+            };
+            $scope.preview=function(){
+                var previewInstance=$uibModal.open({
+                   templateUrl:"src/page/preview.html",
+                    animation:true,
+                    backdrop:"static"
+                });
+
+            };
         }]);
