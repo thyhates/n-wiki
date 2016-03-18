@@ -4,49 +4,66 @@
 angular.module("app")
     .controller("ListController", ["$http", "$anchorScroll", "$location", "$stateParams", "$scope", "toastr", "$state", "$uibModal",
         function ($http, $anchorScroll, $location, $stateParams, $scope, toastr, $state, $uibModal) {
+            $scope.docs = [];
             $scope.goto = function (id) {
                 $location.hash(id);
                 $anchorScroll();
             };
-            function getDocument() {
+            function getAllDocList() {
                 $http({
-                    url: "getDocument",
-                    method: "POST",
-                    data: {
-                        name: $stateParams.docName
-                    }
+                    url: "getAllDocs",
+                    method: "POST"
                 }).then(function (data) {
-                    if (data.data.status) {
-                        $scope.apis = data.data.model.apis;
-                        $scope.documentInfo = data.data.model.docInfo;
-                        $scope.titles = getDocList($scope.apis);
-                        //console.log($scope.titles);
-                    } else {
-                        toastr.warning(data.data.msg);
-                    }
+                    $scope.docs = data.data.model;
+                    getDocList();
+                }, function (data) {
                 });
             }
 
-            function getDocList(lists) {
+            function getDocList() {
+                $scope.docs.forEach(function (doc) {
+                    $http({
+                        url: "getDocument",
+                        method: "POST",
+                        data: {
+                            name: doc.name
+                        }
+                    }).then(function (data) {
+                        if (data.data.status) {
+                            $scope.apis = data.data.model.apis;
+                            doc.apiList = getApiList($scope.apis);
+                        } else {
+                            toastr.warning(data.data.msg);
+                        }
+                    });
+                });
+
+            }
+
+            function getApiList(doc) {
                 var titls = [];
-                for (var i = 0; i < lists.length; i++) {
-                    titls.push({idx: i, name: lists[i].name});
-                    console.log(titls);
+                for (var i = 0; i < doc.length; i++) {
+                    titls.push({idx: i, name: doc[i].name});
                 }
-                console.log(titls);
                 return titls;
             }
-            getDocument();
-            $scope.addApi = function () {
+
+            getAllDocList();
+            $scope.addApi = function (apiName) {
                 var addInstance = $uibModal.open({
                     animation: true,
                     templateUrl: "src/page/form.html",
                     controller: "AddApiController",
                     keyboard: false,
-                    backdrop: "static"
+                    backdrop: "static",
+                    resolve: {
+                        apiName: function () {
+                            return apiName;
+                        }
+                    }
                 });
                 addInstance.result.then(function (data) {
-                    getDocument();
+                    getAllDocList();
                 }, function () {
                 });
             };
@@ -58,25 +75,27 @@ angular.module("app")
                     keyboard: false,
                     backdrop: "static"
                 });
-                delInstance.result.then(function (data) {
-                    if (data) {
+                delInstance.result.then(function (docName) {
+                    if (docName) {
                         $http({
                             url: "delDocument",
                             method: "POST",
                             data: {
-                                name: $stateParams.docName
+                                name: docName
                             }
                         }).then(function (data) {
                             if (data.data.status) {
+                                getAllDocList();
                                 toastr.success(data.data.msg);
-                                $state.go("home");
+
                             } else {
                                 toastr.warning(data.data.msg);
                             }
                         });
+                    } else {
+                        console.log("dismiss");
                     }
                 });
-
             };
             $scope.editDoc = function () {
                 var editInstance = $uibModal.open({
@@ -108,41 +127,53 @@ angular.module("app")
                         infos: function () {
                             return $scope.apis[index];
                         },
-                        indexs:function(){
+                        indexs: function () {
                             return index;
                         }
 
                     }
                 });
             };
-            $scope.delApi = function (index) {
-                console.log(index);
+
+        }])
+    .controller("MainController", ["$http", "$scope", "$stateParams", "toastr","$state",
+        function ($http, $scope, $stateParams, toastr,$state) {
+            $scope.apis = [];
+            $http({
+                url: "getDocument",
+                method: "POST",
+                data: {
+                    name: $stateParams.docName
+                }
+            }).then(function (data) {
+                if (data.data.status) {
+                    console.log(data.data.model.apis[$stateParams.apiIndex]);
+                    $scope.apis.push(data.data.model.apis[$stateParams.apiIndex]);
+                    //console.log($scope.apis);
+                    $scope.documentInfo = data.data.model.docInfo;
+                    //$scope.titles = getDocList($scope.apis);
+                    //console.log(getApiList($scope.apis));
+                } else {
+                    toastr.warning(data.data.msg);
+                }
+            });
+            $scope.delApi = function (index, apiName) {
+                console.log($stateParams);
                 $http({
                     url: "delApi",
                     method: "POST",
                     data: {
-                        index: index,
-                        name: $stateParams.docName
+                        index: $stateParams.apiIndex,
+                        name: apiName
                     }
                 }).then(function (data) {
                     toastr.success(data.data.msg);
-                    getDocument();
+                    $state.go("home");
                 }, function (data) {
                     toastr.warning(data.data.msg);
                 })
             };
         }])
-    .controller("MainController", ["$http", "$scope", function ($http, $scope) {
-        $scope.docs = [];
-        $http({
-            url: "getAllDocs",
-            method: "POST"
-        }).then(function (data) {
-            $scope.docs = data.data.model;
-        }, function (data) {
-        });
-
-    }])
     .controller("NewDocumentController", ["$scope", "$http", "toastr", "$state", function ($scope, $http, toastr, $state) {
         $scope.newDocument = function () {
             $http({
@@ -160,8 +191,8 @@ angular.module("app")
             });
         };
     }])
-    .controller("AddApiController", ["schemaForm", "$scope", "toastr", "$uibModalInstance", "$stateParams", "$http",
-        function (schemaForm, $scope, toastr, $uibModalInstance, $stateParams, $http) {
+    .controller("AddApiController", ["schemaForm", "apiName", "$scope", "toastr", "$uibModalInstance", "$stateParams", "$http",
+        function (schemaForm, apiName, $scope, toastr, $uibModalInstance, $stateParams, $http) {
             $scope.add_schema = {
                 type: "object",
                 properties: {
@@ -238,7 +269,7 @@ angular.module("app")
                         url: "addApi",
                         method: "POST",
                         data: {
-                            name: $stateParams.docName,
+                            name: apiName,
                             body: $scope.add_model
                         }
                     }).then(function (data) {
@@ -255,14 +286,15 @@ angular.module("app")
                 }
             }
         }])
-    .controller("delDocumentCtl", ["$uibModalInstance", "$scope", function ($uibModalInstance, $scope) {
-        $scope.ok = function () {
-            $uibModalInstance.close(true);
-        };
-        $scope.cancel = function () {
-            $uibModalInstance.dismiss();
-        }
-    }])
+    .controller("delDocumentCtl", ["$uibModalInstance", "$scope", "$stateParams",
+        function ($uibModalInstance, $scope, $stateParams) {
+            $scope.ok = function () {
+                $uibModalInstance.close($stateParams.docName);
+            };
+            $scope.cancel = function () {
+                $uibModalInstance.dismiss();
+            }
+        }])
     .controller("editDocInfoCtrl", ["$scope", "$uibModalInstance", "$http", "info", "toastr", "$stateParams",
         function ($scope, $uibModalInstance, $http, info, toastr, $stateParams) {
             $scope.add_schema = {
@@ -328,9 +360,22 @@ angular.module("app")
                 }
             }
         }])
-    .controller("editApiCtrl", ["$scope", "infos","indexs", "$uibModalInstance", "$http", "toastr", "$stateParams", "schemaForm",
-        function ($scope, infos,indexs, $uibModalInstance, $http, toastr, $stateParams, schemaForm) {
-            $scope.add_model = infos;
+    .controller("editApiCtrl", ["$scope", "$http", "toastr", "$stateParams", "schemaForm","$state",
+        function ($scope, $http, toastr, $stateParams, schemaForm,$state) {
+            console.log($stateParams);
+            $http({
+                url: "getDocument",
+                method: "POST",
+                data: {
+                    name: $stateParams.docName
+                }
+            }).then(function (data) {
+                if (data.data.status) {
+                    $scope.add_model = data.data.model.apis[$stateParams.apiIndex];
+                } else {
+                    toastr.warning(data.data.msg);
+                }
+            });
             $scope.add_schema = {
                 type: "object",
                 properties: {
@@ -394,11 +439,11 @@ angular.module("app")
                 {
                     type: "submit",
                     title: "save"
+                },{
+                    type:"buttom",
+                    title:"preview"
                 }
             ];
-            $scope.hideModal = function () {
-                $uibModalInstance.dismiss();
-            };
             $scope.submitAdd = function (form) {
                 $scope.$broadcast('schemaFormValidate');
                 if (form.$valid && form.$dirty) {
@@ -406,17 +451,16 @@ angular.module("app")
                         url: "editApi",
                         method: "POST",
                         data: {
-                            index:indexs,
+                            index: $stateParams.apiIndex,
                             name: $stateParams.docName,
                             api: $scope.add_model
                         }
                     }).then(function (data) {
                         if (data.data.status) {
                             toastr.success(data.data.msg);
-                            $uibModalInstance.close($scope.add_model);
+                            $state.go("home");
                         } else {
                             toastr.warning(data.data.msg);
-                            $uibModalInstance.dismiss();
                         }
                     });
                 } else {

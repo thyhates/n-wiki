@@ -10,14 +10,59 @@
         </ul>
     </div>
 </header>
+<!--<div class="container" ui-view="main-container">-->
+<!--<div class="list" ng-controller="MainController">-->
+<!--<ul class="list-group">-->
+<!--<li class="list-group-item" ng-repeat="doc in docs">-->
+<!--<span class="badge">{{doc.type | docType}}</span>-->
+<!--<a ng-href="#/doc/{{doc.name}}">{{doc.name}}</a>-->
+<!--<span class="doc_description">{{doc.description}}</span>-->
+<!--</li>-->
+<!--</ul>-->
+<!--</div>-->
+<!--</div>-->
 <div class="container" ui-view="main-container">
-    <div class="list" ng-controller="MainController">
-        <ul class="list-group">
-            <li class="list-group-item" ng-repeat="doc in docs">
-                <span class="badge">{{doc.type | docType}}</span>
-                <a ng-href="#/doc/{{doc.name}}">{{doc.name}}</a>
-                <span class="doc_description">{{doc.description}}</span>
-            </li>
-        </ul>
+    <div class="row">
+        <div class="col-xs-2" >
+            <div class="list">
+                <h3>目录</h3>
+                <div ng-if="docs"
+                     style="-webkit-border-radius:5px ;-moz-border-radius: 5px;border-radius: 5px;">
+                    <uib-accordion>
+                        <uib-accordion-group heading="{{doc.name}}" ng-repeat="doc in docs">
+                            <ul class="list-group">
+                                <li class="list-group-item" ng-repeat="api  in doc.apiList ">
+                                    <a ng-href="#/{{doc.name}}/{{$index}}" style="cursor: pointer;">{{api.name}}</a>
+                                </li>
+                            </ul>
+                            <button type="button" class="btn btn-default btn-sm" ng-click="addApi(doc.name)">Add Api</button>
+                        </uib-accordion-group>
+                    </uib-accordion>
+                </div>
+            </div>
+        </div>
+        <div class="col-xs-9" ui-view="apiContent">
+
+        </div>
+        <div class="col-xs-1">
+            <div class="tools">
+                <ul class="list">
+                    <li><a ng-click="editDoc()"><span class="glyphicon glyphicon-pencil" title="编辑"></span></a></li>
+                    <li><a ng-click="deleteDoc()"><span class="glyphicon glyphicon-minus" title="删除"></span></a></li>
+                </ul>
+            </div>
+        </div>
     </div>
 </div>
+<script type="text/ng-template" id="confirm.html">
+    <div class="modal-header">
+        <h3 class="modal-title">警告</h3>
+    </div>
+    <div class="modal-body">
+        <p>确定删除该文档？</p>
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-primary" type="button" ng-click="ok()">OK</button>
+        <button class="btn btn-warning" type="button" ng-click="cancel()">Cancel</button>
+    </div>
+</script>

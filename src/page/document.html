@@ -1,88 +1,54 @@
-<div class="row">
-    <div class="col-xs-2">
-        <div class="list">
-            <h3>目录</h3>
-            <div ng-if="titles"
-                 style="-webkit-border-radius:5px ;-moz-border-radius: 5px;border-radius: 5px;">
-                <ul class="list-group">
-                    <li class="list-group-item" ng-repeat="title in titles track by $index">
-                        <a ng-click="goto($index)" style="cursor: pointer;">{{title.name}}</a>
-                    </li>
-                </ul>
-            </div>
-        </div>
+<div class="document-container">
+    <div class="title">
+        <h2>{{documentInfo.name}}</h2>
+        <span>{{ documentInfo.description}}</span>
     </div>
-    <div class="col-xs-9">
-        <div class="document-container">
-            <div class="title">
-                <h2>{{documentInfo.name}}</h2>
-                <span>{{ documentInfo.description}}</span>
-            </div>
-            <div class="apiBody" ng-repeat="api in apis" id="{{$index}}">
-                <h3>{{api.name}}</h3>
-                <span>{{api.description}}</span>
-                <a style="cursor: pointer;" ng-click="delApi($index)"><span class="glyphicon glyphicon-minus pull-right" style="margin-right: 10px;"></span></a>
-                <a style="cursor: pointer;" ng-click="editApi($index)"><span class="glyphicon glyphicon-pencil pull-right" style="margin-right: 10px;"></span></a>
-                <table class="table table-bordered">
-                    <tr>
-                        <td>{{documentInfo.type|docType}}</td>
-                        <td>{{api.api}}</td>
-                    </tr>
-                    <tr ng-if="api.params">
-                        <td colspan="2">
-                            <b>
-                                参数
-                            </b>
-                        </td>
-                    </tr>
-                    <tr ng-repeat="param in api.params" ng-if="api.params">
-                        <td><b>{{param.apiName}}</b></td>
-                        <td>{{param.apiValue}}</td>
-                    </tr>
-                    <tr ng-if="api.res">
-                        <td colspan="2">
-                            <b>
-                                返回
-                            </b>
-                        </td>
-                    </tr>
-                    <tr ng-repeat="res in api.res" ng-if="api.res">
-                        <td><b>
-                            {{res.key}}
+    <div ui-view="editContent">
+        <div ng-if="apis.length" class="apiBody" ng-repeat="api in apis" id="{{$index}}">
+            <h3>{{api.name}}</h3>
+            <span>{{api.description}}</span>
+            <a style="cursor: pointer;" ng-click="delApi($index,documentInfo.name)"><span
+                    class="glyphicon glyphicon-minus pull-right"
+                    style="margin-right: 10px;"></span></a>
+            <a style="cursor: pointer;" ng-href="#/{{documentInfo.name}}/{{$index}}/edit"><span
+                    class="glyphicon glyphicon-pencil pull-right" style="margin-right: 10px;"></span></a>
+            <table class="table table-bordered" >
+                <tr>
+                    <td>{{documentInfo.type|docType}}</td>
+                    <td>{{api.api}}</td>
+                </tr>
+                <tr ng-if="api.params">
+                    <td colspan="2">
+                        <b>
+                            参数
                         </b>
-                        </td>
-                        <td>
-                            {{res.revalue}}
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><b>Demo</b></td>
-                        <td>{{api.demo}}</td>
-                    </tr>
-                </table>
-            </div>
-        </div>
-    </div>
-    <div class="col-xs-1">
-        <div class="tools">
-            <ul class="list">
-                <li><a ng-click="addApi()"><span class="glyphicon glyphicon-plus" title="添加"></span></a></li>
-                <li><a ng-click="editDoc()"><span class="glyphicon glyphicon-pencil" title="编辑"></span></a></li>
-                <li><a ng-click="deleteDoc()"><span class="glyphicon glyphicon-minus" title="删除"></span></a></li>
-            </ul>
-        </div>
+                    </td>
+                </tr>
+                <tr ng-repeat="param in api.params" ng-if="api.params">
+                    <td><b>{{param.apiName}}</b></td>
+                    <td>{{param.apiValue}}</td>
+                </tr>
+                <tr ng-if="api.res">
+                    <td colspan="2">
+                        <b>
+                            返回
+                        </b>
+                    </td>
+                </tr>
+                <tr ng-repeat="res in api.res" ng-if="api.res">
+                    <td><b>
+                        {{res.key}}
+                    </b>
+                    </td>
+                    <td>
+                        {{res.revalue}}
+                    </td>
+                </tr>
+                <tr>
+                    <td><b>Demo</b></td>
+                    <td>{{api.demo}}</td>
+                </tr>
+            </table>
         </div>
     </div>
 </div>
-<script type="text/ng-template" id="confirm.html">
-    <div class="modal-header">
-        <h3 class="modal-title">警告</h3>
-    </div>
-    <div class="modal-body">
-        <p>确定删除该文档？</p>
-    </div>
-    <div class="modal-footer">
-        <button class="btn btn-primary" type="button" ng-click="ok()">OK</button>
-        <button class="btn btn-warning" type="button" ng-click="cancel()">Cancel</button>
-    </div>
-</script>
