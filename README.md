@@ -2,5 +2,7 @@
 document manage
 
 ##Start
+```javascript
 npm install
 node server.js
+```
