@@ -136,8 +136,8 @@ angular.module("app")
             };
 
         }])
-    .controller("MainController", ["$http", "$scope", "$stateParams", "toastr","$state",
-        function ($http, $scope, $stateParams, toastr,$state) {
+    .controller("MainController", ["$http", "$scope", "$stateParams", "toastr", "$state","$uibModal",
+        function ($http, $scope, $stateParams, toastr, $state,$uibModal) {
             $scope.apis = [];
             $http({
                 url: "getDocument",
@@ -158,20 +158,33 @@ angular.module("app")
                 }
             });
             $scope.delApi = function (index, apiName) {
-                console.log($stateParams);
-                $http({
-                    url: "delApi",
-                    method: "POST",
-                    data: {
-                        index: $stateParams.apiIndex,
-                        name: apiName
+                var delApiInstance=$uibModal.open({
+                    animation: true,
+                    templateUrl: "confirm.html",
+                    controller: "delDocumentCtl",
+                    keyboard: false,
+                    backdrop: "static"
+                });
+                delApiInstance.result.then(function (docName) {
+                    if (docName) {
+                        $http({
+                            url: "delApi",
+                            method: "POST",
+                            data: {
+                                index: $stateParams.apiIndex,
+                                name: apiName
+                            }
+                        }).then(function (data) {
+                            toastr.success(data.data.msg);
+                            $state.go("home");
+                        }, function (data) {
+                            toastr.warning(data.data.msg);
+                        })
+                    } else {
+                        console.log("dismiss");
                     }
-                }).then(function (data) {
-                    toastr.success(data.data.msg);
-                    $state.go("home");
-                }, function (data) {
-                    toastr.warning(data.data.msg);
-                })
+                });
+
             };
         }])
     .controller("NewDocumentController", ["$scope", "$http", "toastr", "$state", function ($scope, $http, toastr, $state) {
@@ -360,8 +373,8 @@ angular.module("app")
                 }
             }
         }])
-    .controller("editApiCtrl", ["$scope", "$http", "toastr","$uibModal", "$stateParams", "schemaForm","$state",
-        function ($scope, $http, toastr,$uibModal, $stateParams, schemaForm,$state) {
+    .controller("editApiCtrl", ["$scope", "$http", "toastr", "$uibModal", "$stateParams", "schemaForm", "$state",
+        function ($scope, $http, toastr, $uibModal, $stateParams, schemaForm, $state) {
             console.log($stateParams);
             $http({
                 url: "getDocument",
@@ -439,9 +452,9 @@ angular.module("app")
                 {
                     type: "submit",
                     title: "save"
-                },{
-                    type:"button",
-                    title:"preview"
+                }, {
+                    type: "button",
+                    title: "preview"
                 }
             ];
             $scope.submitAdd = function (form) {
@@ -467,11 +480,11 @@ angular.module("app")
                     toastr.warning("请把表单填完整后在提交")
                 }
             };
-            $scope.preview=function(){
-                var previewInstance=$uibModal.open({
-                   templateUrl:"src/page/preview.html",
-                    animation:true,
-                    backdrop:"static"
+            $scope.preview = function () {
+                var previewInstance = $uibModal.open({
+                    templateUrl: "src/page/preview.html",
+                    animation: true,
+                    backdrop: "static"
                 });
 
             };
