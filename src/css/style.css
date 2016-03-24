@@ -33,3 +33,6 @@
 .list > li {
     cursor: pointer;
 }
+.list-group-item{
+    border:0;
+}

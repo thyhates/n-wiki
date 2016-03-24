@@ -11,6 +11,7 @@ angular.module("app").factory("authorInterceptor", ["$log", "$q", "$location",
                 return res || $q.when(res);
             },
             responseError: function (err) {
+
                 return err;
             }
         };

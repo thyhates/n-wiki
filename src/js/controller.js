@@ -187,7 +187,8 @@ angular.module("app")
 
             };
         }])
-    .controller("NewDocumentController", ["$scope", "$http", "toastr", "$state", function ($scope, $http, toastr, $state) {
+    .controller("NewDocumentController", ["$scope", "$http", "toastr", "$state",
+        function ($scope, $http, toastr, $state) {
         $scope.newDocument = function () {
             $http({
                 url: "newDocument",
@@ -232,11 +233,15 @@ angular.module("app")
                             properties: {
                                 apiName: {
                                     type: "string",
-                                    title: "apiName"
+                                    title: "参数名"
                                 },
                                 apiValue: {
                                     type: "string",
-                                    title: "apiVlaue"
+                                    title: "默认值"
+                                },
+                                type:{
+                                    type:"string",
+                                    title:"类型"
                                 }
                             }
                         }

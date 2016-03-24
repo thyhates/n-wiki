@@ -5,7 +5,7 @@
         </div>
         <ul class="nav navbar-nav navbar-right">
             <li>
-                <a ng-href="#/new">新建</a>
+                <a ng-href="new">新建</a>
             </li>
         </ul>
     </div>
@@ -21,9 +21,9 @@
 <!--</ul>-->
 <!--</div>-->
 <!--</div>-->
-<div class="container" ui-view="main-container">
+<div class="container" ui-view="main-container" >
     <div class="row">
-        <div class="col-xs-2" >
+        <div class="col-xs-2" ng-controller="ListController">
             <div class="list">
                 <h3>目录</h3>
                 <div ng-if="docs"
@@ -32,7 +32,7 @@
                         <uib-accordion-group heading="{{doc.name}}" ng-repeat="doc in docs">
                             <ul class="list-group">
                                 <li class="list-group-item" ng-repeat="api  in doc.apiList ">
-                                    <a ng-href="#/{{doc.name}}/{{$index}}" style="cursor: pointer;">{{api.name}}</a>
+                                    <a ng-href="/{{doc.name}}/{{$index}}" style="cursor: pointer;">{{api.name}}</a>
                                 </li>
                             </ul>
                             <button type="button" class="btn btn-default btn-sm" ng-click="addApi(doc.name)">Add Api</button>
