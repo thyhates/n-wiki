@@ -1,54 +1,69 @@
-<div class="document-container">
+<div class="document-container" style="border: 1px solid #ddd;" ng-controller="MainController">
     <div class="title">
-        <h2>{{documentInfo.name}}</h2>
+        <h2>{{documentInfo.name}}
+            <a ng-href="{{documentInfo.name}}/{{documentInfo.index}}/newApi" class="btn btn-default btn-sm pull-right">新加接口
+            </a>
+        </h2>
         <span>{{ documentInfo.description}}</span>
     </div>
     <div ui-view="editContent">
-        <div ng-if="apis.length" class="apiBody" ng-repeat="api in apis" id="{{$index}}">
+        <div ng-if="api" class="apiBody" ng-repeat="api in apis" id="{{$index}}">
             <h3>{{api.name}}</h3>
-            <span>{{api.description}}</span>
-            <a style="cursor: pointer;" ng-click="delApi($index,documentInfo.name)"><span
-                    class="glyphicon glyphicon-minus pull-right"
-                    style="margin-right: 10px;"></span></a>
-            <a style="cursor: pointer;" ng-href="{{documentInfo.name}}/{{$index}}/edit"><span
-                    class="glyphicon glyphicon-pencil pull-right" style="margin-right: 10px;"></span></a>
-            <table class="table table-bordered" >
-                <tr>
-                    <td>{{documentInfo.type|docType}}</td>
-                    <td>{{api.api}}</td>
-                </tr>
-                <tr ng-if="api.params">
-                    <td colspan="2">
-                        <b>
-                            参数
-                        </b>
-                    </td>
-                </tr>
+            <a style="cursor: pointer;margin-left: 10px;" ng-click="delApi(documentInfo.index,documentInfo.name)"
+               class="btn btn-default pull-right">删除</a>
+            <a style="cursor: pointer;" ng-href="{{documentInfo.name}}/{{documentInfo.index}}/edit"
+               class="btn btn-default pull-right">编辑</a>
+            <br>
+            <p>
+                请求路径:&nbsp;&nbsp;{{api.api}}
+            </p>
+            <p>
+                请求模式:&nbsp;&nbsp;{{api.method}}
+            </p>
+            <p>请求参数(header):</p>
+            <table class="table table-bordered">
+                <thead>
+                <th style="width:20%;word-wrap: break-word;">参数名称</th>
+                <th style="width:20%;word-wrap: break-word;">类型</th>
+                <th style="width:60%;word-wrap: break-word;">说明</th>
+                </thead>
+                <tbody>
                 <tr ng-repeat="param in api.params" ng-if="api.params">
-                    <td><b>{{param.apiName}}</b></td>
+                    <td>{{param.apiName}}</td>
+                    <td>{{param.type}}</td>
                     <td>{{param.apiValue}}</td>
                 </tr>
-                <tr ng-if="api.res">
-                    <td colspan="2">
-                        <b>
-                            返回
-                        </b>
-                    </td>
-                </tr>
+                </tbody>
+            </table>
+            <p>请求参数(urlParam):</p>
+            <table class="table table-bordered">
+                <thead>
+                <th style="width:20%;word-wrap: break-word;">参数名称</th>
+                <th style="width:20%;word-wrap: break-word;">类型</th>
+                <th style="width:60%;word-wrap: break-word;">说明</th>
+                </thead>
+                <tbody>
                 <tr ng-repeat="res in api.res" ng-if="api.res">
-                    <td><b>
+                    <td>
                         {{res.key}}
-                    </b>
                     </td>
+                    <td>{{res.type}}</td>
                     <td>
                         {{res.revalue}}
                     </td>
                 </tr>
-                <tr>
-                    <td><b>Demo</b></td>
-                    <td>{{api.demo}}</td>
-                </tr>
+                </tbody>
             </table>
+            <p>
+                JSON返回示例:
+            </p>
+            <pre>
+{{api.demo}}
+        </pre>
+            <p>
+                接口说明:
+            </p>
+            <pre>{{api.description}}</pre>
         </div>
     </div>
 </div>

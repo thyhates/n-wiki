@@ -1,11 +1,148 @@
-<div style="padding: 30px;">
-    <!--<div class="modal-header">-->
-        <!--<button type="button" ng-click="hideModal()" class="close" data-dismiss="modal" aria-label="Close">-->
-            <!--<span aria-hidden="true">&times;</span>-->
-        <!--</button>-->
-        <!--<h4 class="modal-title">添加</h4>-->
-    <!--</div>-->
-    <form sf-schema="add_schema" sf-form="add_form" sf-model="add_model"
-          name="addForm" ng-submit="submitAdd(addForm)">
-    </form>
-</div>
+<uib-tabset active="activeJustified" justified="true">
+    <uib-tab index="0" heading="编辑">
+        <div style="padding: 30px;" on-form-ready class="editContainer">
+            <form name="addForm" ng-submit="submitAdd(addForm)" class="form-horizontal">
+                <div class="apiBody">
+                    <p>
+                        请求名称: <input type="text" ng-model="apis.name" style="margin-left: 15px;">
+                    </p>
+                    <p>
+                        请求路径: <input type="text" ng-model="apis.api" style="margin-left: 15px;">
+                    </p>
+                    <p>
+                        请求模式:
+                        <select ng-model="apis.method" style="margin-left: 15px;">
+                            <option value="GET">GET</option>
+                            <option value="POST">POST</option>
+                        </select>
+                    </p>
+                    <p>请求参数(header):
+                        <button class="btn btn-primary" type="button" ng-click="addParams($event)">新增</button>
+                    </p>
+                    <table class="table table-bordered" id="header-table">
+                        <thead>
+                        <th style="width:20%;word-wrap: break-word;">参数名称</th>
+                        <th style="width:20%;word-wrap: break-word;">类型</th>
+                        <th style="width:40%;word-wrap: break-word;">说明</th>
+                        <th style="width:20%;word-wrap: break-word;">操作</th>
+                        </thead>
+                        <tbody>
+                        <tr ng-repeat="param in apis.params" ng-if="apis.params">
+                            <td><input type="text" ng-model="param.apiName"/></td>
+                            <td><input type="text" ng-model="param.type"/></td>
+                            <td><input type="text" ng-model="param.apiValue"/></td>
+                            <td><a ng-click="delParam($index)" class="btn btn-danger">删除</a></td>
+                        </tr>
+                        </tbody>
+                    </table>
+
+                    <p>请求参数(urlParam):
+                        <button class="btn btn-primary" type="button" ng-click="addRes($event)">新增</button>
+                    </p>
+                    <table class="table table-bordered" id="res-table">
+                        <thead>
+                        <th style="width:20%;word-wrap: break-word;">参数名称</th>
+                        <th style="width:20%;word-wrap: break-word;">类型</th>
+                        <th style="width:40%;word-wrap: break-word;">说明</th>
+                        <th style="width:20%;word-wrap: break-word;">操作</th>
+                        </thead>
+                        <tbody>
+                        <tr ng-repeat="res in apis.res" ng-if="apis.res">
+                            <td>
+                                <input type="text" ng-model="res.key"/>
+                            </td>
+                            <td>
+                                <input type="text" ng-model="res.type"/>
+                            </td>
+                            <td>
+                                <input type="text" ng-model="res.revalue"/>
+                            </td>
+                            <td><a ng-click="delRes($index)" class="btn btn-danger">删除</a></td>
+                        </tr>
+                        </tbody>
+                    </table>
+
+                    <p>
+                        JSON返回示例:
+                    </p>
+                    <textarea ng-model="apis.demo" style="min-width:100%;max-width:100%;" rows="6"></textarea>
+                    <br/>
+                    <p>
+                        接口说明:
+                    </p>
+                    <textarea ng-model="apis.description" style="min-width:100%;max-width:100%;" rows="6"></textarea>
+                    <input type="submit" value="保存" class="btn btn-primary"/>
+                </div>
+            </form>
+        </div>
+    </uib-tab>
+    <uib-tab index="1" heading="预览">
+        <div style="padding: 30px;" on-form-ready class="editContainer">
+            <form name="addForm" ng-submit="submitAdd(addForm)" class="form-horizontal">
+                <div class="apiBody">
+                    <p>
+                        请求名称：{{apis.name}}
+                    </p>
+                    <p>
+                        请求路径: {{apis.api}}
+                    </p>
+                    <p>
+                        请求模式: {{apis.method}}
+                    </p>
+                    <p>请求参数(header):
+                    </p>
+                    <table class="table table-bordered">
+                        <thead>
+                        <th style="width:20%;word-wrap: break-word;">参数名称</th>
+                        <th style="width:20%;word-wrap: break-word;">类型</th>
+                        <th style="width:40%;word-wrap: break-word;">说明</th>
+                        </thead>
+                        <tbody>
+                        <tr ng-repeat="param in apis.params" ng-if="apis.params">
+                            <td>{{param.apiName}}
+                            </td>
+                            <td>{{param.type}}
+                            </td>
+                            <td>{{param.apiValue}}</td>
+                        </tr>
+                        </tbody>
+                    </table>
+
+                    <p>请求参数(urlParam):
+                    </p>
+                    <table class="table table-bordered">
+                        <thead>
+                        <th style="width:20%;word-wrap: break-word;">参数名称</th>
+                        <th style="width:20%;word-wrap: break-word;">类型</th>
+                        <th style="width:40%;word-wrap: break-word;">说明</th>
+                        </thead>
+                        <tbody>
+                        <tr ng-repeat="res in apis.res" ng-if="apis.res">
+                            <td>
+                                {{res.key}}
+                            </td>
+                            <td>
+                                {{res.type}}
+                            </td>
+                            <td>
+                                {{res.revalue}}
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+
+                    <p>
+                        JSON返回示例:
+                    </p>
+                    <pre>{{apis.demo}}</pre>
+                    <br/>
+                    <p>
+                        接口说明:
+                    </p>
+                    <pre>{{apis.description}}</pre>
+                </div>
+            </form>
+        </div>
+    </uib-tab>
+</uib-tabset>
+

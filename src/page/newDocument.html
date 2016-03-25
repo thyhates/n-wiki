@@ -3,7 +3,7 @@
         <form ng-submit="newDocument()" name="newDoc" class="form-horizontal" novalidate>
             <div class="form-group">
                 <label for="name" class="control-label col-xs-2">
-                    name
+                    文档名
                 </label>
                 <div class="col-xs-6">
                     <input type="text" required class="form-control" id="name" ng-model="newDocs.name"  placeholder="name">
@@ -11,7 +11,7 @@
             </div>
             <div class="form-group">
                 <label for="type" class="control-label col-xs-2">
-                    type
+                    类型
                 </label>
                 <div class="col-xs-6">
                     <select ng-model="newDocs.type" id="type" class="form-control" required>
@@ -22,15 +22,15 @@
             </div>
             <div class="form-group">
                 <label for="description" class="control-label col-xs-2">
-                    description
+                    文档描述
                 </label>
                 <div class="col-xs-6">
                     <textarea ng-model="newDocs.description" class="form-control" id="description" cols="30" rows="10"></textarea>
                 </div>
             </div>
             <div class="form-group text-center">
-                <button class="btn btn-primary" type="submit" ng-disabled="newDoc.$invalid">submit</button>
-                <button class="btn btn-default" type="reset">reset</button>
+                <button class="btn btn-primary" type="submit" ng-disabled="newDoc.$invalid">保存</button>
+                <button class="btn btn-default" type="reset">重置</button>
             </div>
         </form>
     </div>

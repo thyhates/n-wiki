@@ -1,0 +1,76 @@
+<div style="padding: 30px;border: 1px solid #ddd;" on-new-form-ready class="editContainer" >
+    <form name="addForm" ng-submit="addApi(addForm)" class="form-horizontal">
+        <div class="apiBody">
+            <p>
+                接口名称: <input type="text" ng-model="newApi.name" style="margin-left: 15px;">
+            </p>
+            <p>
+                请求路径: <input type="text" ng-model="newApi.api" style="margin-left: 15px;">
+            </p>
+            <p>
+                请求模式:
+                <select ng-model="newApi.method" style="margin-left: 15px;">
+                    <option value="" selected>请选择</option>
+                    <option value="GET">GET</option>
+                    <option value="POST">POST</option>
+                </select>
+            </p>
+            <p>请求参数(header):
+                <button class="btn btn-primary" type="button" ng-click="addParams($event)">新增</button>
+            </p>
+            <table class="table table-bordered" id="header-table">
+                <thead>
+                <th style="width:20%;word-wrap: break-word;">参数名称</th>
+                <th style="width:20%;word-wrap: break-word;">类型</th>
+                <th style="width:40%;word-wrap: break-word;">说明</th>
+                <th style="width:20%;word-wrap: break-word;">操作</th>
+                </thead>
+                <tbody>
+                <tr ng-repeat="param in newApi.params" ng-if="newApi.params">
+                    <td><input type="text" ng-model="param.apiName"/></td>
+                    <td><input type="text" ng-model="param.type"/></td>
+                    <td><input type="text" ng-model="param.apiValue"/></td>
+                    <td><a ng-click="delParam($index)" class="btn btn-danger">删除</a></td>
+                </tr>
+                </tbody>
+            </table>
+
+            <p>请求参数(urlParam):
+                <button class="btn btn-primary" type="button" ng-click="addRes($event)">新增</button>
+            </p>
+            <table class="table table-bordered" id="res-table">
+                <thead>
+                <th style="width:20%;word-wrap: break-word;">参数名称</th>
+                <th style="width:20%;word-wrap: break-word;">类型</th>
+                <th style="width:40%;word-wrap: break-word;">说明</th>
+                <th style="width:20%;word-wrap: break-word;">操作</th>
+                </thead>
+                <tbody>
+                <tr ng-repeat="res in newApi.res" ng-if="newApi.res">
+                    <td>
+                        <input type="text" ng-model="res.key"/>
+                    </td>
+                    <td>
+                        <input type="text" ng-model="res.type"/>
+                    </td>
+                    <td>
+                        <input type="text" ng-model="res.revalue"/>
+                    </td>
+                    <td><a ng-click="delRes($index)" class="btn btn-danger">删除</a></td>
+                </tr>
+                </tbody>
+            </table>
+
+            <p>
+                JSON返回示例:
+            </p>
+            <textarea ng-model="newApi.demo" style="min-width:100%;max-width:100%;" rows="6"></textarea>
+            <br/>
+            <p>
+                接口说明:
+            </p>
+            <textarea ng-model="newApi.description" style="min-width:100%;max-width:100%;" rows="6"></textarea>
+            <input type="submit" value="保存" class="btn btn-primary"/>
+        </div>
+    </form>
+</div>
