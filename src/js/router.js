@@ -45,6 +45,15 @@ angular.module("app").config(["$stateProvider", "$urlRouterProvider",
                         controller:"AddApiController"
                     }
                 }
+            })
+            .state("home.login",{
+                url:"login",
+                views:{
+                    "main-container":{
+                        templateUrl:"src/page/login.html",
+                        controller:"LoginController"
+                    }
+                }
             });
         $urlRouterProvider.otherwise("/");
     }]);

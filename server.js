@@ -6,7 +6,7 @@ var express = require("express");
 var app = express();
 var body_parser = require("body-parser");
 var fs = require("fs");
-
+var crypto=require("crypto");
 app.use(express.static(__dirname));
 app.use(body_parser.json());
 app.use(body_parser.urlencoded({extended: true}));
@@ -22,6 +22,7 @@ function getAllFiles() {
     var file = fs.readdirSync("doc");
     return file;
 }
+
 app.post("/getAllDocs", function (req, res) {
     var files = getAllFiles();
     var body = [];
@@ -30,27 +31,6 @@ app.post("/getAllDocs", function (req, res) {
         body.push(buffer.docInfo);
     }
     res.status(200).send({status: true, model: body});
-});
-app.post("/editDocs", function (req, res) {
-    var name = req.body.name;
-    var info = JSON.parse(fs.readFileSync("doc/" + name + ".json"));
-    var newInfo = req.body.info;
-    if (name != newInfo.name) {
-        fs.unlink("doc/" + info.docInfo.name + ".json", function (err) {
-            if (err) {
-                res.status(200).send({status: false, msg: err});
-            }
-        });
-    }
-    info.docInfo = newInfo;
-    fs.writeFile("doc/" + newInfo.name + ".json", JSON.stringify(info), function (err) {
-        if (err) {
-            res.status(200).send({status: false, msg: "应用信息修改失败。"})
-        } else {
-            res.status(200).send({status: true, msg: "应用信息修改成功"});
-        }
-    });
-
 });
 app.post("/getDocument", function (req, res) {
     var name = req.body.name;
@@ -89,16 +69,6 @@ app.post("/newDocument", function (req, res) {
             });
         } else {
             res.status(200).send({status: false, msg: "该文档已存在"});
-        }
-    });
-});
-app.post("/delDocument", function (req, res) {
-    var name = req.body.name;
-    fs.unlink("doc/" + name + ".json", function (err) {
-        if (err) {
-            res.status(200).send({status: false, msg: err});
-        } else {
-            res.status(200).send({status: true, msg: "文档删除成功"});
         }
     });
 });
