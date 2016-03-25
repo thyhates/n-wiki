@@ -7,7 +7,6 @@ angular.module("app")
             restrict: "A",
             link: function (scope, element, attr) {
                 scope.addParams = function ($event) {
-                    console.log(scope.apis);
                     var api = {
                         apiName: "",
                         apiValue: "",
@@ -16,7 +15,6 @@ angular.module("app")
                     scope.apis.params.push(api);
                 };
                 scope.addRes = function ($event) {
-                    console.log(scope.apis);
                     var api = {
                         key: "",
                         revalue: "",
