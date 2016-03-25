@@ -3,6 +3,6 @@
  */
 "use strict";
 var app = angular.module("app", ["ngAnimate",
-    'ui.router',"toastr","schemaForm","ui.bootstrap"]).run(function(){
+    'ui.router',"toastr","ui.bootstrap"]).run(function(){
     console.log("start app");
 });

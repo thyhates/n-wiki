@@ -72,3 +72,7 @@ li.list-group-item:last-child{
 #res-table td >.btn,#header-table td >.btn{
     padding:2px 12px;
 }
+.nav-tabs.nav-justified{
+    width:20%;
+    margin-bottom: -1px;
+}

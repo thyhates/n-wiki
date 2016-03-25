@@ -36,6 +36,15 @@ angular.module("app").config(["$stateProvider", "$urlRouterProvider",
                         controller: "NewDocumentController"
                     }
                 }
+            })
+            .state("home.newApi",{
+                url:":docName/:apiIndex/newApi",
+                views:{
+                    "apiContent":{
+                        templateUrl:"src/page/newApi.html",
+                        controller:"AddApiController"
+                    }
+                }
             });
         $urlRouterProvider.otherwise("/");
     }]);

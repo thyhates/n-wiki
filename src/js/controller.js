@@ -2,8 +2,13 @@
  * Created by zhipu.liao on 2016/3/4.
  */
 angular.module("app")
+    .controller("DocIndexController", ["$stateParams", "$scope", function ($stateParams, $scope) {
+        //console.log($stateParams);
+    }])
     .controller("ListController", ["$http", "$anchorScroll", "$location", "$stateParams", "$scope", "toastr", "$state", "$uibModal",
         function ($http, $anchorScroll, $location, $stateParams, $scope, toastr, $state, $uibModal) {
+            //console.log($stateParams)
+            console.log("21324534");
             $scope.docs = [];
             $scope.goto = function (id) {
                 $location.hash(id);
@@ -49,24 +54,24 @@ angular.module("app")
             }
 
             getAllDocList();
-            $scope.addApi = function (apiName) {
-                var addInstance = $uibModal.open({
-                    animation: true,
-                    templateUrl: "src/page/form.html",
-                    controller: "AddApiController",
-                    keyboard: false,
-                    backdrop: "static",
-                    resolve: {
-                        apiName: function () {
-                            return apiName;
-                        }
-                    }
-                });
-                addInstance.result.then(function (data) {
-                    getAllDocList();
-                }, function () {
-                });
-            };
+            /*$scope.addApi = function (apiName) {
+             var addInstance = $uibModal.open({
+             animation: true,
+             templateUrl: "/front/form.html",
+             controller: "AddApiController",
+             keyboard: true,
+             backdrop: "static",
+             resolve: {
+             apiName: function () {
+             return apiName;
+             }
+             }
+             });
+             addInstance.result.then(function (data) {
+             getAllDocList();
+             }, function () {
+             });
+             };*/
             $scope.deleteDoc = function () {
                 var delInstance = $uibModal.open({
                     animation: true,
@@ -98,17 +103,18 @@ angular.module("app")
                 });
             };
             $scope.editDoc = function () {
+                console.log($scope);
                 var editInstance = $uibModal.open({
                     animation: true,
-                    templateUrl: "src/page/form.html",
+                    templateUrl: "/front/form.html",
                     keyboard: false,
                     controller: "editDocInfoCtrl",
-                    backdrop: "static",
-                    resolve: {
-                        info: function () {
-                            return $scope.documentInfo;
-                        }
-                    }
+                    backdrop: "static"
+                    //resolve: {
+                    //    info: function () {
+                    //        return $scope.documentInfo;
+                    //    }
+                    //}
                 });
                 editInstance.result.then(function (data) {
 
@@ -119,7 +125,7 @@ angular.module("app")
             $scope.editApi = function (index) {
                 var editApiInstance = $uibModal.open({
                     animation: true,
-                    templateUrl: "src/page/form.html",
+                    templateUrl: "/front/form.html",
                     keyboard: false,
                     controller: "editApiCtrl",
                     backdrop: "static",
@@ -136,8 +142,8 @@ angular.module("app")
             };
 
         }])
-    .controller("MainController", ["$http", "$scope", "$stateParams", "toastr", "$state","$uibModal",
-        function ($http, $scope, $stateParams, toastr, $state,$uibModal) {
+    .controller("MainController", ["$http", "$scope", "$stateParams", "toastr", "$state", "$uibModal",
+        function ($http, $scope, $stateParams, toastr, $state, $uibModal) {
             $scope.apis = [];
             $http({
                 url: "getDocument",
@@ -147,18 +153,16 @@ angular.module("app")
                 }
             }).then(function (data) {
                 if (data.data.status) {
-                    console.log(data.data.model.apis[$stateParams.apiIndex]);
                     $scope.apis.push(data.data.model.apis[$stateParams.apiIndex]);
-                    //console.log($scope.apis);
                     $scope.documentInfo = data.data.model.docInfo;
-                    //$scope.titles = getDocList($scope.apis);
-                    //console.log(getApiList($scope.apis));
+                    console.log($scope.documentInfo);
+                    $scope.documentInfo.index = $stateParams.apiIndex;
                 } else {
                     toastr.warning(data.data.msg);
                 }
             });
             $scope.delApi = function (index, apiName) {
-                var delApiInstance=$uibModal.open({
+                var delApiInstance = $uibModal.open({
                     animation: true,
                     templateUrl: "confirm.html",
                     controller: "delDocumentCtl",
@@ -176,7 +180,12 @@ angular.module("app")
                             }
                         }).then(function (data) {
                             toastr.success(data.data.msg);
-                            $state.go("home");
+                            $state.transitionTo("home.doc",{
+                                docName:$stateParams.docName,
+                                apiIndex:0
+                            },{
+                                reload:true
+                            });
                         }, function (data) {
                             toastr.warning(data.data.msg);
                         })
@@ -189,114 +198,55 @@ angular.module("app")
         }])
     .controller("NewDocumentController", ["$scope", "$http", "toastr", "$state",
         function ($scope, $http, toastr, $state) {
-        $scope.newDocument = function () {
-            $http({
-                url: "newDocument",
-                method: "POST",
-                data: $scope.newDocs
-            }).then(function (data) {
-                if (data.data.status) {
-                    toastr.success(data.data.msg);
-                    $state.go("home");
-                } else {
-                    toastr.warning(data.data.msg);
-                }
-            }, function (data) {
-            });
-        };
-    }])
-    .controller("AddApiController", ["schemaForm", "apiName", "$scope", "toastr", "$uibModalInstance", "$stateParams", "$http",
-        function (schemaForm, apiName, $scope, toastr, $uibModalInstance, $stateParams, $http) {
-            $scope.add_schema = {
-                type: "object",
-                properties: {
-                    name: {
-                        type: "string",
-                        required: true,
-                        title: "Name",
-                        description: "name for doc"
-                    },
-                    description: {
-                        type: "string",
-                        description: "description"
-                    },
-                    api: {
-                        type: "string",
-                        title: "Api",
-                        required: true,
-                        description: "api"
-                    },
-                    params: {
-                        type: "array",
-                        items: {
-                            type: "object",
-                            properties: {
-                                apiName: {
-                                    type: "string",
-                                    title: "参数名"
-                                },
-                                apiValue: {
-                                    type: "string",
-                                    title: "默认值"
-                                },
-                                type:{
-                                    type:"string",
-                                    title:"类型"
-                                }
-                            }
-                        }
-                    },
-                    res: {
-                        type: "array",
-                        items: {
-                            type: "object",
-                            properties: {
-                                key: {
-                                    type: "string",
-                                    title: "key"
-                                },
-                                revalue: {
-                                    type: "string",
-                                    title: "revalue"
-                                }
-                            }
-                        }
-                    },
-                    demo: {
-                        type: "string",
-                        title: "demo"
+            $scope.newDocument = function () {
+                $http({
+                    url: "newDocument",
+                    method: "POST",
+                    data: $scope.newDocs
+                }).then(function (data) {
+                    if (data.data.status) {
+                        toastr.success(data.data.msg);
+                        $state.transitionTo("home.doc",{
+                            docName:$stateParams.docName,
+                            apiIndex:0
+                        },{
+                            reload:true
+                        });
+                    } else {
+                        toastr.warning(data.data.msg);
                     }
-                },
-                required: ["name", "api"]
+                }, function (data) {
+                });
             };
-            $scope.add_form = [
-                "*",
-                {
-                    type: "submit",
-                    title: "save"
-                }
-            ];
-            $scope.add_model = {};
-            $scope.hideModal = function () {
-                $uibModalInstance.dismiss();
-            };
-            $scope.submitAdd = function (form) {
-                $scope.$broadcast('schemaFormValidate');
-                if (form.$valid && form.$dirty) {
+        }])
+    .controller("AddApiController", [ "$scope", "toastr","$stateParams", "$http","$state",
+        function ($scope, toastr,  $stateParams, $http,$state) {
+            //console.log($scope.apis);
+            $scope.newApi={
+                params:[],
+                res:[]
+            }
+            $scope.addApi = function (form) {
+                console.log($scope.newApi);
+                if (form.$valid) {
                     $http({
                         url: "addApi",
                         method: "POST",
                         data: {
-                            name: apiName,
-                            body: $scope.add_model
+                            name: $stateParams.docName,
+                            body: $scope.newApi
                         }
                     }).then(function (data) {
                         if (data.data.status) {
                             toastr.success(data.data.msg);
-                            $uibModalInstance.close($scope.add_model);
+                            $state.transitionTo("home.doc",{
+                                docName:$stateParams.docName,
+                                apiIndex:0
+                            },{
+                                reload:true
+                            });
                         } else {
                             toastr.warning(data.data.msg);
-                            $uibModalInstance.dismiss();
                         }
                     });
                 } else {
@@ -313,47 +263,28 @@ angular.module("app")
                 $uibModalInstance.dismiss();
             }
         }])
-    .controller("editDocInfoCtrl", ["$scope", "$uibModalInstance", "$http", "info", "toastr", "$stateParams",
-        function ($scope, $uibModalInstance, $http, info, toastr, $stateParams) {
-            $scope.add_schema = {
-                type: "object",
-                properties: {
-                    name: {
-                        type: "string",
-                        title: "name"
-                    },
-                    type: {
-                        type: "string",
-                        title: "docType"
-                    },
-                    description: {
-                        type: "string",
-                        title: "description"
-                    }
-                },
-                required: ["name", "type"]
-            };
-            $scope.add_form = [
-                "name", {
-                    key: "type",
-                    type: "select",
-                    titleMap: {
-                        "0": "api",
-                        "1": "sdk"
-                    }
-                }, {
-                    key: "description",
-                    type: "textarea"
-                },
-                {
-                    type: "submit",
-                    title: "save"
+    .controller("editDocInfoCtrl", ["$scope", "$uibModalInstance", "$http", "toastr", "$stateParams",
+        function ($scope, $uibModalInstance, $http, toastr, $stateParams) {
+            $http({
+                url: "getDocument",
+                method: "POST",
+                data: {
+                    name: $stateParams.docName
                 }
-            ];
+            }).then(function (data) {
+                if (data.data.status) {
+                    $scope.info = data.data.model;
+                    //console.log($scope.documentInfo);
+                    $scope.add_model = $scope.info;
+                } else {
+                    toastr.warning(data.data.msg);
+                }
+            });
+            //console.log($scope);
             $scope.hideModal = function () {
                 $uibModalInstance.dismiss();
             };
-            $scope.add_model = info;
+
             $scope.submitAdd = function (form) {
                 $scope.$broadcast('schemaFormValidate');
                 if (form.$valid && form.$dirty) {
@@ -368,6 +299,7 @@ angular.module("app")
                         if (data.data.status) {
                             toastr.success(data.data.msg);
                             $uibModalInstance.close($scope.add_model);
+                            $state.go("home");
                         } else {
                             toastr.warning(data.data.msg);
                             $uibModalInstance.dismiss();
@@ -378,9 +310,9 @@ angular.module("app")
                 }
             }
         }])
-    .controller("editApiCtrl", ["$scope", "$http", "toastr", "$uibModal", "$stateParams", "schemaForm", "$state",
-        function ($scope, $http, toastr, $uibModal, $stateParams, schemaForm, $state) {
-            console.log($stateParams);
+    .controller("editApiCtrl", ["$scope", "$http", "toastr", "$uibModal", "$stateParams", "$state",
+        function ($scope, $http, toastr, $uibModal, $stateParams, $state) {
+            //console.log($scope)
             $http({
                 url: "getDocument",
                 method: "POST",
@@ -389,94 +321,138 @@ angular.module("app")
                 }
             }).then(function (data) {
                 if (data.data.status) {
-                    $scope.add_model = data.data.model.apis[$stateParams.apiIndex];
+                    $scope.apis = data.data.model.apis[$stateParams.apiIndex];
+                    $scope.documentInfo = data.data.model.docInfo;
+                    console.log($scope.apis);
                 } else {
                     toastr.warning(data.data.msg);
                 }
             });
-            $scope.add_schema = {
-                type: "object",
-                properties: {
-                    name: {
-                        type: "string",
-                        required: true,
-                        title: "Name",
-                        description: "name for doc"
-                    },
-                    description: {
-                        type: "string",
-                        description: "description"
-                    },
-                    api: {
-                        type: "string",
-                        title: "Api",
-                        required: true,
-                        description: "api"
-                    },
-                    params: {
-                        type: "array",
-                        items: {
-                            type: "object",
-                            properties: {
-                                apiName: {
-                                    type: "string",
-                                    title: "apiName"
-                                },
-                                apiValue: {
-                                    type: "string",
-                                    title: "apiVlaue"
-                                }
-                            }
-                        }
-                    },
-                    res: {
-                        type: "array",
-                        items: {
-                            type: "object",
-                            properties: {
-                                key: {
-                                    type: "string",
-                                    title: "key"
-                                },
-                                revalue: {
-                                    type: "string",
-                                    title: "revalue"
-                                }
-                            }
-                        }
-                    },
-                    demo: {
-                        type: "string",
-                        title: "demo"
-                    }
-                },
-                required: ["name", "api"]
-            };
-            $scope.add_form = [
-                "*",
-                {
-                    type: "submit",
-                    title: "save"
-                }, {
-                    type: "button",
-                    title: "preview"
-                }
-            ];
+            /*            $scope.add_schema = {
+             type: "object",
+             properties: {
+             name: {
+             type: "string",
+             required: true,
+             title: "接口名"
+             },
+             description: {
+             type: "string",
+             title: "接口描述"
+             },
+             api: {
+             type: "string",
+             title: "接口地址",
+             required: true
+             },
+             method: {
+             type: "string",
+             title: "请求方法"
+             },
+             params: {
+             type: "array",
+             items: {
+             type: "object",
+             properties: {
+             apiName: {
+             type: "string",
+             title: "参数名"
+             },
+             apiValue: {
+             type: "string",
+             title: "默认值"
+             },
+             type: {
+             type: "string",
+             title: "类型"
+             }
+             }
+             }
+             },
+             res: {
+             type: "array",
+             items: {
+             type: "object",
+             properties: {
+             key: {
+             type: "string",
+             title: "参数名"
+             },
+             revalue: {
+             type: "string",
+             title: "说明"
+             },
+             type: {
+             type: "string",
+             title: "类型"
+             }
+             }
+             }
+             },
+             demo: {
+             type: "string",
+             title: "JSON返回示例"
+             }
+             },
+             required: ["name", "api"]
+             };
+             $scope.add_form = [
+             {
+             "type": "section",
+             "htmlClass": "row",
+             "items": [
+             {
+             "type": "section",
+             "items": ["name"],
+             htmlClass: "col-xs-5"
+             }]
+             }, {
+             "type": "section",
+             "htmlClass": "row",
+             "items": [
+             {
+             "type": "section",
+             "items": ["description"],
+             htmlClass: "col-xs-5"
+             }]
+             }, "api", {
+             key: "method",
+             type: "select",
+             titleMap: {
+             "GET": "GET",
+             "POST": "POST"
+             }
+             },
+             "params", "res",
+             {
+             key: "demo",
+             type: "textarea",
+             width: "50%"
+             },
+             {
+             type: "submit",
+             title: "save"
+             }
+             ];*/
             $scope.submitAdd = function (form) {
-                $scope.$broadcast('schemaFormValidate');
-                if (form.$valid && form.$dirty) {
+                if (form.$valid) {
                     $http({
                         url: "editApi",
                         method: "POST",
                         data: {
                             index: $stateParams.apiIndex,
                             name: $stateParams.docName,
-                            api: $scope.add_model
+                            api: $scope.apis
                         }
                     }).then(function (data) {
                         if (data.data.status) {
                             toastr.success(data.data.msg);
-                            $state.go("home");
+                            $state.transitionTo("home.doc",{
+                                docName:$stateParams.docName,
+                                apiIndex:0
+                            },{
+                                reload:true
+                            });
                         } else {
                             toastr.warning(data.data.msg);
                         }
@@ -487,7 +463,7 @@ angular.module("app")
             };
             $scope.preview = function () {
                 var previewInstance = $uibModal.open({
-                    templateUrl: "src/page/preview.html",
+                    templateUrl: "/front/preview.html",
                     animation: true,
                     backdrop: "static"
                 });
