@@ -7,14 +7,14 @@ angular.module("app").config(["$stateProvider", "$urlRouterProvider",
         var mystate = $stateProvider
             .state("home", {
                 url: "/",
-                templateUrl: "src/page/list.html",
+                templateUrl: "page/list.html",
                 controller: "ListController"
             })
             .state("home.doc", {
                 url: ":docName/:apiIndex",
                 views: {
                     "apiContent": {
-                        templateUrl: "src/page/document.html",
+                        templateUrl: "page/document.html",
                         controller: "MainController"
                     }
                 }
@@ -23,7 +23,7 @@ angular.module("app").config(["$stateProvider", "$urlRouterProvider",
                 url: ":docName/:apiIndex/edit",
                 views: {
                     "apiContent": {
-                        templateUrl: "src/page/form.html",
+                        templateUrl: "page/form.html",
                         controller: "editApiCtrl"
                     }
                 }
@@ -32,7 +32,7 @@ angular.module("app").config(["$stateProvider", "$urlRouterProvider",
                 url: "new",
                 views: {
                     "main-container": {
-                        templateUrl: "src/page/newDocument.html",
+                        templateUrl: "page/newDocument.html",
                         controller: "NewDocumentController"
                     }
                 }
@@ -41,7 +41,7 @@ angular.module("app").config(["$stateProvider", "$urlRouterProvider",
                 url: "login",
                 views: {
                     "main-container": {
-                        templateUrl: "src/page/login.html",
+                        templateUrl: "page/login.html",
                         controller: "LoginController"
                     }
                 }
@@ -50,7 +50,7 @@ angular.module("app").config(["$stateProvider", "$urlRouterProvider",
                 url: ":docName/:apiIndex/newApi",
                 views: {
                     "apiContent": {
-                        templateUrl: "src/page/newApi.html",
+                        templateUrl: "page/newApi.html",
                         controller: "AddApiController"
                     }
                 }
@@ -59,7 +59,7 @@ angular.module("app").config(["$stateProvider", "$urlRouterProvider",
                 url: ":docName/:apiIndex/errCode",
                 views: {
                     "apiContent": {
-                        templateUrl: "src/page/errorCode.html",
+                        templateUrl: "page/errorCode.html",
                         controller: "ErrorController"
                     }
                 }
@@ -68,7 +68,7 @@ angular.module("app").config(["$stateProvider", "$urlRouterProvider",
                 url: ":docName/edit/err",
                 views: {
                     "apiContent": {
-                        templateUrl: "src/page/errorForm.html",
+                        templateUrl: "page/errorForm.html",
                         controller: "EditErrController"
                     }
                 }

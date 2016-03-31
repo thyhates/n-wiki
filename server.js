@@ -3,14 +3,19 @@
  */
 "use strict";
 var express = require("express");
-var app = express();
 var body_parser = require("body-parser");
+var app = express();
 var fs = require("fs");
-var crypto=require("crypto");
-app.use(express.static(__dirname));
+var crypto = require("crypto");
+app.use(express.static("node_modules"));
+app.use(express.static("src"));
+app.use(express.static("dist"));
 app.use(body_parser.json());
 app.use(body_parser.urlencoded({extended: true}));
 
+app.get("/",function(req,res){
+    res.sendFile(__dirname+"/index.html");
+})
 /*fs.readFile("doc/document.json", function (err, data) {
  if (err) {
  console.log(err);
@@ -85,37 +90,37 @@ app.post("/addApi", function (req, res) {
         }
     })
 });
-app.post("/delApi",function(req,res){
-    var name=req.body.name;
-    var index=req.body.index;
-    var body=fs.readFile("doc/"+name+".json",function(err,data){
-        if(err){
-            res.status(200).send({status:false,msg:"api删除失败。"});
-        }else{
-            var info=JSON.parse(data);
-            info.apis.splice(index,1);
-            fs.writeFile("doc/"+name+".json",JSON.stringify(info), function(err){
-                if(err){
-                    res.status(200).send({status:false,msg:"api写入失败"});
-                }else{
-                    res.status(200).send({status:true,msg:"api删除成功"});
+app.post("/delApi", function (req, res) {
+    var name = req.body.name;
+    var index = req.body.index;
+    var body = fs.readFile("doc/" + name + ".json", function (err, data) {
+        if (err) {
+            res.status(200).send({status: false, msg: "api删除失败。"});
+        } else {
+            var info = JSON.parse(data);
+            info.apis.splice(index, 1);
+            fs.writeFile("doc/" + name + ".json", JSON.stringify(info), function (err) {
+                if (err) {
+                    res.status(200).send({status: false, msg: "api写入失败"});
+                } else {
+                    res.status(200).send({status: true, msg: "api删除成功"});
                 }
             });
         }
     });
 });
-app.post("/editApi",function(req,res){
-    var name=req.body.name;
-    var newInfo=req.body.api;
-    var index=req.body.index;
-    var apiInfo=JSON.parse(fs.readFileSync("doc/"+name+".json"));
-    apiInfo.apis[index]=newInfo;
-    fs.writeFile("doc/"+name+".json",JSON.stringify(apiInfo),function(err){
-        if(err){
+app.post("/editApi", function (req, res) {
+    var name = req.body.name;
+    var newInfo = req.body.api;
+    var index = req.body.index;
+    var apiInfo = JSON.parse(fs.readFileSync("doc/" + name + ".json"));
+    apiInfo.apis[index] = newInfo;
+    fs.writeFile("doc/" + name + ".json", JSON.stringify(apiInfo), function (err) {
+        if (err) {
             console.log(err);
-            res.status(200).send({status:false,msg:"编辑失败"});
-        }else{
-            res.status(200).send({status:true,msg:"编辑成功"} );
+            res.status(200).send({status: false, msg: "编辑失败"});
+        } else {
+            res.status(200).send({status: true, msg: "编辑成功"});
         }
     })
 });
