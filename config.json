@@ -1,8 +1,12 @@
 {
-  "user":[
+  "user": [
     {
-      "name":"admin",
-      "password":"1431350a1049653584759fc78725b8dc"
+      "name": "admin",
+      "password": "1431350a1049653584759fc78725b8dc"
+    },
+    {
+      "name": "admin",
+      "password": "1431350a1049653584759fc78725b8dc"
     }
   ]
 }

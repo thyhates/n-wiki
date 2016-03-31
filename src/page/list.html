@@ -4,17 +4,17 @@
             <a class="navbar-brand" ng-href="asd">文档管理</a>
         </div>
         <ul class="nav navbar-nav navbar-right">
-            <li>
+            <li ng-if="isLogin">
                 <a ng-href="new">新建</a>
             </li>
-            <li><a ng-href="login">登录</a></li>
-            <li><a ng-href="logout">退出</a></li>
+            <li ng-if="!isLogin"><a ng-href="new">登录</a></li>
+            <li ng-if="isLogin"><a ng-click="logout()" style="cursor: pointer;">退出</a></li>
         </ul>
     </div>
 </header>
 <div class="container" ui-view="main-container">
     <div class="row">
-        <div class="col-xs-3">
+        <div class="col-xs-2">
             <div class="list">
                 <h3>目录</h3>
                 <div ng-if="docs"

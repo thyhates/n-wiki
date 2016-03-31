@@ -3,7 +3,7 @@
         <h2>{{documentInfo.name}}
             <a ng-if="documentInfo.type==0" ng-href="{{documentInfo.name}}/{{documentInfo.index}}/errCode" class="btn btn-default btn-sm pull-right"
                style="margin-left: 10px;">错误码</a>
-            <a ng-href="{{documentInfo.name}}/{{documentInfo.type}}/newApi" class="btn btn-default btn-sm pull-right">新加接口
+            <a ng-href="{{documentInfo.name}}/{{documentInfo.type}}/newApi" ng-if="isLogin" class="btn btn-default btn-sm pull-right">新加接口
             </a>
         </h2>
         <span>{{ documentInfo.description}}</span>
@@ -13,9 +13,9 @@
             <h3>{{api.name}}</h3>
             <a style="cursor: pointer;margin-left: 10px;" href="http://www.ssss.com" target="_blank"
                class="btn btn-default pull-right">去调试</a>
-            <a style="cursor: pointer;margin-left: 10px;" ng-click="delApi(documentInfo.index,documentInfo.name)"
+            <a ng-if="isLogin" style="cursor: pointer;margin-left: 10px;" ng-click="delApi(documentInfo.index,documentInfo.name)"
                class="btn btn-default pull-right">删除</a>
-            <a style="cursor: pointer;" ng-href="{{documentInfo.name}}/{{documentInfo.index}}/edit"
+            <a ng-if="isLogin" style="cursor: pointer;" ng-href="{{documentInfo.name}}/{{documentInfo.index}}/edit"
                class="btn btn-default pull-right">编辑</a>
             <br>
             <p>
@@ -76,9 +76,9 @@
     </div>
     <div ng-if="api&&documentInfo.type==1" class="apiBody" ng-repeat="api in apis">
         <h3>{{api.name}}</h3>
-        <a style="cursor: pointer;margin-left: 10px;" ng-click="delApi(documentInfo.index,documentInfo.name)"
+        <a ng-if="isLogin" style="cursor: pointer;margin-left: 10px;" ng-click="delApi(documentInfo.index,documentInfo.name)"
            class="btn btn-default pull-right">删除</a>
-        <a style="cursor: pointer;" ng-href="{{documentInfo.name}}/{{documentInfo.index}}/edit"
+        <a ng-if="isLogin" style="cursor: pointer;" ng-href="{{documentInfo.name}}/{{documentInfo.index}}/edit"
            class="btn btn-default pull-right">编辑</a>
         <br>
         <p>

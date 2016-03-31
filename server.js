@@ -15,7 +15,7 @@ app.use(body_parser.urlencoded({extended: true}));
 
 app.get("/",function(req,res){
     res.sendFile(__dirname+"/index.html");
-})
+});
 /*fs.readFile("doc/document.json", function (err, data) {
  if (err) {
  console.log(err);
@@ -123,6 +123,24 @@ app.post("/editApi", function (req, res) {
             res.status(200).send({status: true, msg: "编辑成功"});
         }
     })
+});
+app.post("/login",function(req,res){
+    fs.readFile("config.json",function(err,data){
+        var users=JSON.parse(data).user;
+        var reqName=req.body.name;
+        var psd= crypto.createHash("md5").update(req.body.password).digest("hex");
+        var isRight=false;
+        users.forEach(function(user){
+            if(reqName===user.name&&psd===user.password){
+                isRight=true;
+            }
+        });
+        if(isRight){
+            res.status(200).send({status:true,msg:"登录成功"});
+        }else{
+            res.status(401).send({status:false,msg:"用户名或密码不正确！"});
+        }
+    });
 });
 app.listen(8084, function () {
     console.log("It's express,welcome!  127.0.0.1:8084");

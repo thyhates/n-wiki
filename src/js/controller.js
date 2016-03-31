@@ -280,10 +280,11 @@ angular.module("app")
             $scope.login = function (form) {
                 if (form.$valid) {
                     $http({
-                        url: "login/checkLogin",
+                        url: "login",
                         data: $scope.user,
                         method: "POST"
                     }).then(function (res) {
+                        console.log(res.data);
                         if(res.data.status){
                             sessionStorage.setItem("isLogin",true);
                             $rootScope.isLogin=sessionStorage.isLogin;
