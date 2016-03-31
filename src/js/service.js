@@ -1,8 +1,8 @@
 /**
  * Created by zhipu.liao on 2016/3/4.
  */
-angular.module("app").factory("authorInterceptor", ["$log", "$q", "$location",
-    function ($log, $q, $location) {
+angular.module("app").factory("authorInterceptor", ["$log", "$q","$rootScope", "$location",
+    function ($log, $q,$rootScope, $location) {
         var myInterceptor = {
             request: function (config) {
                 return config;
@@ -11,7 +11,6 @@ angular.module("app").factory("authorInterceptor", ["$log", "$q", "$location",
                 return res || $q.when(res);
             },
             responseError: function (err) {
-
                 return err;
             }
         };

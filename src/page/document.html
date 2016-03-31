@@ -1,14 +1,18 @@
 <div class="document-container" style="border: 1px solid #ddd;" ng-controller="MainController">
     <div class="title">
         <h2>{{documentInfo.name}}
-            <a ng-href="{{documentInfo.name}}/{{documentInfo.index}}/newApi" class="btn btn-default btn-sm pull-right">新加接口
+            <a ng-if="documentInfo.type==0" ng-href="{{documentInfo.name}}/{{documentInfo.index}}/errCode" class="btn btn-default btn-sm pull-right"
+               style="margin-left: 10px;">错误码</a>
+            <a ng-href="{{documentInfo.name}}/{{documentInfo.type}}/newApi" class="btn btn-default btn-sm pull-right">新加接口
             </a>
         </h2>
         <span>{{ documentInfo.description}}</span>
     </div>
     <div ui-view="editContent">
-        <div ng-if="api" class="apiBody" ng-repeat="api in apis" id="{{$index}}">
+        <div ng-if="api&&documentInfo.type==0" class="apiBody" ng-repeat="api in apis">
             <h3>{{api.name}}</h3>
+            <a style="cursor: pointer;margin-left: 10px;" href="http://www.ssss.com" target="_blank"
+               class="btn btn-default pull-right">去调试</a>
             <a style="cursor: pointer;margin-left: 10px;" ng-click="delApi(documentInfo.index,documentInfo.name)"
                class="btn btn-default pull-right">删除</a>
             <a style="cursor: pointer;" ng-href="{{documentInfo.name}}/{{documentInfo.index}}/edit"
@@ -25,12 +29,14 @@
                 <thead>
                 <th style="width:20%;word-wrap: break-word;">参数名称</th>
                 <th style="width:20%;word-wrap: break-word;">类型</th>
-                <th style="width:60%;word-wrap: break-word;">说明</th>
+                <th style="width:20%">必填</th>
+                <th style="width:40%;word-wrap: break-word;">说明</th>
                 </thead>
                 <tbody>
                 <tr ng-repeat="param in api.params" ng-if="api.params">
                     <td>{{param.apiName}}</td>
                     <td>{{param.type}}</td>
+                    <td>{{param.require}}</td>
                     <td>{{param.apiValue}}</td>
                 </tr>
                 </tbody>
@@ -40,7 +46,8 @@
                 <thead>
                 <th style="width:20%;word-wrap: break-word;">参数名称</th>
                 <th style="width:20%;word-wrap: break-word;">类型</th>
-                <th style="width:60%;word-wrap: break-word;">说明</th>
+                <th style="width:20%">必填</th>
+                <th style="width:40%;word-wrap: break-word;">说明</th>
                 </thead>
                 <tbody>
                 <tr ng-repeat="res in api.res" ng-if="api.res">
@@ -48,6 +55,7 @@
                         {{res.key}}
                     </td>
                     <td>{{res.type}}</td>
+                    <td>{{res.require}}</td>
                     <td>
                         {{res.revalue}}
                     </td>
@@ -66,4 +74,89 @@
             <pre>{{api.description}}</pre>
         </div>
     </div>
+    <div ng-if="api&&documentInfo.type==1" class="apiBody" ng-repeat="api in apis">
+        <h3>{{api.name}}</h3>
+        <a style="cursor: pointer;margin-left: 10px;" ng-click="delApi(documentInfo.index,documentInfo.name)"
+           class="btn btn-default pull-right">删除</a>
+        <a style="cursor: pointer;" ng-href="{{documentInfo.name}}/{{documentInfo.index}}/edit"
+           class="btn btn-default pull-right">编辑</a>
+        <br>
+        <p>
+            接口定义:&nbsp;&nbsp;{{api.api}}
+        </p>
+        <p>功能描述:&nbsp;&nbsp;{{api.description}}</p>
+        <p>参数:</p>
+        <table class="table table-bordered">
+            <thead>
+            <th style="width:20%;word-wrap: break-word;">参数名称</th>
+            <th style="width:20%;word-wrap: break-word;">类型</th>
+            <th style="width:20%">必填</th>
+            <th style="width:30%;word-wrap: break-word;">描述</th>
+            <th style="width:10%;word-wrap: break-word;">默认值</th>
+            </thead>
+            <tbody>
+            <tr ng-repeat="param in api.params" ng-if="api.params">
+                <td>{{param.apiName}}</td>
+                <td>{{param.type}}</td>
+                <td>{{param.require}}</td>
+                <td>{{param.apiValue}}</td>
+                <td>{{param.defaultValue}}</td>
+            </tr>
+            </tbody>
+        </table>
+        <p>返回值:</p>
+        <table class="table table-bordered">
+            <thead>
+            <th style="width:20%;word-wrap: break-word;">名称</th>
+            <th style="width:40%;word-wrap: break-word;">类型</th>
+            <th style="word-wrap: break-word;">描述</th>
+            </thead>
+            <tbody>
+            <tr ng-repeat="res in api.res" ng-if="api.res">
+                <td>
+                    {{res.key}}
+                </td>
+                <td>{{res.type}}</td>
+                <td>
+                    {{res.revalue}}
+                </td>
+            </tr>
+
+            </tbody>
+        </table>
+        <p>回调参数:</p>
+        <table class="table table-bordered">
+            <thead>
+            <th style="width:20%;word-wrap: break-word;">参数名称</th>
+            <th style="width:20%;word-wrap: break-word;">类型</th>
+            <th style="width:20%">必填</th>
+            <th style="width:30%;word-wrap: break-word;">描述</th>
+            <th style="width:10%;word-wrap: break-word;">默认值</th>
+            </thead>
+            <tbody>
+            <tr ng-repeat="param in api.callbackParams" ng-if="api.callbackParams">
+                <td>
+                    {{param.apiName}}
+                </td>
+                <td>{{param.type}}</td>
+                <td>{{param.require}}</td>
+                <td>
+                    {{param.apiValue}}
+                </td>
+                <td>{{param.defaultValue}}</td>
+            </tr>
+            </tbody>
+        </table>
+        <p>
+            示例:
+        </p>
+            <pre>
+{{api.demo}}
+        </pre>
+        <p>
+            补充说明:
+        </p>
+        <pre>{{api.extractComment}}</pre>
+    </div>
+</div>
 </div>

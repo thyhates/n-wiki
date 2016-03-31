@@ -1,0 +1,44 @@
+<div class="document-container" style="border: 1px solid #ddd;" ng-controller="EditErrController" on-err-ready>
+    <h4 style="border-bottom: 1px solid #ddd;">错误码列表</h4>
+    <div class="opt">
+        <a ng-click="addErr()" class="btn btn-primary" style="margin: 15px 0;">新增</a>
+        <a href="javascript:history.go(-1);" class="btn btn-default pull-right" style="margin: 15px 0;">返回</a>
+    </div>
+    <form name="EditForm" ng-submit="addErrs()">
+        <table class="table table-bordered">
+            <thead>
+            <th style="width:25%;word-wrap: break-word;">
+                错误码
+            </th>
+            <th style="width:25%;word-wrap: break-word;">
+                错误码返回
+            </th>
+            <th style="width:25%;word-wrap: break-word;">
+                错误码返回说明
+            </th>
+            <th style="word-wrap: break-word;">
+                操作
+            </th>
+            </thead>
+            <tbody>
+
+            <tr ng-repeat="err in errors">
+                <td>
+                    <input type="text" ng-model="err.name">
+                </td>
+                <td>
+                    <input type="text" ng-model="err.res">
+                </td>
+                <td>
+                    <input type="text" ng-model="err.description">
+                </td>
+                <td>
+                    <input type="button" ng-click="delErr($index)" class="btn btn-danger" value="删除"
+                           style="padding:2px 12px;">
+                </td>
+            </tr>
+            </tbody>
+        </table>
+        <input type="submit" value="保存" class="btn btn-primary" style="margin-top:20px;">
+    </form>
+</div>

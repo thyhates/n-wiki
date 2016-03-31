@@ -37,21 +37,39 @@ angular.module("app").config(["$stateProvider", "$urlRouterProvider",
                     }
                 }
             })
-            .state("home.newApi",{
-                url:":docName/:apiIndex/newApi",
-                views:{
-                    "apiContent":{
-                        templateUrl:"src/page/newApi.html",
-                        controller:"AddApiController"
+            .state("home.login", {
+                url: "login",
+                views: {
+                    "main-container": {
+                        templateUrl: "src/page/login.html",
+                        controller: "LoginController"
                     }
                 }
             })
-            .state("home.login",{
-                url:"login",
-                views:{
-                    "main-container":{
-                        templateUrl:"src/page/login.html",
-                        controller:"LoginController"
+            .state("home.newApi", {
+                url: ":docName/:apiIndex/newApi",
+                views: {
+                    "apiContent": {
+                        templateUrl: "src/page/newApi.html",
+                        controller: "AddApiController"
+                    }
+                }
+            })
+            .state("home.error", {
+                url: ":docName/:apiIndex/errCode",
+                views: {
+                    "apiContent": {
+                        templateUrl: "src/page/errorCode.html",
+                        controller: "ErrorController"
+                    }
+                }
+            })
+            .state("home.editErr", {
+                url: ":docName/edit/err",
+                views: {
+                    "apiContent": {
+                        templateUrl: "src/page/errorForm.html",
+                        controller: "EditErrController"
                     }
                 }
             });

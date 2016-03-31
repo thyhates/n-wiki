@@ -7,7 +7,6 @@
 .document-container,.editContainer {
     padding: 20px;
     border: 1px solid #ddd;
-    border-top:0;
     margin-bottom: 20px;
 }
 .list-group{
@@ -66,13 +65,30 @@ li.list-group-item:last-child{
 .table-bordered td a{
     cursor: pointer;
 }
-#res-table td >input,#header-table td >input{
+.table input{
     width:100%;
 }
-#res-table td >.btn,#header-table td >.btn{
+.table td >.btn{
     padding:2px 12px;
 }
 .nav-tabs.nav-justified{
     width:20%;
     margin-bottom: -1px;
+}
+.loginDiv{
+    width: 100%;
+    margin:auto auto;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+}
+.navbar-right li,.navbar-right ul{
+    display: inline-block;
+}
+.list-group-item{
+    padding:3px 15px;
+    font-size: 12px;
+}
+.panel-title span{
+    font-size: 14px;
 }

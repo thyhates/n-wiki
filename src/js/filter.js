@@ -3,16 +3,16 @@
  */
 angular.module("app")
     .filter("docType", function () {
-    return function (type) {
-        switch (type) {
-            case "0":
-                return "api";
-                break;
-            case "1":
-                return "sdk";
-                break;
-            default:
-                break;
-        }
-    };
-});
+        return function (type) {
+            switch (type) {
+                case "0":
+                    return "api";
+                    break;
+                case "1":
+                    return "sdk";
+                    break;
+                default:
+                    break;
+            }
+        };
+    });

@@ -10,7 +10,9 @@ angular.module("app")
                     var api = {
                         apiName: "",
                         apiValue: "",
-                        type: ""
+                        type: "",
+                        require: "是",
+                        defaultValue: ""
                     };
                     scope.apis.params.push(api);
                 };
@@ -18,7 +20,8 @@ angular.module("app")
                     var api = {
                         key: "",
                         revalue: "",
-                        type: ""
+                        type: "",
+                        require: "否"
                     };
                     scope.apis.res.push(api);
                 };
@@ -28,10 +31,24 @@ angular.module("app")
                 scope.delRes = function (index) {
                     scope.apis.res.splice(index, 1);
                 };
+                scope.addCallbackParam = function ($event) {
+                    console.log($event);
+                    var callbackParam = {
+                        apiName: "",
+                        apiValue: "",
+                        type: "",
+                        require: "是",
+                        defaultValue: ""
+                    };
+                    scope.apis.callbackParams.push(callbackParam);
+                };
+                scope.delCallbackParam = function (index) {
+                    scope.apis.callbackParams.splice(index, 1);
+                };
             }
         }
     }])
-    .directive("onNewFormReady",["$timeout",function($timeout){
+    .directive("onNewFormReady", ["$timeout", function ($timeout) {
         return {
             restrict: "A",
             link: function (scope, element, attr) {
@@ -39,7 +56,9 @@ angular.module("app")
                     var api = {
                         apiName: "",
                         apiValue: "",
-                        type: ""
+                        type: "",
+                        require: "是",
+                        defaultValue: ""
                     };
                     scope.newApi.params.push(api);
                 };
@@ -47,7 +66,8 @@ angular.module("app")
                     var api = {
                         key: "",
                         revalue: "",
-                        type: ""
+                        type: "",
+                        require: "否"
                     };
                     scope.newApi.res.push(api);
                 };
@@ -57,6 +77,39 @@ angular.module("app")
                 scope.delRes = function (index) {
                     scope.newApi.res.splice(index, 1);
                 };
+                scope.addCallbackParam = function ($event) {
+                    console.log($event);
+                    var callbackParam = {
+                        apiName: "",
+                        apiValue: "",
+                        type: "",
+                        require: "是",
+                        defaultValue: ""
+                    };
+                    scope.newApi.callbackParams.push(callbackParam);
+                };
+                scope.delCallbackParam = function (index) {
+                    scope.newApi.callbackParams.splice(index, 1);
+                };
+            }
+        }
+    }])
+    .directive("onErrReady", ["$timeout", function ($timeout) {
+        return {
+            "restrict": "A",
+            link: function (scope) {
+                scope.addErr = function () {
+                    var err = {
+                        name: "",
+                        res: "",
+                        description: ""
+                    };
+                    scope.errors.push(err);
+                };
+                scope.delErr = function (index) {
+                    console.log(scope.errors);
+                    //scope.errors.splice(index, 1);
+                }
             }
         }
     }]);

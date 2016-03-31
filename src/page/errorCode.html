@@ -1,0 +1,33 @@
+<div class="document-container" style="border: 1px solid #ddd;" ng-controller="ErrorController">
+    <h4 style="border-bottom: 1px solid #ddd;">错误码列表</h4>
+    <div class="opt">
+        <a ng-href="{{docname}}/edit/err" class="btn btn-default pull-right" style="margin: 15px 15px;">编辑</a>
+        <a href="javascript:history.go(-1);" class="btn btn-default pull-right" style="margin: 15px 15px;">返回</a>
+    </div>
+    <table class="table table-bordered">
+        <thead>
+        <th style="width:33%;word-wrap: break-word;">
+            错误码
+        </th>
+        <th style="width:33%;word-wrap: break-word;">
+            错误码返回
+        </th>
+        <th style="word-wrap: break-word;">
+            错误码返回说明
+        </th>
+        </thead>
+        <tbody>
+        <tr ng-repeat="err in errors">
+            <td>
+                {{err.name}}
+            </td>
+            <td>
+                {{err.res}}
+            </td>
+            <td>
+                {{err.description}}
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
