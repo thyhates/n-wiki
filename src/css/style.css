@@ -85,10 +85,3 @@ li.list-group-item:last-child{
 .navbar-right li,.navbar-right ul{
     display: inline-block;
 }
-.list-group-item{
-    padding:3px 15px;
-    font-size: 12px;
-}
-.panel-title span{
-    font-size: 14px;
-}
