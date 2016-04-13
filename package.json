@@ -1,13 +1,14 @@
 {
-  "name": "serever",
-  "version": "1.0.0",
-  "description": "back-end server website",
+  "name": "n-wiki",
+  "version": "1.1.1",
+  "description": "back-end server for document manage",
   "main": "index.html",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
-    "wholeally"
+    "wiki",
+    "document manage"
   ],
   "author": "zhipu.liao",
   "license": "ISC",

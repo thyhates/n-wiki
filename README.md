@@ -3,6 +3,7 @@ document manage
 
 ##Start
 ```javascript
+npm install n-wiki
 npm install
 node server.js
 ```
