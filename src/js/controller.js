@@ -12,6 +12,10 @@ angular.module("app")
                     method: "POST"
                 }).then(function (data) {
                     $scope.docs = data.data.model;
+                    if(data.data.logined){
+                        sessionStorage.setItem("isLogin",true);
+                        $rootScope.isLogin=sessionStorage.isLogin;
+                    }
                     getDocList();
                 }, function (data) {
                 });
@@ -46,7 +50,7 @@ angular.module("app")
             getAllDocList();
             $scope.logout=function(){
                 $http({
-                    url:"login/logout",
+                    url:"/logout",
                     method:"POST"
                 }).then(function(res){
                     sessionStorage.clear();

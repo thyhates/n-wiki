@@ -54,14 +54,6 @@ li.list-group-item:last-child{
 .table-bordered.table{
     table-layout: fixed;
 }
-
-.table-bordered th{
-    background: #dedede;
-    border: 1px solid #666 !important;
-}
-.table-bordered td{
-    border: 1px solid #666 !important;
-}
 .table-bordered td a{
     cursor: pointer;
 }

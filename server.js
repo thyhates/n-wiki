@@ -6,6 +6,7 @@ var express = require("express");
 var body_parser = require("body-parser");
 var app = express();
 var fs = require("fs");
+var session = require("express-session");
 var crypto = require("crypto");
 app.use(express.static("node_modules"));
 app.use(express.static("src"));
@@ -13,8 +14,9 @@ app.use(express.static("dist"));
 app.use(body_parser.json());
 app.use(body_parser.urlencoded({extended: true}));
 
-app.get("/",function(req,res){
-    res.sendFile(__dirname+"/index.html");
+
+app.get("/", function (req, res) {
+    res.sendFile(__dirname + "/index.html");
 });
 /*fs.readFile("doc/document.json", function (err, data) {
  if (err) {
@@ -28,14 +30,23 @@ function getAllFiles() {
     return file;
 }
 
+var hs = crypto.createHash("md5").update("abcdefg").digest("hex");
+app.use(session({
+    secret: hs
+}));
+
 app.post("/getAllDocs", function (req, res) {
+    var logined=true;
+    if(!isLogin(req)){
+        logined=false;
+    }
     var files = getAllFiles();
     var body = [];
     for (let i = 0; i < files.length; i++) {
         var buffer = JSON.parse(fs.readFileSync("doc/" + files[i]));
         body.push(buffer.docInfo);
     }
-    res.status(200).send({status: true, model: body});
+    res.status(200).send({status: true, model: body,logined:logined});
 });
 app.post("/getDocument", function (req, res) {
     var name = req.body.name;
@@ -49,6 +60,10 @@ app.post("/getDocument", function (req, res) {
 
 });
 app.post("/newDocument", function (req, res) {
+    if (!isLogin(req)) {
+        res.status(401).send({msg: "请先登录"});
+        return false;
+    }
     var name = req.body.name,
         type = req.body.type,
         description = req.body.description;
@@ -78,6 +93,10 @@ app.post("/newDocument", function (req, res) {
     });
 });
 app.post("/addApi", function (req, res) {
+    if (!isLogin(req)) {
+        res.status(401).send({msg: "请先登录"});
+        return false;
+    }
     var apiName = req.body.name;
     var api = req.body.body;
     var json = JSON.parse(fs.readFileSync("doc/" + apiName + ".json"));
@@ -91,6 +110,10 @@ app.post("/addApi", function (req, res) {
     })
 });
 app.post("/delApi", function (req, res) {
+    if (!isLogin(req)) {
+        res.status(401).send({msg: "请先登录"});
+        return false;
+    }
     var name = req.body.name;
     var index = req.body.index;
     var body = fs.readFile("doc/" + name + ".json", function (err, data) {
@@ -110,6 +133,10 @@ app.post("/delApi", function (req, res) {
     });
 });
 app.post("/editApi", function (req, res) {
+    if (!isLogin(req)) {
+        res.status(401).send({msg: "请先登录"});
+        return false;
+    }
     var name = req.body.name;
     var newInfo = req.body.api;
     var index = req.body.index;
@@ -124,26 +151,41 @@ app.post("/editApi", function (req, res) {
         }
     })
 });
-app.post("/login",function(req,res){
-    fs.readFile("config.json",function(err,data){
-        var users=JSON.parse(data).user;
-        var reqName=req.body.name;
-        var psd= crypto.createHash("md5").update(req.body.password).digest("hex");
-        var isRight=false;
-        users.forEach(function(user){
-            if(reqName===user.name&&psd===user.password){
-                isRight=true;
+app.post("/login", function (req, res) {
+    fs.readFile("config.json", function (err, data) {
+        var users = JSON.parse(data).user;
+        var reqName = req.body.name;
+        var psd = crypto.createHash("md5").update(req.body.password).digest("hex");
+        var isRight = false;
+        users.forEach(function (user) {
+            if (reqName === user.name && psd === user.password) {
+                isRight = true;
             }
         });
-        if(isRight){
-            res.status(200).send({status:true,msg:"登录成功"});
-        }else{
-            res.status(401).send({status:false,msg:"用户名或密码不正确！"});
+        if (isRight) {
+
+            req.session.isLogin = true;
+            res.status(200).send({status: true, msg: "登录成功"});
+        } else {
+            res.status(401).send({status: false, msg: "用户名或密码不正确！"});
         }
     });
 });
-app.use(function(req,res){
-    res.sendFile(__dirname+"/index.html");
+app.post("/logout", function (req, res) {
+    req.session.isLogin = false;
+    console.log(req.session.isLogin);
+    res.status(200).send({msg: "退出成功"});
+});
+function isLogin(req) {
+    console.log(req);
+    if (!req.session.isLogin) {
+        return false;
+    }
+    return true;
+}
+app.use(function (req, res) {
+
+    res.sendFile(__dirname + "/index.html");
 });
 app.listen(8084, function () {
     console.log("It's express,welcome!  127.0.0.1:8084");
