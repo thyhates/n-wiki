@@ -1,8 +1,8 @@
 <uib-tabset active="activeJustified" justified="true">
     <uib-tab index="0" heading="编辑">
         <div style="padding: 30px;border: 1px solid #ddd;" on-new-form-ready class="editContainer">
-            <form name="addForm" ng-submit="addApi(addForm)" class="form-horizontal">
-                <div class="apiBody" ng-if="docType==0">
+            <form sf-schema="addSchema" sf-form="addForm" sf-model="addModel"ng-submit="addApi()">
+                <!--<div class="apiBody" ng-if="docType==0">
                     <p>
                         接口名称: <input type="text" ng-model="newApi.name" style="margin-left: 15px;">
                     </p>
@@ -173,7 +173,7 @@
                     <textarea ng-model="newApi.extractComment" style="min-width:100%;max-width:100%;"
                               rows="6"></textarea>
                     <input type="submit" value="保存" class="btn btn-primary"/>
-                </div>
+                </div>-->
             </form>
         </div>
     </uib-tab>

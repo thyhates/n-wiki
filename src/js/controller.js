@@ -139,9 +139,11 @@ angular.module("app")
                 res: [],
                 callbackParams: []
             };
+            $scope.addSchema=formConfig[$stateParams.apiIndex].schema;
+            $scope.addForm=formConfig[$stateParams.apiIndex].form;
+            $scope.addModel=$scope.newApi;
             $scope.docType = $stateParams.apiIndex;
             $scope.addApi = function (form) {
-                if (form.$valid) {
                     $http({
                         url: "addApi",
                         method: "POST",
@@ -162,9 +164,6 @@ angular.module("app")
                             toastr.warning(data.data.msg);
                         }
                     });
-                } else {
-                    toastr.warning("请把表单填完整后在提交")
-                }
             }
         }])
     .controller("delDocumentCtl", ["$uibModalInstance", "$scope", "$stateParams",
@@ -197,7 +196,6 @@ angular.module("app")
                 }
             });
             $scope.submitAdd = function (form) {
-                if (form.$valid) {
                     $http({
                         url: "editApi",
                         method: "POST",
@@ -219,12 +217,10 @@ angular.module("app")
                             toastr.warning(data.data.msg);
                         }
                     });
-                } else {
-                    toastr.warning("请把表单填完整后在提交")
-                }
             };
         }])
-    .controller("ErrorController", ["$stateParams", "$http", "$scope", function ($stateParams, $http, $scope) {
+    .controller("ErrorController", ["$stateParams", "$http", "$scope",
+        function ($stateParams, $http, $scope) {
         $scope.docname = $stateParams.docName;
         $scope.errors = [];
         $http({

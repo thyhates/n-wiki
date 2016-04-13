@@ -92,6 +92,24 @@ app.post("/newDocument", function (req, res) {
         }
     });
 });
+app.post("/editErrorCode",function(req,res){
+    if (!isLogin(req)) {
+        res.status(401).send({msg: "请先登录"});
+        return false;
+    }
+    var name = req.body.name;
+    var body = req.body.body;
+    var errInfo = JSON.parse(fs.readFileSync("doc/" + name + ".json"));
+    errInfo.errorCodeLst=body;
+    fs.writeFile("doc/" + name + ".json", JSON.stringify(errInfo), function (err) {
+        if (err) {
+            console.log(err);
+            res.status(200).send({status: false, msg: "编辑失败"});
+        } else {
+            res.status(200).send({status: true, msg: "编辑成功"});
+        }
+    })
+});
 app.post("/addApi", function (req, res) {
     if (!isLogin(req)) {
         res.status(401).send({msg: "请先登录"});

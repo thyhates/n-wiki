@@ -113,10 +113,27 @@ var formConfig = [{
             key: "res",
             add: "添加",
             items: [
-                "res[].key",
-                "res[].type",
-                "res[].require",
-                "res[].revalue"
+                {
+                    "type": "section",
+                    "htmlClass": "row",
+                    items: [{
+                        "type": "section",
+                        "htmlClass": "col-xs-6",
+                        items: ["res[].key"]
+                    }, {
+                        "type": "section",
+                        "htmlClass": "col-xs-6",
+                        items: ["res[].type"]
+                    }, {
+                        "type": "section",
+                        "htmlClass": "col-xs-6",
+                        items: ["res[].require"]
+                    }, {
+                        "type": "section",
+                        "htmlClass": "col-xs-6",
+                        items: ["res[].revalue"]
+                    }]
+                }
             ]
         },
         // "params", "res",
