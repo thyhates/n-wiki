@@ -83,34 +83,51 @@ var formConfig = [{
     },
     form: ["name", "api", "method",
         {
-            "type": "section",
-            "htmlClass": "row",
-            "items": [
+            key: "params",
+            add: "添加",
+            items: [
                 {
                     "type": "section",
-                    "htmlClass": "col-xs-12",
-                    "items": [
-                        "params"
-                    ]
-                },
-                {
-                    "type": "section",
-                    "htmlClass": "col-xs-12",
-                    "items": [
-                        "res"
-                    ]
+                    "htmlClass": "row",
+                    items: [{
+                        "type": "section",
+                        "htmlClass": "col-xs-6",
+                        items: ["params[].apiName"]
+                    }, {
+                        "type": "section",
+                        "htmlClass": "col-xs-6",
+                        items: ["params[].type"]
+                    }, {
+                        "type": "section",
+                        "htmlClass": "col-xs-6",
+                        items: ["params[].require"]
+                    }, {
+                        "type": "section",
+                        "htmlClass": "col-xs-6",
+                        items: ["params[].apiValue"]
+                    }]
                 }
             ]
         },
-         // "params", "res",
         {
-        key: "demo",
-        "type": "textarea"
-    }, {
-        key: "description",
-        "type": "textarea"
-    }, {
-        type: "submit",
-        title: "保存"
-    }]
+            key: "res",
+            add: "添加",
+            items: [
+                "res[].key",
+                "res[].type",
+                "res[].require",
+                "res[].revalue"
+            ]
+        },
+        // "params", "res",
+        {
+            key: "demo",
+            "type": "textarea"
+        }, {
+            key: "description",
+            "type": "textarea"
+        }, {
+            type: "submit",
+            title: "保存"
+        }]
 }];

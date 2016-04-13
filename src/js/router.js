@@ -7,14 +7,18 @@ angular.module("app").config(["$stateProvider", "$urlRouterProvider",
         var mystate = $stateProvider
             .state("home", {
                 url: "/",
-                templateUrl: "page/list.html",
+                templateUrl: function () {
+                  return  "page/list.html?"+Math.random();
+                },
                 controller: "ListController"
             })
             .state("home.doc", {
                 url: ":docName/:apiIndex",
                 views: {
                     "apiContent": {
-                        templateUrl: "page/document.html",
+                        templateUrl:function () {
+                            return  "page/document.html?"+Math.random();
+                        },
                         controller: "MainController"
                     }
                 }
@@ -23,7 +27,9 @@ angular.module("app").config(["$stateProvider", "$urlRouterProvider",
                 url: ":docName/:apiIndex/edit",
                 views: {
                     "apiContent": {
-                        templateUrl: "page/form.html",
+                        templateUrl: function () {
+                            return  "page/form.html?"+Math.random();
+                        },
                         controller: "editApiCtrl"
                     }
                 }
@@ -32,7 +38,9 @@ angular.module("app").config(["$stateProvider", "$urlRouterProvider",
                 url: "new",
                 views: {
                     "main-container": {
-                        templateUrl: "page/newDocument.html",
+                        templateUrl: function () {
+                            return  "page/newDocument.html?"+Math.random();
+                        },
                         controller: "NewDocumentController"
                     }
                 }
@@ -41,7 +49,9 @@ angular.module("app").config(["$stateProvider", "$urlRouterProvider",
                 url: "login",
                 views: {
                     "main-container": {
-                        templateUrl: "page/login.html",
+                        templateUrl: function () {
+                            return  "page/login.html?"+Math.random();
+                        },
                         controller: "LoginController"
                     }
                 }
@@ -50,7 +60,9 @@ angular.module("app").config(["$stateProvider", "$urlRouterProvider",
                 url: ":docName/:apiIndex/newApi",
                 views: {
                     "apiContent": {
-                        templateUrl: "page/newApi.html",
+                        templateUrl: function () {
+                            return  "page/newApi.html?"+Math.random();
+                        },
                         controller: "AddApiController"
                     }
                 }
@@ -59,7 +71,9 @@ angular.module("app").config(["$stateProvider", "$urlRouterProvider",
                 url: ":docName/:apiIndex/errCode",
                 views: {
                     "apiContent": {
-                        templateUrl: "page/errorCode.html",
+                        templateUrl: function () {
+                            return  "page/errorCode.html?"+Math.random();
+                        },
                         controller: "ErrorController"
                     }
                 }
@@ -68,7 +82,9 @@ angular.module("app").config(["$stateProvider", "$urlRouterProvider",
                 url: ":docName/edit/err",
                 views: {
                     "apiContent": {
-                        templateUrl: "page/errorForm.html",
+                        templateUrl: function () {
+                            return  "page/errorForm.html?"+Math.random();
+                        },
                         controller: "EditErrController"
                     }
                 }

@@ -11,8 +11,6 @@
     <div ui-view="editContent">
         <div ng-if="api&&documentInfo.type==0" class="apiBody" ng-repeat="api in apis">
             <h3>{{api.name}}</h3>
-            <a style="cursor: pointer;margin-left: 10px;" href="http://www.ssss.com" target="_blank"
-               class="btn btn-default pull-right">去调试</a>
             <a ng-if="isLogin" style="cursor: pointer;margin-left: 10px;" ng-click="delApi(documentInfo.index,documentInfo.name)"
                class="btn btn-default pull-right">删除</a>
             <a ng-if="isLogin" style="cursor: pointer;" ng-href="{{documentInfo.name}}/{{documentInfo.index}}/edit"
