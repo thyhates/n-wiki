@@ -1,5 +1,5 @@
 # n-wiki
-document manage
+API & SDK 管理
 
 ##Start
 ```javascript
