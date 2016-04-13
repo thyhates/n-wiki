@@ -8,9 +8,9 @@ var uglify = require('gulp-uglify');//js文件压缩
 var livereload = require("gulp-livereload");//刷新
 
 gulp.task("default", function () {
-    return gulp.src(["src/js/**.**", "demo.js", "demo.html", "demo.css"])
+    return gulp.src("src/js/**.**")
         .pipe(concat("app.min.js"))
-        .pipe(uglify())
+        // .pipe(uglify())
         .pipe(gulp.dest("dist/js"))
         .pipe(livereload());
 });

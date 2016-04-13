@@ -178,6 +178,7 @@ angular.module("app")
         }])
     .controller("editApiCtrl", ["$scope", "$http", "toastr", "$uibModal", "$stateParams", "$state",
         function ($scope, $http, toastr, $uibModal, $stateParams, $state) {
+
             $http({
                 url: "getDocument",
                 method: "POST",
@@ -188,6 +189,9 @@ angular.module("app")
                 if (data.data.status) {
                     $scope.apis = data.data.model.apis[$stateParams.apiIndex];
                     $scope.documentInfo = data.data.model.docInfo;
+                    $scope.editSchema=formConfig[$scope.documentInfo.type].schema;
+                    $scope.editForm=formConfig[$scope.documentInfo.type].form;
+                    $scope.editModel= $scope.apis;
                 } else {
                     toastr.warning(data.data.msg);
                 }
