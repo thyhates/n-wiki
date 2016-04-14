@@ -136,7 +136,6 @@ var formConfig = [{
                 }
             ]
         },
-        // "params", "res",
         {
             key: "demo",
             "type": "textarea"

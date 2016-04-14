@@ -195,14 +195,12 @@ app.post("/logout", function (req, res) {
     res.status(200).send({msg: "退出成功"});
 });
 function isLogin(req) {
-    console.log(req);
     if (!req.session.isLogin) {
         return false;
     }
     return true;
 }
 app.use(function (req, res) {
-
     res.sendFile(__dirname + "/index.html");
 });
 app.listen(8084, function () {

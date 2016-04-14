@@ -2,7 +2,7 @@
   "name": "n-wiki",
   "version": "1.1.1",
   "description": "back-end server for document manage",
-  "main": "index.html",
+  "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
