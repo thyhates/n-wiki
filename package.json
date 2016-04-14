@@ -2,6 +2,7 @@
   "name": "n-wiki",
   "version": "1.1.1",
   "description": "back-end server for document manage",
+  "repository":"https://github.com/thyhates/n-wiki.git",
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
