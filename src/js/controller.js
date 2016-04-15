@@ -10,7 +10,7 @@ angular.module("app")
                 method:"POST"
             }).then(function(data){
                 if(data.data.status){
-                    $scope.logs=data.data.model.logs;
+                    $scope.logs=data.data.model.logs.reverse();
                 }else{
                     toastr.warning(data.data.msg);
                 }
@@ -32,7 +32,7 @@ angular.module("app")
                     getDocList();
                 }, function (data) {
                 });
-            };
+            }
             function getDocList() {
                 $scope.docs.forEach(function (doc) {
                     $http({
