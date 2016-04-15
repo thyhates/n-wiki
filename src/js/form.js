@@ -37,7 +37,8 @@ var formConfig = [{
                         },
                         require: {
                             type: "string",
-                            title: "是否必填"
+                            title: "是否必填",
+                            default:"是"
                         },
                         apiValue: {
                             type: "string",
@@ -62,7 +63,8 @@ var formConfig = [{
                         },
                         require: {
                             type: "string",
-                            title: "是否必填"
+                            title: "是否必填",
+                            default:"是"
                         },
                         revalue: {
                             type: "string",

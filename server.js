@@ -34,7 +34,29 @@ var hs = crypto.createHash("md5").update("abcdefg").digest("hex");
 app.use(session({
     secret: hs
 }));
-
+function addLog(action,target,user,apiName,apiIndex){
+    var logs=JSON.parse(fs.readFileSync("log.json"));
+    var time=new Date();
+    var log={
+        action:action,
+        time:time.toLocaleString(),
+        target:target,
+        user:user,
+        apiName:apiName||"",
+        apiIndex:apiIndex||""
+    };
+    if(logs.logs.length>30){
+        logs.logs.shift();
+    }
+    logs.logs.push(log);
+    fs.writeFile("log.json",JSON.stringify(logs),function(err){
+        if(err){
+            console.log(err);
+        }else{
+            return true;
+        }
+    });
+}
 app.post("/getAllDocs", function (req, res) {
     var logined=true;
     if(!isLogin(req)){
@@ -84,6 +106,7 @@ app.post("/newDocument", function (req, res) {
                         msg: err
                     });
                 } else {
+                    addLog("创建文档",name,req.session.username);
                     res.status(200).send({status: true, msg: "文档创建成功"});
                 }
             });
@@ -103,9 +126,9 @@ app.post("/editErrorCode",function(req,res){
     errInfo.errorCodeLst=body;
     fs.writeFile("doc/" + name + ".json", JSON.stringify(errInfo), function (err) {
         if (err) {
-            console.log(err);
             res.status(200).send({status: false, msg: "编辑失败"});
         } else {
+            addLog("编辑错误码",name,req.session.username);
             res.status(200).send({status: true, msg: "编辑成功"});
         }
     })
@@ -123,6 +146,7 @@ app.post("/addApi", function (req, res) {
         if (err) {
             res.status(200).send({status: false, msg: "Api添加失败"});
         } else {
+            addLog("添加API",apiName,req.session.username,api.name,json.apis.length-1);
             res.status(200).send({status: true, msg: "Api添加成功"});
         }
     })
@@ -144,6 +168,7 @@ app.post("/delApi", function (req, res) {
                 if (err) {
                     res.status(200).send({status: false, msg: "api写入失败"});
                 } else {
+                    addLog("删除API",name,req.session.username);
                     res.status(200).send({status: true, msg: "api删除成功"});
                 }
             });
@@ -165,9 +190,20 @@ app.post("/editApi", function (req, res) {
             console.log(err);
             res.status(200).send({status: false, msg: "编辑失败"});
         } else {
+            addLog("编辑API",name,req.session.username,newInfo.name,index);
             res.status(200).send({status: true, msg: "编辑成功"});
         }
     })
+});
+app.post("/getLog",function(req,res){
+    fs.readFile("log.json",function(err,data){
+       if(err){
+           console.log(err);
+           res.status(200).send({status:false,msg:"日志读取失败"});
+       } else{
+           res.status(200).send({status:true,msg:"日志读取成功",model:JSON.parse(data)});
+       }
+    });
 });
 app.post("/login", function (req, res) {
     fs.readFile("config.json", function (err, data) {
@@ -181,8 +217,8 @@ app.post("/login", function (req, res) {
             }
         });
         if (isRight) {
-
             req.session.isLogin = true;
+            req.session.username=reqName;
             res.status(200).send({status: true, msg: "登录成功"});
         } else {
             res.status(401).send({status: false, msg: "用户名或密码不正确！"});

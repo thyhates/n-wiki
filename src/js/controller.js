@@ -5,7 +5,17 @@ angular.module("app")
     .controller("ListController", ["$rootScope","$http",  "$location", "$stateParams", "$scope", "toastr", "$state",
         function ($rootScope,$http,  $location, $stateParams, $scope, toastr, $state) {
             $scope.docs = [];
+            $http({
+                url:"getLog",
+                method:"POST"
+            }).then(function(data){
+                if(data.data.status){
+                    $scope.logs=data.data.model.logs;
+                }else{
+                    toastr.warning(data.data.msg);
+                }
 
+            });
             function getAllDocList() {
                 $http({
                     url: "getAllDocs",
@@ -15,6 +25,9 @@ angular.module("app")
                     if(data.data.logined){
                         sessionStorage.setItem("isLogin",true);
                         $rootScope.isLogin=sessionStorage.isLogin;
+                    }else{
+                        sessionStorage.setItem("isLogin",false);
+                        $rootScope.isLogin=undefined;
                     }
                     getDocList();
                 }, function (data) {

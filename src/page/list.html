@@ -47,8 +47,15 @@
             </div>
         </div>
         <div class="col-xs-9" ui-view="apiContent">
-            <h1>
-            </h1>
+            <div class="page-header">
+                <h3>文档操作日志</h3>
+            </div>
+            <ul class="list-group">
+                <li class="list-group-item list-group-item-success" ng-repeat="log in logs">
+                    用户：{{log.user}} ; 操作:{{log.action}} ; 文档：{{log.target}} ；
+                    <span ng-if="log.apiName"> 接口：<a ng-href="{{log.target}}/{{log.apiIndex}}"> {{log.apiName}} </a></span> 时间: {{log.time}}
+                </li>
+            </ul>
         </div>
         <!--<div class="col-xs-1">
             <div class="tools">
