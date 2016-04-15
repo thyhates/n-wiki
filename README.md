@@ -1,5 +1,5 @@
 # n-wiki
-API & SDK 管理
+API & SDK 文档管理
 
 ##Start
 
