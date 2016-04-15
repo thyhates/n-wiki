@@ -49,14 +49,15 @@ function addLog(action,target,user,apiName,apiIndex){
         logs.logs.shift();
     }
     logs.logs.push(log);
+    var errs;
     fs.writeFile("log.json",JSON.stringify(logs),function(err){
         if(err){
-            console.log(err);
-            return err;
+            errs=err;
         }else{
-            return true;
+            errs=false;
         }
     });
+    return errs;
 }
 app.post("/getAllDocs", function (req, res) {
     var logined=true;
@@ -108,10 +109,10 @@ app.post("/newDocument", function (req, res) {
                     });
                 } else {
                     var errs=addLog("创建文档",name,req.session.username);
-                    if(errs==true){
-
+                    if(!errs){
                         res.status(200).send({status: true, msg: "文档创建成功"});
                     }else{
+                        console.log(errs);
                         res.status(200).send({status:false,msg:"添加操作日志失败",model:errs})
                     }
                 }
@@ -135,7 +136,7 @@ app.post("/editErrorCode",function(req,res){
             res.status(200).send({status: false, msg: "编辑失败"});
         } else {
             var errs=addLog("编辑错误码",name,req.session.username);
-            if(errs==true){
+            if(!errs){
                 res.status(200).send({status: true, msg: "编辑成功"});
             }else{
                 res.status(200).send({status:false,msg:"添加操作日志失败",model:errs})
@@ -157,7 +158,7 @@ app.post("/addApi", function (req, res) {
             res.status(200).send({status: false, msg: "Api添加失败"});
         } else {
             var errs=addLog("添加API",apiName,req.session.username,api.name,json.apis.length-1);
-            if(errs==true){
+            if(!errs){
                 res.status(200).send({status: true, msg: "Api添加成功"});
             }else{
                 res.status(200).send({status:false,msg:"添加操作日志失败",model:errs})
@@ -183,7 +184,7 @@ app.post("/delApi", function (req, res) {
                     res.status(200).send({status: false, msg: "api写入失败"});
                 } else {
                     var errs=addLog("删除API",name,req.session.username);
-                    if(errs==true){
+                    if(!errs){
                         res.status(200).send({status: true, msg: "api删除成功"});
                     }else{
                         res.status(200).send({status:false,msg:"添加操作日志失败",model:errs})
@@ -209,7 +210,7 @@ app.post("/editApi", function (req, res) {
             res.status(200).send({status: false, msg: "编辑失败"});
         } else {
             var errs=addLog("编辑API",name,req.session.username,newInfo.name,index);
-            if(errs==true){
+            if(!errs){
                 res.status(200).send({status: true, msg: "编辑成功"});
             }else{
                 res.status(200).send({status:false,msg:"添加操作日志失败",model:errs})
