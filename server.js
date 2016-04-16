@@ -306,6 +306,7 @@ app.post("/login", function (req, res) {
 });
 app.post("/logout", function (req, res) {
     req.session.isLogin = false;
+    req.session.username=null;
     console.log(req.session.isLogin);
     res.status(200).send({msg: "退出成功"});
 });
