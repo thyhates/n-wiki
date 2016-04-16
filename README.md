@@ -4,7 +4,6 @@ API & SDK 文档管理
 ##Start
 
 ```javascript
-npm install n-wiki
 npm install
 node server.js
 ```
