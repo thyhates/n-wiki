@@ -2,32 +2,34 @@
  * Created by zhipu.liao on 2016/3/4.
  */
 angular.module("app")
-    .controller("ListController", ["$rootScope","$http",  "$location", "$stateParams", "$scope", "toastr", "$state",
-        function ($rootScope,$http,  $location, $stateParams, $scope, toastr, $state) {
+    .controller("ListController", ["$rootScope", "$http", "$location", "$stateParams", "$scope", "toastr", "$state", "$uibModal",
+        function ($rootScope, $http, $location, $stateParams, $scope, toastr, $state, $uibModal) {
             $scope.docs = [];
-            $http({
-                url:"getLog",
-                method:"POST"
-            }).then(function(data){
-                if(data.data.status){
-                    $scope.logs=data.data.model.logs.reverse();
-                }else{
-                    toastr.warning(data.data.msg);
-                }
+            function getLog(){
+                $http({
+                    url: "getLog",
+                    method: "POST"
+                }).then(function (data) {
+                    if (data.data.status) {
+                        $scope.logs = data.data.model.logs.reverse();
+                    } else {
+                        toastr.warning(data.data.msg);
+                    }
 
-            });
+                });
+            }
             function getAllDocList() {
                 $http({
                     url: "getAllDocs",
                     method: "POST"
                 }).then(function (data) {
                     $scope.docs = data.data.model;
-                    if(data.data.logined){
-                        sessionStorage.setItem("isLogin",true);
-                        $rootScope.isLogin=sessionStorage.isLogin;
-                    }else{
-                        sessionStorage.setItem("isLogin",false);
-                        $rootScope.isLogin=undefined;
+                    if (data.data.logined) {
+                        sessionStorage.setItem("isLogin", true);
+                        $rootScope.isLogin = sessionStorage.isLogin;
+                    } else {
+                        sessionStorage.setItem("isLogin", false);
+                        $rootScope.isLogin = undefined;
                     }
                     getDocList();
                 }, function (data) {
@@ -50,9 +52,7 @@ angular.module("app")
                         }
                     });
                 });
-
             }
-
             function getApiList(doc) {
                 var titls = [];
                 for (var i = 0; i < doc.length; i++) {
@@ -60,14 +60,76 @@ angular.module("app")
                 }
                 return titls;
             }
+            function isCanShow(){
+                if($state.includes("home.edit")||$state.includes("home.doc")||$state.includes("home.newApi")||$state.includes("home.error")||$state.includes("home.editErr")){
+                    return true;
+                }else{
+                    return false;
+                }
+            }
+            $scope.deleteDoc = function () {
+                if(!isCanShow()){
+                    toastr.warning("请选中要删除的文档");
+                    return false;
+                }
+                var delInstance = $uibModal.open({
+                    animation: true,
+                    templateUrl: "confirm.html",
+                    controller: "delDocumentCtl",
+                    keyboard: false,
+                    backdrop: "static"
+                });
+                delInstance.result.then(function (docName) {
+                    if (docName) {
+                        $http({
+                            url: "delDocument",
+                            method: "POST",
+                            data: {
+                                name: docName
+                            }
+                        }).then(function (data) {
+                            if (data.data.status) {
+                                getAllDocList();
+                                getLog();
+                                $state.go("home");
+                                toastr.success(data.data.msg);
+
+                            } else {
+                                toastr.warning(data.data.msg);
+                            }
+                        });
+                    } else {
+                        console.log("dismiss");
+                    }
+                });
+            };
+            $scope.editDoc = function () {
+                if(!isCanShow()){
+                    toastr.warning("请选中要编辑的文档");
+                    return false;
+                }
+                console.log($state.includes("home.doc"));
+                var editInstance = $uibModal.open({
+                    animation: true,
+                    templateUrl: "page/editDoc.html",
+                    keyboard: false,
+                    controller: "editDocInfoCtrl",
+                    backdrop: "static"
+                });
+                editInstance.result.then(function (data) {
+                   location.reload();
+                }, function (data) {
+                });
+            };
             getAllDocList();
-            $scope.logout=function(){
+            getLog();
+            $scope.logout = function () {
                 $http({
-                    url:"/logout",
-                    method:"POST"
-                }).then(function(res){
+                    url: "/logout",
+                    method: "POST"
+                }).then(function (res) {
                     sessionStorage.clear();
-                    $rootScope.isLogin=sessionStorage.isLogin;
+                    $rootScope.isLogin = sessionStorage.isLogin;
                     $state.go("home");
                 })
             };
@@ -152,35 +214,40 @@ angular.module("app")
                 res: [],
                 callbackParams: []
             };
-            $scope.addSchema=formConfig[$stateParams.apiIndex].schema;
-            $scope.addForm=formConfig[$stateParams.apiIndex].form;
-            $scope.addModel=$scope.newApi;
+            $scope.addSchema = formConfig[$stateParams.apiIndex].schema;
+            $scope.addForm = formConfig[$stateParams.apiIndex].form;
+            $scope.addModel = $scope.newApi;
             $scope.docType = $stateParams.apiIndex;
             $scope.addApi = function (form) {
-                    $http({
-                        url: "addApi",
-                        method: "POST",
-                        data: {
-                            name: $stateParams.docName,
-                            body: $scope.newApi
-                        }
-                    }).then(function (data) {
-                        if (data.data.status) {
-                            toastr.success(data.data.msg);
-                            $state.transitionTo("home.doc", {
-                                docName: $stateParams.docName,
-                                apiIndex: 0
-                            }, {
-                                reload: true
-                            });
-                        } else {
-                            toastr.warning(data.data.msg);
-                        }
-                    });
+                $http({
+                    url: "addApi",
+                    method: "POST",
+                    data: {
+                        name: $stateParams.docName,
+                        body: $scope.newApi
+                    }
+                }).then(function (data) {
+                    if (data.data.status) {
+                        toastr.success(data.data.msg);
+                        $state.transitionTo("home.doc", {
+                            docName: $stateParams.docName,
+                            apiIndex: 0
+                        }, {
+                            reload: true
+                        });
+                    } else {
+                        toastr.warning(data.data.msg);
+                    }
+                });
             }
         }])
-    .controller("delDocumentCtl", ["$uibModalInstance", "$scope", "$stateParams",
-        function ($uibModalInstance, $scope, $stateParams) {
+    .controller("delDocumentCtl", ["$uibModalInstance", "$scope", "$stateParams","toastr",
+        function ($uibModalInstance, $scope, $stateParams,toastr) {
+            if(!$stateParams.docName){
+                $uibModalInstance.dismiss();
+                toastr.warning("请选中要删除的文档");
+                return false;
+            }
             $scope.ok = function () {
                 $uibModalInstance.close($stateParams.docName);
             };
@@ -201,58 +268,58 @@ angular.module("app")
                 if (data.data.status) {
                     $scope.apis = data.data.model.apis[$stateParams.apiIndex];
                     $scope.documentInfo = data.data.model.docInfo;
-                    $scope.editSchema=formConfig[$scope.documentInfo.type].schema;
-                    $scope.editForm=formConfig[$scope.documentInfo.type].form;
-                    $scope.editModel= $scope.apis;
+                    $scope.editSchema = formConfig[$scope.documentInfo.type].schema;
+                    $scope.editForm = formConfig[$scope.documentInfo.type].form;
+                    $scope.editModel = $scope.apis;
                 } else {
                     toastr.warning(data.data.msg);
                 }
             });
             $scope.submitAdd = function (form) {
-                    $http({
-                        url: "editApi",
-                        method: "POST",
-                        data: {
-                            index: $stateParams.apiIndex,
-                            name: $stateParams.docName,
-                            api: $scope.apis
-                        }
-                    }).then(function (data) {
-                        if (data.data.status) {
-                            toastr.success(data.data.msg);
-                            $state.transitionTo("home.doc", {
-                                docName: $stateParams.docName,
-                                apiIndex: 0
-                            }, {
-                                reload: true
-                            });
-                        } else {
-                            toastr.warning(data.data.msg);
-                        }
-                    });
+                $http({
+                    url: "editApi",
+                    method: "POST",
+                    data: {
+                        index: $stateParams.apiIndex,
+                        name: $stateParams.docName,
+                        api: $scope.apis
+                    }
+                }).then(function (data) {
+                    if (data.data.status) {
+                        toastr.success(data.data.msg);
+                        $state.transitionTo("home.doc", {
+                            docName: $stateParams.docName,
+                            apiIndex: 0
+                        }, {
+                            reload: true
+                        });
+                    } else {
+                        toastr.warning(data.data.msg);
+                    }
+                });
             };
         }])
     .controller("ErrorController", ["$stateParams", "$http", "$scope",
         function ($stateParams, $http, $scope) {
-        $scope.docname = $stateParams.docName;
-        $scope.errors = [];
-        $http({
-            url: "getDocument",
-            method: "POST",
-            data: {
-                name: $stateParams.docName
-            }
-        }).then(function (data) {
-            if (data.data.status) {
-                //if (typeof data.data.model.errorCodeLst!="undefined") {
-                //    $scope.errors = data.data.model.errorCodeLst;
-                //} else {
-                //    $scope.errors = [];
-                //}
-                $scope.errors = data.data.model.errorCodeLst || [];
-            }
-        });
-    }])
+            $scope.docname = $stateParams.docName;
+            $scope.errors = [];
+            $http({
+                url: "getDocument",
+                method: "POST",
+                data: {
+                    name: $stateParams.docName
+                }
+            }).then(function (data) {
+                if (data.data.status) {
+                    //if (typeof data.data.model.errorCodeLst!="undefined") {
+                    //    $scope.errors = data.data.model.errorCodeLst;
+                    //} else {
+                    //    $scope.errors = [];
+                    //}
+                    $scope.errors = data.data.model.errorCodeLst || [];
+                }
+            });
+        }])
     .controller("EditErrController", ["$stateParams", "$http", "toastr", "$scope",
         function ($stateParams, $http, toastr, $scope) {
             $http({
@@ -291,8 +358,8 @@ angular.module("app")
                 });
             };
         }])
-    .controller("LoginController", ["$scope", "$http","$rootScope", "toastr","$state",
-        function ($scope, $http,$rootScope, toastr,$state) {
+    .controller("LoginController", ["$scope", "$http", "$rootScope", "toastr", "$state",
+        function ($scope, $http, $rootScope, toastr, $state) {
 
             $scope.login = function (form) {
                 if (form.$valid) {
@@ -302,11 +369,11 @@ angular.module("app")
                         method: "POST"
                     }).then(function (res) {
                         console.log(res.data);
-                        if(res.data.status){
-                            sessionStorage.setItem("isLogin",true);
-                            $rootScope.isLogin=sessionStorage.isLogin;
+                        if (res.data.status) {
+                            sessionStorage.setItem("isLogin", true);
+                            $rootScope.isLogin = sessionStorage.isLogin;
                             $state.go("home");
-                        }else{
+                        } else {
                             toastr.warning(res.data.msg);
                         }
                     });
@@ -315,4 +382,83 @@ angular.module("app")
                 }
             };
 
+        }])
+    .controller("editDocInfoCtrl", ["$scope", "$uibModalInstance", "$http",  "toastr", "$stateParams",
+        function ($scope, $uibModalInstance, $http,  toastr, $stateParams) {
+            $http({
+                url: "getDocument",
+                method: "POST",
+                data: {
+                    name: $stateParams.docName
+                }
+            }).then(function (data) {
+                if (data.data.status) {
+                    $scope.documentInfo = data.data.model.docInfo;
+                    $scope.add_model = $scope.documentInfo;
+                } else {
+                    toastr.warning(data.data.msg);
+                }
+            });
+            $scope.add_schema = {
+                type: "object",
+                properties: {
+                    name: {
+                        type: "string",
+                        title: "name"
+                    },
+                    type: {
+                        type: "string",
+                        title: "docType"
+                    },
+                    description: {
+                        type: "string",
+                        title: "description"
+                    }
+                },
+                required: ["name", "type"]
+            };
+            $scope.add_form = [
+                "name", {
+                    key: "type",
+                    type: "select",
+                    titleMap: {
+                        "0": "api",
+                        "1": "sdk"
+                    }
+                }, {
+                    key: "description",
+                    type: "textarea"
+                },
+                {
+                    type: "submit",
+                    title: "save"
+                }
+            ];
+            $scope.hideModal = function () {
+                $uibModalInstance.dismiss();
+            };
+
+            $scope.submitAdd = function (form) {
+                $scope.$broadcast('schemaFormValidate');
+                if (form.$valid && form.$dirty) {
+                    $http({
+                        url: "editDocs",
+                        method: "POST",
+                        data: {
+                            name: $stateParams.docName,
+                            info: $scope.add_model
+                        }
+                    }).then(function (data) {
+                        if (data.data.status) {
+                            toastr.success(data.data.msg);
+                            $uibModalInstance.close($scope.add_model);
+                        } else {
+                            toastr.warning(data.data.msg);
+                            $uibModalInstance.dismiss();
+                        }
+                    });
+                } else {
+                    toastr.warning("请把表单填完整后在提交")
+                }
+            }
         }]);

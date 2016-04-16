@@ -37,6 +37,9 @@ app.use(session({
 function addLog(action,target,user,apiName,apiIndex){
     var logs=JSON.parse(fs.readFileSync("log.json"));
     var time=new Date();
+    if(apiIndex===0){
+        apiIndex="0";
+    }
     var log={
         action:action,
         time:time.toLocaleString(),
@@ -122,6 +125,58 @@ app.post("/newDocument", function (req, res) {
         }
     });
 });
+app.post("/editDocs", function (req, res) {
+    if (!isLogin(req)) {
+        res.status(401).send({msg: "请先登录"});
+        return false;
+    }
+    var name = req.body.name;
+    var info = JSON.parse(fs.readFileSync("doc/" + name + ".json"));
+    var newInfo = req.body.info;
+    if (name != newInfo.name) {
+        fs.unlink("doc/" + info.docInfo.name + ".json", function (err) {
+            if (err) {
+                res.status(200).send({status: false, msg: err});
+                return false;
+            }
+        });
+    }
+    info.docInfo = newInfo;
+    fs.writeFile("doc/" + newInfo.name + ".json", JSON.stringify(info), function (err) {
+        if (err) {
+            res.status(200).send({status: false, msg: "修改失败。"})
+        } else {
+            var errs=addLog("修改文档",newInfo.name,req.session.username);
+            if(!errs){
+                res.status(200).send({status: true, msg: "修改成功"});
+            }else{
+                console.log(errs);
+                res.status(200).send({status:false,msg:"添加操作日志失败",model:errs})
+            }
+        }
+    });
+
+});
+app.post("/delDocument", function (req, res) {
+    if (!isLogin(req)) {
+        res.status(401).send({msg: "请先登录"});
+        return false;
+    }
+    var name = req.body.name;
+    fs.unlink("doc/" + name + ".json", function (err) {
+        if (err) {
+            res.status(200).send({status: false, msg: err});
+        } else {
+            var errs=addLog("删除文档",name,req.session.username);
+            if(!errs){
+                res.status(200).send({status: true, msg: "文档删除成功"});
+            }else{
+                console.log(errs);
+                res.status(200).send({status:false,msg:"添加操作日志失败",model:errs})
+            }
+        }
+    });
+});
 app.post("/editErrorCode",function(req,res){
     if (!isLogin(req)) {
         res.status(401).send({msg: "请先登录"});
@@ -139,7 +194,7 @@ app.post("/editErrorCode",function(req,res){
             if(!errs){
                 res.status(200).send({status: true, msg: "编辑成功"});
             }else{
-                res.status(200).send({status:false,msg:"添加操作日志失败",model:errs})
+                res.status(200).send({status:false,msg:"添加操作日志失败",model:errs});
             }
         }
     })
@@ -178,12 +233,13 @@ app.post("/delApi", function (req, res) {
             res.status(200).send({status: false, msg: "api删除失败。"});
         } else {
             var info = JSON.parse(data);
+            var apiName=info.apis[index].name;
             info.apis.splice(index, 1);
             fs.writeFile("doc/" + name + ".json", JSON.stringify(info), function (err) {
                 if (err) {
                     res.status(200).send({status: false, msg: "api写入失败"});
                 } else {
-                    var errs=addLog("删除API",name,req.session.username);
+                    var errs=addLog("删除API",name,req.session.username,apiName);
                     if(!errs){
                         res.status(200).send({status: true, msg: "api删除成功"});
                     }else{

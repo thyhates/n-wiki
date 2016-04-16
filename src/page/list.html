@@ -53,18 +53,18 @@
             <ul class="list-group">
                 <li class="list-group-item list-group-item-success" ng-repeat="log in logs">
                     用户：{{log.user}} ; 操作:{{log.action}} ; 文档：{{log.target}} ；
-                    <span ng-if="log.apiName"> 接口：<a ng-href="{{log.target}}/{{log.apiIndex}}"> {{log.apiName}} </a></span> 时间: {{log.time}}
+                    <span ng-if="log.apiName"> 接口：<span ng-if="!log.apiIndex">{{log.apiName}}</span><a ng-href="{{log.target}}/{{log.apiIndex}}" ng-if="log.apiIndex"> {{log.apiName}} </a></span> 时间: {{log.time}}
                 </li>
             </ul>
         </div>
-        <!--<div class="col-xs-1">
+        <div class="col-xs-1" ng-if="isLogin">
             <div class="tools">
                 <ul class="list">
                     <li><a ng-click="editDoc()"><span class="glyphicon glyphicon-pencil" title="编辑"></span></a></li>
                     <li><a ng-click="deleteDoc()"><span class="glyphicon glyphicon-minus" title="删除"></span></a></li>
                 </ul>
             </div>
-        </div>-->
+        </div>
     </div>
 </div>
 <script type="text/ng-template" id="confirm.html">
