@@ -14,11 +14,11 @@
 </header>
 <div class="container" ui-view="main-container">
     <div class="row">
-        <div class="col-xs-2">
+        <div class="col-xs-2" on-list-ready>
             <div class="list">
                 <h3>目录</h3>
                 <div ng-if="docs"
-                     style="-webkit-border-radius:5px ;-moz-border-radius: 5px;border-radius: 5px;">
+                     style="-webkit-border-radius:5px ;-moz-border-radius: 5px;border-radius: 5px;" >
                     <script type="text/ng-template" id="group-templates.html">
                         <div class="panel {{panelClass || 'panel-default'}}">
                             <div class="panel-heading">
@@ -35,7 +35,7 @@
                     </script>
                     <uib-accordion>
                         <uib-accordion-group heading="{{doc.name}}" ng-repeat="doc in docs"
-                                             template-url="group-templates.html">
+                                             template-url="group-templates.html" is-open="doc.isOpen">
                             <ul class="list-group">
                                 <li class="list-group-item" ng-repeat="api  in doc.apiList ">
                                     <a ng-href="{{doc.name}}/{{$index}}" style="cursor: pointer;">{{api.name}}</a>

@@ -18,6 +18,9 @@ app.use(body_parser.urlencoded({extended: true}));
 app.get("/", function (req, res) {
     res.sendFile(__dirname + "/index.html");
 });
+app.get("/favicon.ico",function(req,res){
+    res.sendFile(__dirname + "/favicon.ico");
+});
 /*fs.readFile("doc/document.json", function (err, data) {
  if (err) {
  console.log(err);
