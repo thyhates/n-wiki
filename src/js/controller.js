@@ -5,7 +5,7 @@ angular.module("app")
     .controller("ListController", ["$rootScope", "$http", "$location", "$stateParams", "$scope", "toastr", "$state", "$uibModal",
         function ($rootScope, $http, $location, $stateParams, $scope, toastr, $state, $uibModal) {
             $scope.docs = [];
-            function getLog(){
+            function getLog() {
                 $http({
                     url: "getLog",
                     method: "POST"
@@ -18,6 +18,7 @@ angular.module("app")
 
                 });
             }
+
             function getAllDocList() {
                 $http({
                     url: "getAllDocs",
@@ -35,6 +36,7 @@ angular.module("app")
                 }, function (data) {
                 });
             }
+
             function getDocList() {
                 $scope.docs.forEach(function (doc) {
                     $http({
@@ -53,6 +55,7 @@ angular.module("app")
                     });
                 });
             }
+
             function getApiList(doc) {
                 var titls = [];
                 for (var i = 0; i < doc.length; i++) {
@@ -60,15 +63,17 @@ angular.module("app")
                 }
                 return titls;
             }
-            function isCanShow(){
-                if($state.includes("home.edit")||$state.includes("home.doc")||$state.includes("home.newApi")||$state.includes("home.error")||$state.includes("home.editErr")){
+
+            function isCanShow() {
+                if ($state.includes("home.edit") || $state.includes("home.doc") || $state.includes("home.newApi") || $state.includes("home.error") || $state.includes("home.editErr")) {
                     return true;
-                }else{
+                } else {
                     return false;
                 }
             }
+
             $scope.deleteDoc = function () {
-                if(!isCanShow()){
+                if (!isCanShow()) {
                     toastr.warning("请选中要删除的文档");
                     return false;
                 }
@@ -104,7 +109,7 @@ angular.module("app")
                 });
             };
             $scope.editDoc = function () {
-                if(!isCanShow()){
+                if (!isCanShow()) {
                     toastr.warning("请选中要编辑的文档");
                     return false;
                 }
@@ -117,7 +122,7 @@ angular.module("app")
                     backdrop: "static"
                 });
                 editInstance.result.then(function (data) {
-                   location.reload();
+                    location.reload();
                 }, function (data) {
                 });
             };
@@ -207,8 +212,8 @@ angular.module("app")
                 });
             };
         }])
-    .controller("AddApiController", ["$scope", "toastr", "$stateParams", "$http", "$state",
-        function ($scope, toastr, $stateParams, $http, $state) {
+    .controller("AddApiController", ["$scope", "toastr","$uibModal", "$stateParams", "$http", "$state",
+        function ($scope, toastr, $uibModal,$stateParams, $http, $state) {
             $scope.newApi = {
                 params: [],
                 res: [],
@@ -239,11 +244,46 @@ angular.module("app")
                         toastr.warning(data.data.msg);
                     }
                 });
+            };
+            $scope.showJSONinput = function () {
+                var inputJson = $uibModal.open({
+                    animation: true,
+                    templateUrl: "page/jsonInput.html",
+                    controller: "JsonInputController",
+                    keyboard: false,
+                    backdrop: "static"
+                });
+                inputJson.result.then(function (res) {
+                    try{
+                        var resObj = JSON.parse(res);
+                    }catch (err){
+                        toastr.warning("非法的JSON字符串!");
+                    }
+
+                    for (var key in resObj) {
+                        var obj = {
+                            key: key,
+                            require: "是",
+                            type: typeof resObj[key]
+                        };
+                        if (typeof resObj[key] === 'number') {
+                            if(!isInt(resObj[key])){
+                                obj.type="float";
+                            }else{
+                                obj.type='int';
+                            }
+                        }
+                        $scope.newApi.res.push(obj);
+                    }
+                });
+            };
+            function isInt(n) {
+                return n % 1 === 0;
             }
         }])
-    .controller("delDocumentCtl", ["$uibModalInstance", "$scope", "$stateParams","toastr",
-        function ($uibModalInstance, $scope, $stateParams,toastr) {
-            if(!$stateParams.docName){
+    .controller("delDocumentCtl", ["$uibModalInstance", "$scope", "$stateParams", "toastr",
+        function ($uibModalInstance, $scope, $stateParams, toastr) {
+            if (!$stateParams.docName) {
                 $uibModalInstance.dismiss();
                 toastr.warning("请选中要删除的文档");
                 return false;
@@ -267,6 +307,7 @@ angular.module("app")
             }).then(function (data) {
                 if (data.data.status) {
                     $scope.apis = data.data.model.apis[$stateParams.apiIndex];
+                    console.log('form model', $scope.apis);
                     $scope.documentInfo = data.data.model.docInfo;
                     $scope.editSchema = formConfig[$scope.documentInfo.type].schema;
                     $scope.editForm = formConfig[$scope.documentInfo.type].form;
@@ -275,6 +316,42 @@ angular.module("app")
                     toastr.warning(data.data.msg);
                 }
             });
+
+            $scope.showJSONinput = function () {
+                var inputJson = $uibModal.open({
+                    animation: true,
+                    templateUrl: "page/jsonInput.html",
+                    controller: "JsonInputController",
+                    keyboard: false,
+                    backdrop: "static"
+                });
+                inputJson.result.then(function (res) {
+                    try{
+                        var resObj = JSON.parse(res);
+                    }catch (err){
+                        toastr.warning("非法的JSON字符串!");
+                    }
+                    for (var key in resObj) {
+                        var obj = {
+                            key: key,
+                            require: "是",
+                            type: typeof resObj[key]
+                        };
+                        if (typeof resObj[key] === 'number') {
+                           if(!isInt(resObj[key])){
+                               obj.type="float";
+                           }else{
+                               obj.type='int';
+                           }
+                        }
+                        $scope.apis.res.push(obj);
+                    }
+                });
+            };
+            function isInt(n) {
+                return n % 1 === 0;
+            }
+
             $scope.submitAdd = function (form) {
                 $http({
                     url: "editApi",
@@ -383,8 +460,8 @@ angular.module("app")
             };
 
         }])
-    .controller("editDocInfoCtrl", ["$scope", "$uibModalInstance", "$http",  "toastr", "$stateParams",
-        function ($scope, $uibModalInstance, $http,  toastr, $stateParams) {
+    .controller("editDocInfoCtrl", ["$scope", "$uibModalInstance", "$http", "toastr", "$stateParams",
+        function ($scope, $uibModalInstance, $http, toastr, $stateParams) {
             $http({
                 url: "getDocument",
                 method: "POST",
@@ -461,4 +538,12 @@ angular.module("app")
                     toastr.warning("请把表单填完整后在提交")
                 }
             }
-        }]);
+        }])
+    .controller("JsonInputController", ["$scope", "$uibModalInstance", function ($scope, $uibModalInstance) {
+        $scope.ok = function () {
+            $uibModalInstance.close($scope.jsonInput);
+        };
+        $scope.cancel = function () {
+            $uibModalInstance.dismiss();
+        };
+    }]);
