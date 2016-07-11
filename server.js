@@ -209,6 +209,8 @@ app.post("/addApi", function (req, res) {
     }
     var apiName = req.body.name;
     var api = req.body.body;
+    api.createUser=req.session.username;
+    api.createTime=new Date();
     var json = JSON.parse(fs.readFileSync("doc/" + apiName + ".json"));
     json.apis.push(api);
     fs.writeFile("doc/" + apiName + ".json", JSON.stringify(json), function (err) {
@@ -260,12 +262,13 @@ app.post("/editApi", function (req, res) {
     }
     var name = req.body.name;
     var newInfo = req.body.api;
+    newInfo.update=req.session.username;
+    newInfo.lastTime=new Date();
     var index = req.body.index;
     var apiInfo = JSON.parse(fs.readFileSync("doc/" + name + ".json"));
     apiInfo.apis[index] = newInfo;
     fs.writeFile("doc/" + name + ".json", JSON.stringify(apiInfo), function (err) {
         if (err) {
-            console.log(err);
             res.status(200).send({status: false, msg: "编辑失败"});
         } else {
             var errs=addLog("编辑API",name,req.session.username,newInfo.name,index);

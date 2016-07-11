@@ -259,7 +259,6 @@ angular.module("app")
                     }catch (err){
                         toastr.warning("非法的JSON字符串!");
                     }
-
                     for (var key in resObj) {
                         var obj = {
                             key: key,

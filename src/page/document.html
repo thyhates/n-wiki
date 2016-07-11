@@ -10,12 +10,15 @@
     </div>
     <div ui-view="editContent">
         <div ng-if="api&&documentInfo.type==0" class="apiBody" ng-repeat="api in apis">
-            <h3>{{api.name}}</h3>
-            <a ng-if="isLogin" style="cursor: pointer;margin-left: 10px;" ng-click="delApi(documentInfo.index,documentInfo.name)"
-               class="btn btn-default pull-right">删除</a>
-            <a ng-if="isLogin" style="cursor: pointer;" ng-href="{{documentInfo.name}}/{{documentInfo.index}}/edit"
-               class="btn btn-default pull-right">编辑</a>
-            <br>
+            <h3>{{api.name}}
+                <span class="pull-right" style="font-size:14px;">最后编辑：{{api.update}},时间：{{api.lastTime|date:'yyyy-MM-dd HH:mm:ss'}}</span>
+                <span class="pull-right" style="margin-right: 15px;font-size:14px;">创建人：{{api.createUser}}</span>
+            </h3>
+                <a ng-if="isLogin" style="cursor: pointer;margin-left: 10px;" ng-click="delApi(documentInfo.index,documentInfo.name)"
+                  class="btn btn-default pull-right">删除</a>
+                <a ng-if="isLogin" style="cursor: pointer;" ng-href="{{documentInfo.name}}/{{documentInfo.index}}/edit"
+                   class="btn btn-default pull-right">编辑</a>
+
             <p>
                 请求路径:&nbsp;&nbsp;{{api.api}}
             </p>
