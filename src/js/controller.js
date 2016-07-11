@@ -313,7 +313,7 @@ angular.module("app")
                     $scope.editForm = formConfig[$scope.documentInfo.type].form;
                     $scope.editModel = $scope.apis;
                 } else {
-                    toastr.warning(data.data.msg);
+                        toastr.warning(data.data.msg);
                 }
             });
 

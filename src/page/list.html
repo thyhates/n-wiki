@@ -15,10 +15,10 @@
 <div class="container" ui-view="main-container">
     <div class="row">
         <div class="col-xs-3" on-list-ready>
-            <div class="list">
+            <div class="list" >
                 <h3>目录</h3>
                 <div ng-if="docs"
-                     style="-webkit-border-radius:5px ;-moz-border-radius: 5px;border-radius: 5px;" >
+                     style="-webkit-border-radius:5px ;-moz-border-radius: 5px;border-radius: 5px;max-height: 600px;overflow: auto;" >
                     <script type="text/ng-template" id="group-templates.html">
                         <div class="panel {{panelClass || 'panel-default'}}">
                             <div class="panel-heading">
@@ -46,7 +46,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-xs-9" ui-view="apiContent">
+        <div class="col-xs-9 " ui-view="apiContent" >
             <div class="page-header">
                 <h3>文档操作日志</h3>
             </div>

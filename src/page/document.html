@@ -63,13 +63,13 @@
             <p>
                 JSON返回示例:
             </p>
-            <pre>
+            <p style="height: 300px;">
 {{api.demo}}
-        </pre>
+        </p>
             <p>
                 接口说明:
             </p>
-            <pre>{{api.description}}</pre>
+            <p style="height: 300px;word-break: break-all;border: 1px solid #ccc;border-radius:3px;padding: 5px;">{{api.description}}</p>
         </div>
     </div>
     <div ng-if="api&&documentInfo.type==1" class="apiBody" ng-repeat="api in apis">

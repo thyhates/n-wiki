@@ -16,7 +16,6 @@ angular.module("app").factory("authorInterceptor", ["$log", "$injector","$q","$r
                 /*if(!$rootScope.isLogin){
                  $injector.get('$state').go("home");
                  }*/
-                console.log(err);
                 return err;
             }
         };
