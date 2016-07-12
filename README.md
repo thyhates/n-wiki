@@ -8,7 +8,7 @@ npm install
 node server.js
 ```
 ####添加管理员
-在config.json中添加用户
+在config.json中添加用户,密码经过md5加密
 ```json
 {
   "user": [
