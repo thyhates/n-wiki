@@ -8,9 +8,9 @@ var app = express();
 var fs = require("fs");
 var session = require("express-session");
 var crypto = require("crypto");
-app.use(express.static("node_modules"));
-app.use(express.static("src"));
-app.use(express.static("dist"));
+app.use(express.static(__dirname + "/node_modules"));
+app.use(express.static(__dirname + "/src"));
+app.use(express.static(__dirname + "/dist"));
 app.use(body_parser.json());
 app.use(body_parser.urlencoded({extended: true}));
 
@@ -35,7 +35,9 @@ function getAllFiles() {
 
 var hs = crypto.createHash("md5").update("abcdefg").digest("hex");
 app.use(session({
-    secret: hs
+    secret: hs,
+    saveUninitialized:true,
+    resave:false
 }));
 function addLog(action,target,user,apiName,apiIndex){
     var logs=JSON.parse(fs.readFileSync("log.json"));
