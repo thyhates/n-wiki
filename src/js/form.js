@@ -6,7 +6,7 @@ var formConfig = [{
     schema: {
         type: "object",
         properties: {
-            name: {
+            label: {
                 type: "string",
                 title: "请求名称",
                 description: "接口的名称"
@@ -83,7 +83,7 @@ var formConfig = [{
             }
         }
     },
-    form: ["name", "api", "method",
+    form: ["label", "api", "method",
         {
             key: "params",
             add: "添加",

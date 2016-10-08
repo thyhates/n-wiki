@@ -13,7 +13,7 @@ angular.module("app").config(["$stateProvider", "$urlRouterProvider",
                 controller: "ListController"
             })
             .state("home.doc", {
-                url: ":docName/:apiIndex",
+                url: ":id/:aid",
                 views: {
                     "apiContent": {
                         templateUrl:function () {
@@ -24,7 +24,7 @@ angular.module("app").config(["$stateProvider", "$urlRouterProvider",
                 }
             })
             .state("home.edit", {
-                url: ":docName/:apiIndex/edit",
+                url: ":id/:aid/edit",
                 views: {
                     "apiContent": {
                         templateUrl: function () {
@@ -57,7 +57,7 @@ angular.module("app").config(["$stateProvider", "$urlRouterProvider",
                 }
             })
             .state("home.newApi", {
-                url: ":docName/:apiIndex/newApi",
+                url: ":id/:apiId/newApi",
                 views: {
                     "apiContent": {
                         templateUrl: function () {
@@ -68,7 +68,7 @@ angular.module("app").config(["$stateProvider", "$urlRouterProvider",
                 }
             })
             .state("home.error", {
-                url: ":docName/:apiIndex/errCode",
+                url: ":id/:aid/errCode",
                 views: {
                     "apiContent": {
                         templateUrl: function () {
@@ -79,7 +79,7 @@ angular.module("app").config(["$stateProvider", "$urlRouterProvider",
                 }
             })
             .state("home.editErr", {
-                url: ":docName/edit/err",
+                url: ":id/edit/err",
                 views: {
                     "apiContent": {
                         templateUrl: function () {

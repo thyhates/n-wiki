@@ -1,15 +1,15 @@
-<div class="document-container" style="border: 1px solid #ddd;" ng-controller="MainController">
+<div class="document-container" style="border: 1px solid #ddd;">
     <div class="title">
-        <h2>{{documentInfo.name}}
+        <h2>{{documentInfo.label}}
             <a ng-if="documentInfo.type==0" ng-href="{{documentInfo.name}}/{{documentInfo.index}}/errCode" class="btn btn-default btn-sm pull-right"
                style="margin-left: 10px;">错误码</a>
-            <a ng-href="{{documentInfo.name}}/{{documentInfo.type}}/newApi" ng-if="isLogin" class="btn btn-default btn-sm pull-right">新加接口
+            <a ng-href="{{docId}}/{{apiId}}/newApi" ng-if="isLogin" class="btn btn-default btn-sm pull-right">新加接口
             </a>
         </h2>
         <span>{{ documentInfo.description}}</span>
     </div>
     <div ui-view="editContent">
-        <div ng-if="api&&documentInfo.type==0" class="apiBody" ng-repeat="api in apis">
+        <div ng-if="api&&documentInfo.type==0" class="apiBody">
             <h3>{{api.name}}
                 <span class="pull-right" style="font-size:14px;">最后编辑：{{api.update}},时间：{{api.lastTime|date:'yyyy-MM-dd HH:mm:ss'}}</span>
                 <span class="pull-right" style="margin-right: 15px;font-size:14px;">创建人：{{api.createUser}}</span>

@@ -3,7 +3,7 @@
  */
 "use strict";
 var app = angular.module("app", ["angular-loading-bar","ngAnimate",
-    'ui.router', "toastr", "ui.bootstrap","schemaForm"]).run(["$rootScope","$state","$timeout","$location",
+    'ui.router', "toastr", "ui.bootstrap","schemaForm","angularBootstrapNavTree"]).run(["$rootScope","$state","$timeout","$location",
     function($rootScope,$state,$timeout,$location){
         console.log(" start app");
         $rootScope.isLogin=sessionStorage.isLogin;

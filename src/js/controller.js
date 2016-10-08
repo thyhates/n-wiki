@@ -5,17 +5,17 @@ angular.module("app")
     .controller("ListController", ["$rootScope", "$http", "$location", "$stateParams", "$scope", "toastr", "$state", "$uibModal",
         function ($rootScope, $http, $location, $stateParams, $scope, toastr, $state, $uibModal) {
             $scope.docs = [];
+            $scope.my_tree = {};
             function getLog() {
                 $http({
                     url: "getLog",
                     method: "POST"
                 }).then(function (data) {
                     if (data.data.status) {
-                        $scope.logs = data.data.model.logs.reverse();
+                        $scope.logs = data.data.model;
                     } else {
                         toastr.warning(data.data.msg);
                     }
-
                 });
             }
 
@@ -39,16 +39,23 @@ angular.module("app")
 
             function getDocList() {
                 $scope.docs.forEach(function (doc) {
+                    doc.onSelect = function (branch) {
+                        this.expanded = true;
+                        $state.go("home.doc", {
+                            id: branch._id,
+                            aid: ""
+                        });
+                    };
                     $http({
                         url: "getDocument",
                         method: "POST",
                         data: {
-                            name: doc.name
+                            id: doc._id
                         }
                     }).then(function (data) {
                         if (data.data.status) {
-                            $scope.apis = data.data.model.apis;
-                            doc.apiList = getApiList($scope.apis);
+                            $scope.apis = data.data.model;
+                            doc.children = getApiList($scope.apis);
                         } else {
                             toastr.warning(data.data.msg);
                         }
@@ -59,7 +66,22 @@ angular.module("app")
             function getApiList(doc) {
                 var titls = [];
                 for (var i = 0; i < doc.length; i++) {
-                    titls.push({idx: i, name: doc[i].name});
+                    console.log("1",doc[i]);
+                    var doc_id=doc[i].doc_id;
+                    var api_id=doc[i]._id;
+                    titls.push({
+                        label: doc[i].label, onSelect: function (api) {
+                            console.log(api);
+                            $state.go("home.doc", {
+                                id: api.doc_id,
+                                aid:api.api_id
+                            },{
+                                reload:"home.doc"
+                            });
+                        },
+                        doc_id:doc_id,
+                        api_id:api_id
+                    });
                 }
                 return titls;
             }
@@ -90,7 +112,7 @@ angular.module("app")
                             url: "delDocument",
                             method: "POST",
                             data: {
-                                name: docName
+                                doc_id: docName
                             }
                         }).then(function (data) {
                             if (data.data.status) {
@@ -142,19 +164,28 @@ angular.module("app")
     .controller("MainController", ["$http", "$scope", "$stateParams", "toastr", "$state", "$uibModal",
         function ($http, $scope, $stateParams, toastr, $state, $uibModal) {
             $scope.apis = [];
+            $scope.docId = $stateParams.id;
+            $scope.apiId = $stateParams.aid;
             $http({
-                url: "getDocument",
+                url: "selectApi",
                 method: "POST",
                 data: {
-                    name: $stateParams.docName
+                    id: $stateParams.aid,
+                    doc_id:$stateParams.id
                 }
             }).then(function (data) {
                 if (data.data.status) {
-                    $scope.apis.push(data.data.model.apis[$stateParams.apiIndex]);
-                    $scope.documentInfo = data.data.model.docInfo;
-                    $scope.documentInfo.index = $stateParams.apiIndex;
+                    if(data.data.model){
+                        $scope.api = data.data.model[0];
+                    }
+                    if ($scope.apis.length == 0) {
+                        $scope.apis = false;
+                    }
+                    $scope.documentInfo = data.data.documentInfo[0];
                 } else {
-                    toastr.warning(data.data.msg);
+                    if($scope.apiId){
+                        toastr.warning(data.data.msg);
+                    }
                 }
             });
             $scope.delApi = function (index, apiName) {
@@ -212,18 +243,20 @@ angular.module("app")
                 });
             };
         }])
-    .controller("AddApiController", ["$scope", "toastr","$uibModal", "$stateParams", "$http", "$state",
-        function ($scope, toastr, $uibModal,$stateParams, $http, $state) {
+    .controller("AddApiController", ["$scope", "toastr", "$uibModal", "$stateParams", "$http", "$state",
+        function ($scope, toastr, $uibModal, $stateParams, $http, $state) {
             $scope.newApi = {
                 params: [],
                 res: [],
                 callbackParams: []
             };
-            $scope.addSchema = formConfig[$stateParams.apiIndex].schema;
-            $scope.addForm = formConfig[$stateParams.apiIndex].form;
+            $scope.addSchema = formConfig[0].schema;
+            $scope.addForm = formConfig[0].form;
             $scope.addModel = $scope.newApi;
             $scope.docType = $stateParams.apiIndex;
             $scope.addApi = function (form) {
+                $scope.newApi.doc_id = $stateParams.id;
+                console.log($scope.newApi);
                 $http({
                     url: "addApi",
                     method: "POST",
@@ -235,8 +268,7 @@ angular.module("app")
                     if (data.data.status) {
                         toastr.success(data.data.msg);
                         $state.transitionTo("home.doc", {
-                            docName: $stateParams.docName,
-                            apiIndex: 0
+                            id: $stateParams.id
                         }, {
                             reload: true
                         });
@@ -254,9 +286,9 @@ angular.module("app")
                     backdrop: "static"
                 });
                 inputJson.result.then(function (res) {
-                    try{
+                    try {
                         var resObj = JSON.parse(res);
-                    }catch (err){
+                    } catch (err) {
                         toastr.warning("非法的JSON字符串!");
                     }
                     for (var key in resObj) {
@@ -266,10 +298,10 @@ angular.module("app")
                             type: typeof resObj[key]
                         };
                         if (typeof resObj[key] === 'number') {
-                            if(!isInt(resObj[key])){
-                                obj.type="float";
-                            }else{
-                                obj.type='int';
+                            if (!isInt(resObj[key])) {
+                                obj.type = "float";
+                            } else {
+                                obj.type = 'int';
                             }
                         }
                         $scope.newApi.res.push(obj);
@@ -312,7 +344,7 @@ angular.module("app")
                     $scope.editForm = formConfig[$scope.documentInfo.type].form;
                     $scope.editModel = $scope.apis;
                 } else {
-                        toastr.warning(data.data.msg);
+                    toastr.warning(data.data.msg);
                 }
             });
 
@@ -325,9 +357,9 @@ angular.module("app")
                     backdrop: "static"
                 });
                 inputJson.result.then(function (res) {
-                    try{
+                    try {
                         var resObj = JSON.parse(res);
-                    }catch (err){
+                    } catch (err) {
                         toastr.warning("非法的JSON字符串!");
                     }
                     for (var key in resObj) {
@@ -337,11 +369,11 @@ angular.module("app")
                             type: typeof resObj[key]
                         };
                         if (typeof resObj[key] === 'number') {
-                           if(!isInt(resObj[key])){
-                               obj.type="float";
-                           }else{
-                               obj.type='int';
-                           }
+                            if (!isInt(resObj[key])) {
+                                obj.type = "float";
+                            } else {
+                                obj.type = 'int';
+                            }
                         }
                         $scope.apis.res.push(obj);
                     }
@@ -465,7 +497,7 @@ angular.module("app")
                 url: "getDocument",
                 method: "POST",
                 data: {
-                    name: $stateParams.docName
+                    doc_id: $stateParams.docName
                 }
             }).then(function (data) {
                 if (data.data.status) {
@@ -521,7 +553,7 @@ angular.module("app")
                         url: "editDocs",
                         method: "POST",
                         data: {
-                            name: $stateParams.docName,
+                            doc_id: $stateParams.docName,
                             info: $scope.add_model
                         }
                     }).then(function (data) {

@@ -6,6 +6,7 @@ var express = require("express");
 var body_parser = require("body-parser");
 var app = express();
 var fs = require("fs");
+var assert = require("assert");
 var session = require("express-session");
 var crypto = require("crypto");
 const mongoClient = require("mongodb").MongoClient;
@@ -132,7 +133,8 @@ app.post("/getAllDocs", function (req, res) {
     dbopt.find("docs", {}, function (result) {
         res.status(200).send({
             status: 1,
-            model: result
+            model: result,
+            logined:logined
         });
     });
 });
@@ -140,29 +142,36 @@ app.post("/getDocument", function (req, res) {
     var query = {
         doc_id: req.body.id
     };
-    dbopt.find("apis", query, function (result) {
-        res.status(200).send({
-            status: 1,
-            model: result
+    var docQuery={
+        _id:new mongo.ObjectId(req.body.id)
+    };
+    dbopt.find("docs",docQuery,function (result1) {
+        dbopt.find("apis", query, function (result) {
+            res.status(200).send({
+                status: true,
+                model: result,
+                documentInfo:result1
+            });
         });
     });
+
 });
 app.post("/newDocument", function (req, res) {
     if (!isLogin(req)) {
         res.status(401).send({msg: "请先登录"});
         return false;
     }
-    var name = req.body.name,
+    var label = req.body.label,
         type = req.body.type,
         description = req.body.description;
     var body = {
-        name: name,
+        label: label,
         type: type,
         description: description
     };
     dbopt.insert("docs", body, function (result) {
         if (result.result.ok === 1) {
-            var errs = addLog("创建文档", name, req.session.username);
+            var errs = addLog("创建文档", label, req.session.username);
             if (!errs) {
                 res.status(200).send({status: true, msg: "文档创建成功"});
             } else {
@@ -171,7 +180,7 @@ app.post("/newDocument", function (req, res) {
             }
         } else {
             res.status(200).send({
-                status: SQLERROR,
+                status: -1,
                 msg: "未知错误，请重试", model: result
             });
         }
@@ -259,7 +268,7 @@ app.post("/addApi", function (req, res) {
     api.createTime = new Date();
     dbopt.insert("apis", api, function (result) {
         if (result.result.ok === 1) {
-            var errs = addLog("创建文档", api.name, req.session.username);
+            var errs = addLog("创建接口", api.label, req.session.username);
             if (!errs) {
                 res.status(200).send({status: true, msg: "Api添加成功"});
             } else {
@@ -282,7 +291,7 @@ app.post("/delApi", function (req, res) {
     var id = req.body.id;
     var query = {
         _id: new mongo.ObjectId(id)
-    }
+    };
     dbopt.delete("apis", query, function (results) {
         if (result.result.ok === 1) {
             res.status(200).send({
@@ -298,12 +307,40 @@ app.post("/delApi", function (req, res) {
         }
     });
 });
+app.post("/selectApi", function (req, res) {
+    var id = req.body.id;
+    if(id){
+        var query = {
+            _id: new mongo.ObjectId(id)
+        };
+    }
+    var docQuery={
+        _id:new mongo.ObjectId(req.body.doc_id)
+    };
+    dbopt.find("docs",docQuery,function (result1) {
+        if(id){
+            dbopt.find("apis", query, function (results) {
+                res.status(200).send({
+                    status: true,
+                    model: results,
+                    documentInfo:result1
+                });
+            });
+        }else{
+            res.status(200).send({
+                status: true,
+                documentInfo:result1
+            });
+        }
+    });
+
+});
 app.post("/editApi", function (req, res) {
     if (!isLogin(req)) {
         res.status(401).send({msg: "请先登录"});
         return false;
     }
-    var name = req.body.id;
+    var id = req.body.id;
     var newInfo = req.body.api;
     newInfo.update = req.session.username;
     newInfo.lastTime = new Date();
@@ -320,13 +357,11 @@ app.post("/editApi", function (req, res) {
     });
 });
 app.post("/getLog", function (req, res) {
-    fs.readFile("log.json", function (err, data) {
-        if (err) {
-            console.log(err);
-            res.status(200).send({status: false, msg: "日志读取失败"});
-        } else {
-            res.status(200).send({status: true, msg: "日志读取成功", model: JSON.parse(data)});
-        }
+   dbopt.find("logs", {}, function (result) {
+        res.status(200).send({
+            status: true,
+            model: result
+        });
     });
 });
 app.post("/login", function (req, res) {

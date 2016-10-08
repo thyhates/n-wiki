@@ -18,31 +18,17 @@
             <div class="list" >
                 <h3>目录</h3>
                 <div ng-if="docs"
-                     style="-webkit-border-radius:5px ;-moz-border-radius: 5px;border-radius: 5px;max-height: 600px;overflow: auto;" >
-                    <script type="text/ng-template" id="group-templates.html">
-                        <div class="panel {{panelClass || 'panel-default'}}">
-                            <div class="panel-heading">
-                                <h4 class="panel-title" style="color:#000">
-                                    <b><a tabindex="0" href="{{heading}}/0" class="accordion-toggle"
-                                          ng-click="toggleOpen()" uib-accordion-transclude="heading"><span
-                                            ng-class="{'text-muted': isDisabled}">{{heading}}</span></a></b>
-                                </h4>
-                            </div>
-                            <div class="panel-collapse collapse" uib-collapse="!isOpen">
-                                <div class="panel-body" style="text-align: right" ng-transclude></div>
-                            </div>
-                        </div>
-                    </script>
-                    <uib-accordion>
-                        <uib-accordion-group heading="{{doc.name}}" ng-repeat="doc in docs"
-                                             template-url="group-templates.html" is-open="doc.isOpen">
+                     style="-webkit-border-radius:5px ;-moz-border-radius: 5px;border-radius: 5px;max-height: 600px;overflow: auto;background: #eeeeee;" >
+                   <!-- <uib-accordion>
+                        <uib-accordion-group heading="{{doc.name}}" ng-repeat="doc in docs" is-open="doc.isOpen">
                             <ul class="list-group">
                                 <li class="list-group-item" ng-repeat="api  in doc.apiList ">
-                                    <a ng-href="{{doc.name}}/{{$index}}" style="cursor: pointer;">{{api.name}}</a>
+                                    <a ng-href="{{api.doc_id}}/{{api._id}}" style="cursor: pointer;">{{api.name}}</a>
                                 </li>
                             </ul>
                         </uib-accordion-group>
-                    </uib-accordion>
+                    </uib-accordion>-->
+                    <abn-tree tree-data= "docs" tree-control= "my_tree"></abn-tree>
                 </div>
             </div>
         </div>

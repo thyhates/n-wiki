@@ -2,7 +2,7 @@
   "name": "n-wiki",
   "version": "1.1.1",
   "description": "back-end server for document manage",
-  "repository":"https://github.com/thyhates/n-wiki.git",
+  "repository": "https://github.com/thyhates/n-wiki.git",
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -30,5 +30,8 @@
     "gulp-livereload": "^3.8.1",
     "gulp-uglify": "^1.5.3",
     "mongodb": "^2.1.18"
+  },
+  "dependencies": {
+    "angular-bootstrap-nav-tree": "^0.2.1"
   }
 }
