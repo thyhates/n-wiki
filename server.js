@@ -11,6 +11,7 @@ var session = require("express-session");
 var crypto = require("crypto");
 const mongoClient = require("mongodb").MongoClient;
 const mongo = require("mongodb");
+var dbopt = require("./dbopt");
 app.use(express.static(__dirname + "/node_modules"));
 app.use(express.static(__dirname + "/src"));
 app.use(express.static(__dirname + "/dist"));
@@ -35,66 +36,6 @@ function getAllFiles() {
     var file = fs.readdirSync("doc");
     return file;
 }
-const mongoUrl = "mongodb://127.0.0.1:27017/wiki";
-const mongoUser = "thyhates";
-const mongoPwd = "123";
-let dbopt = {
-    find: function (co, query, callback) {
-        mongoClient.connect(mongoUrl, function (err, db) {
-            assert.equal(null, err);
-            db.authenticate(mongoUser, mongoPwd, function (err, result) {
-                assert.equal(true, result);
-                let collection = db.collection(co);
-                collection.find(query).toArray().then(function (docs) {
-                    assert.equal(null, err);
-                    db.close();
-                    callback(docs);
-                });
-            });
-        });
-    },
-    insert: function (co, query, callback) {
-        mongoClient.connect(mongoUrl, function (err, db) {
-            assert.equal(null, err);
-            db.authenticate(mongoUser, mongoPwd, function (err, result) {
-                assert.equal(true, result);
-                let collection = db.collection(co);
-                collection.insertOne(query).then(function (items) {
-                    assert.equal(1, items.insertedCount);
-                    db.close();
-                    callback(items);
-                });
-            });
-        });
-    },
-    update: function (co, query, newData, callback) {
-        mongoClient.connect(mongoUrl, function (err, db) {
-            assert.equal(null, err);
-            db.authenticate(mongoUser, mongoPwd, function (err, result) {
-                assert.equal(true, result);
-                let collection = db.collection(co);
-                collection.updateOne(query, newData).then(function (items) {
-                    assert.equal(1, items.matchedCount);
-                    db.close();
-                    callback(items);
-                });
-            });
-        });
-    },
-    delete: function (co, query, callback) {
-        mongoClient.connect(mongoUrl, function (err, db) {
-            assert.equal(null, err);
-            db.authenticate(mongoUser, mongoPwd, function (err, result) {
-                assert.equal(true, result);
-                let collection = db.collection(co);
-                collection.deleteOne(query).then(function (items) {
-                    db.close();
-                    callback(items);
-                });
-            });
-        });
-    }
-};
 var hs = crypto.createHash("md5").update("abcdefg").digest("hex");
 app.use(session({
     secret: hs,
@@ -102,7 +43,6 @@ app.use(session({
     resave: false
 }));
 function addLog(action, target, user, apiName, apiIndex) {
-    var logs = JSON.parse(fs.readFileSync("log.json"));
     var time = new Date();
     if (apiIndex === 0) {
         apiIndex = "0";
@@ -134,7 +74,7 @@ app.post("/getAllDocs", function (req, res) {
         res.status(200).send({
             status: 1,
             model: result,
-            logined:logined
+            logined: logined
         });
     });
 });
@@ -142,15 +82,15 @@ app.post("/getDocument", function (req, res) {
     var query = {
         doc_id: req.body.id
     };
-    var docQuery={
-        _id:new mongo.ObjectId(req.body.id)
+    var docQuery = {
+        _id: new mongo.ObjectId(req.body.id)
     };
-    dbopt.find("docs",docQuery,function (result1) {
+    dbopt.find("docs", docQuery, function (result1) {
         dbopt.find("apis", query, function (result) {
             res.status(200).send({
                 status: true,
                 model: result,
-                documentInfo:result1
+                documentInfo: result1
             });
         });
     });
@@ -191,10 +131,10 @@ app.post("/editDocs", function (req, res) {
         res.status(401).send({msg: "请先登录"});
         return false;
     }
-    var doc_id = req.body.doc_id;
+    var doc_id = req.body.id;
     var newInfo = req.body.info;
     var query = {
-        _id: new mongo.ObjectId(id)
+        _id: new mongo.ObjectId(doc_id)
     };
     var newData = {$set: newInfo};
     dbopt.update("docs", query, newData, function (result) {
@@ -242,12 +182,11 @@ app.post("/editErrorCode", function (req, res) {
         res.status(401).send({msg: "请先登录"});
         return false;
     }
-    var doc_id = req.body.doc_id;
+    var id = req.body.id;
     var body = req.body.body;
 
-    var errorCodeLst = body;
     var query = {
-        _id: new mongo.ObjectId(doc_id)
+        _id: new mongo.ObjectId(id)
     };
     var newData = {$set: {errorCodeLst: body}};
     dbopt.update("docs", query, newData, function (result) {
@@ -293,43 +232,35 @@ app.post("/delApi", function (req, res) {
         _id: new mongo.ObjectId(id)
     };
     dbopt.delete("apis", query, function (results) {
-        if (result.result.ok === 1) {
-            res.status(200).send({
-                status: true,
-                msg: "删除成功"
-            });
-        } else {
-            res.status(200).send({
-                status: -1,
-                msg: "服务器异常",
-                model: result
-            });
-        }
+        res.status(200).send({
+            status: true,
+            msg: "删除成功"
+        });
     });
 });
 app.post("/selectApi", function (req, res) {
     var id = req.body.id;
-    if(id){
+    if (id) {
         var query = {
             _id: new mongo.ObjectId(id)
         };
     }
-    var docQuery={
-        _id:new mongo.ObjectId(req.body.doc_id)
+    var docQuery = {
+        _id: new mongo.ObjectId(req.body.doc_id)
     };
-    dbopt.find("docs",docQuery,function (result1) {
-        if(id){
+    dbopt.find("docs", docQuery, function (result1) {
+        if (id) {
             dbopt.find("apis", query, function (results) {
                 res.status(200).send({
                     status: true,
                     model: results,
-                    documentInfo:result1
+                    documentInfo: result1
                 });
             });
-        }else{
+        } else {
             res.status(200).send({
                 status: true,
-                documentInfo:result1
+                documentInfo: result1
             });
         }
     });
@@ -348,16 +279,23 @@ app.post("/editApi", function (req, res) {
         _id: new mongo.ObjectId(id)
     };
     var newData = {$set: newInfo};
-    dbopt.update("docs", query, newData, function (result) {
-        res.status(200).send({
-            status: true,
-            model: result,
-            msg: "修改成功"
+    console.log("1", query, newInfo);
+    try {
+        dbopt.update("apis", query, newData, function (result) {
+            console.log(result);
+            res.status(200).send({
+                status: true,
+                model: result,
+                msg: "修改成功"
+            });
         });
-    });
+    } catch (err) {
+        console.log("err", err);
+    }
+
 });
 app.post("/getLog", function (req, res) {
-   dbopt.find("logs", {}, function (result) {
+    dbopt.find("logs", {}, function (result) {
         res.status(200).send({
             status: true,
             model: result

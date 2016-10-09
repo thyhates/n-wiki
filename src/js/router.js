@@ -79,7 +79,7 @@ angular.module("app").config(["$stateProvider", "$urlRouterProvider",
                 }
             })
             .state("home.editErr", {
-                url: ":id/edit/err",
+                url: ":id/:aid/edit/err",
                 views: {
                     "apiContent": {
                         templateUrl: function () {

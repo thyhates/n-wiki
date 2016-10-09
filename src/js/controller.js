@@ -66,21 +66,21 @@ angular.module("app")
             function getApiList(doc) {
                 var titls = [];
                 for (var i = 0; i < doc.length; i++) {
-                    console.log("1",doc[i]);
-                    var doc_id=doc[i].doc_id;
-                    var api_id=doc[i]._id;
+                    console.log("1", doc[i]);
+                    var doc_id = doc[i].doc_id;
+                    var api_id = doc[i]._id;
                     titls.push({
                         label: doc[i].label, onSelect: function (api) {
                             console.log(api);
                             $state.go("home.doc", {
                                 id: api.doc_id,
-                                aid:api.api_id
-                            },{
-                                reload:"home.doc"
+                                aid: api.api_id
+                            }, {
+                                reload: "home.doc"
                             });
                         },
-                        doc_id:doc_id,
-                        api_id:api_id
+                        doc_id: doc_id,
+                        api_id: api_id
                     });
                 }
                 return titls;
@@ -171,11 +171,11 @@ angular.module("app")
                 method: "POST",
                 data: {
                     id: $stateParams.aid,
-                    doc_id:$stateParams.id
+                    doc_id: $stateParams.id
                 }
             }).then(function (data) {
                 if (data.data.status) {
-                    if(data.data.model){
+                    if (data.data.model) {
                         $scope.api = data.data.model[0];
                     }
                     if ($scope.apis.length == 0) {
@@ -183,7 +183,7 @@ angular.module("app")
                     }
                     $scope.documentInfo = data.data.documentInfo[0];
                 } else {
-                    if($scope.apiId){
+                    if ($scope.apiId) {
                         toastr.warning(data.data.msg);
                     }
                 }
@@ -196,22 +196,21 @@ angular.module("app")
                     keyboard: false,
                     backdrop: "static"
                 });
-                delApiInstance.result.then(function (docName) {
-                    if (docName) {
+                delApiInstance.result.then(function (aid) {
+                    if (aid) {
                         $http({
                             url: "delApi",
                             method: "POST",
                             data: {
-                                index: $stateParams.apiIndex,
-                                name: apiName
+                                id: aid
                             }
                         }).then(function (data) {
                             toastr.success(data.data.msg);
                             $state.transitionTo("home.doc", {
-                                docName: $stateParams.docName,
-                                apiIndex: 0
+                                id: aid,
+                                aid: ""
                             }, {
-                                reload: true
+                                reload: "home.doc"
                             });
                         }, function (data) {
                             toastr.warning(data.data.msg);
@@ -314,13 +313,17 @@ angular.module("app")
         }])
     .controller("delDocumentCtl", ["$uibModalInstance", "$scope", "$stateParams", "toastr",
         function ($uibModalInstance, $scope, $stateParams, toastr) {
-            if (!$stateParams.docName) {
+            if (!$stateParams.id) {
                 $uibModalInstance.dismiss();
                 toastr.warning("请选中要删除的文档");
                 return false;
             }
             $scope.ok = function () {
-                $uibModalInstance.close($stateParams.docName);
+                if ($stateParams.aid) {
+                    $uibModalInstance.close($stateParams.aid);
+                } else {
+                    $uibModalInstance.close($stateParams.id);
+                }
             };
             $scope.cancel = function () {
                 $uibModalInstance.dismiss();
@@ -330,19 +333,19 @@ angular.module("app")
         function ($scope, $http, toastr, $uibModal, $stateParams, $state) {
 
             $http({
-                url: "getDocument",
+                url: "selectApi",
                 method: "POST",
                 data: {
-                    name: $stateParams.docName
+                    id: $stateParams.aid
                 }
             }).then(function (data) {
                 if (data.data.status) {
-                    $scope.apis = data.data.model.apis[$stateParams.apiIndex];
+                    $scope.api = data.data.model[0];
                     console.log('form model', $scope.apis);
-                    $scope.documentInfo = data.data.model.docInfo;
-                    $scope.editSchema = formConfig[$scope.documentInfo.type].schema;
-                    $scope.editForm = formConfig[$scope.documentInfo.type].form;
-                    $scope.editModel = $scope.apis;
+                    $scope.documentInfo = data.data.model.documentInfo;
+                    $scope.editSchema = formConfig[0].schema;
+                    $scope.editForm = formConfig[0].form;
+                    $scope.editModel = $scope.api;
                 } else {
                     toastr.warning(data.data.msg);
                 }
@@ -375,7 +378,7 @@ angular.module("app")
                                 obj.type = 'int';
                             }
                         }
-                        $scope.apis.res.push(obj);
+                        $scope.api.res.push(obj);
                     }
                 });
             };
@@ -384,22 +387,22 @@ angular.module("app")
             }
 
             $scope.submitAdd = function (form) {
+                delete $scope.api._id;
                 $http({
                     url: "editApi",
                     method: "POST",
                     data: {
-                        index: $stateParams.apiIndex,
-                        name: $stateParams.docName,
-                        api: $scope.apis
+                        id: $stateParams.aid,
+                        api: $scope.api
                     }
                 }).then(function (data) {
                     if (data.data.status) {
                         toastr.success(data.data.msg);
                         $state.transitionTo("home.doc", {
-                            docName: $stateParams.docName,
-                            apiIndex: 0
+                            id: $stateParams.id,
+                            aid: ""
                         }, {
-                            reload: true
+                            reload: "home.doc"
                         });
                     } else {
                         toastr.warning(data.data.msg);
@@ -409,13 +412,14 @@ angular.module("app")
         }])
     .controller("ErrorController", ["$stateParams", "$http", "$scope",
         function ($stateParams, $http, $scope) {
-            $scope.docname = $stateParams.docName;
+            $scope.docId = $stateParams.id;
+            $scope.apiId = $stateParams.aid;
             $scope.errors = [];
             $http({
                 url: "getDocument",
                 method: "POST",
                 data: {
-                    name: $stateParams.docName
+                    id: $stateParams.id
                 }
             }).then(function (data) {
                 if (data.data.status) {
@@ -424,7 +428,7 @@ angular.module("app")
                     //} else {
                     //    $scope.errors = [];
                     //}
-                    $scope.errors = data.data.model.errorCodeLst || [];
+                    $scope.errors = data.data.documentInfo[0].errorCodeLst || [];
                 }
             });
         }])
@@ -434,7 +438,7 @@ angular.module("app")
                 url: "getDocument",
                 method: "POST",
                 data: {
-                    name: $stateParams.docName
+                    id: $stateParams.id
                 }
             }).then(function (data) {
                 if (data.data.status) {
@@ -443,7 +447,7 @@ angular.module("app")
                     //} else {
                     //    $scope.errors = [];
                     //}
-                    $scope.errors = data.data.model.errorCodeLst || [];
+                    $scope.errors = data.data.documentInfo[0].errorCodeLst || [];
                 }
             });
 
@@ -453,7 +457,7 @@ angular.module("app")
                     url: "editErrorCode",
                     method: "POST",
                     data: {
-                        name: $stateParams.docName,
+                        id: $stateParams.id,
                         body: $scope.errors
                     }
                 }).then(function (data) {
@@ -497,11 +501,11 @@ angular.module("app")
                 url: "getDocument",
                 method: "POST",
                 data: {
-                    doc_id: $stateParams.docName
+                    id: $stateParams.id
                 }
             }).then(function (data) {
                 if (data.data.status) {
-                    $scope.documentInfo = data.data.model.docInfo;
+                    $scope.documentInfo = data.data.documentInfo[0];
                     $scope.add_model = $scope.documentInfo;
                 } else {
                     toastr.warning(data.data.msg);
@@ -510,7 +514,7 @@ angular.module("app")
             $scope.add_schema = {
                 type: "object",
                 properties: {
-                    name: {
+                    label: {
                         type: "string",
                         title: "name"
                     },
@@ -523,10 +527,10 @@ angular.module("app")
                         title: "description"
                     }
                 },
-                required: ["name", "type"]
+                required: ["label", "type"]
             };
             $scope.add_form = [
-                "name", {
+                "label", {
                     key: "type",
                     type: "select",
                     titleMap: {
@@ -548,12 +552,13 @@ angular.module("app")
 
             $scope.submitAdd = function (form) {
                 $scope.$broadcast('schemaFormValidate');
+                delete $scope.add_model._id;
                 if (form.$valid && form.$dirty) {
                     $http({
                         url: "editDocs",
                         method: "POST",
                         data: {
-                            doc_id: $stateParams.docName,
+                            id: $stateParams.id,
                             info: $scope.add_model
                         }
                     }).then(function (data) {

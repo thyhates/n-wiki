@@ -1,7 +1,7 @@
 <div class="document-container" style="border: 1px solid #ddd;">
     <div class="title">
         <h2>{{documentInfo.label}}
-            <a ng-if="documentInfo.type==0" ng-href="{{documentInfo.name}}/{{documentInfo.index}}/errCode" class="btn btn-default btn-sm pull-right"
+            <a ng-if="documentInfo.type==0" ng-href="{{docId}}/{{apiId}}/errCode" class="btn btn-default btn-sm pull-right"
                style="margin-left: 10px;">错误码</a>
             <a ng-href="{{docId}}/{{apiId}}/newApi" ng-if="isLogin" class="btn btn-default btn-sm pull-right">新加接口
             </a>
@@ -14,11 +14,12 @@
                 <span class="pull-right" style="font-size:14px;">最后编辑：{{api.update}},时间：{{api.lastTime|date:'yyyy-MM-dd HH:mm:ss'}}</span>
                 <span class="pull-right" style="margin-right: 15px;font-size:14px;">创建人：{{api.createUser}}</span>
             </h3>
+            <div style="display: block;clear: both;margin-top: 10px;">
                 <a ng-if="isLogin" style="cursor: pointer;margin-left: 10px;" ng-click="delApi(documentInfo.index,documentInfo.name)"
                   class="btn btn-default pull-right">删除</a>
-                <a ng-if="isLogin" style="cursor: pointer;" ng-href="{{documentInfo.name}}/{{documentInfo.index}}/edit"
+                <a ng-if="isLogin" style="cursor: pointer;" ng-href="{{docId}}/{{apiId}}/edit"
                    class="btn btn-default pull-right">编辑</a>
-
+            </div>
             <p>
                 请求路径:&nbsp;&nbsp;{{api.api}}
             </p>
