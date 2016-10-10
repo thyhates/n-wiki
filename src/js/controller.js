@@ -188,7 +188,7 @@ angular.module("app")
                     }
                 }
             });
-            $scope.delApi = function (index, apiName) {
+            $scope.delApi = function () {
                 var delApiInstance = $uibModal.open({
                     animation: true,
                     templateUrl: "confirm.html",

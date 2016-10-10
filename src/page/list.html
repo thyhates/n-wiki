@@ -38,8 +38,8 @@
             </div>
             <ul class="list-group">
                 <li class="list-group-item list-group-item-success" ng-repeat="log in logs">
-                    用户：{{log.user}} ; 操作:{{log.action}} ; 文档：{{log.target}} ；
-                    <span ng-if="log.apiName"> 接口：<span ng-if="!log.apiIndex">{{log.apiName}}</span><a ng-href="{{log.target}}/{{log.apiIndex}}" ng-if="log.apiIndex"> {{log.apiName}} </a></span> 时间: {{log.time}}
+                    用户：{{log.user}} ; 操作:{{log.action}} ; 文档：{{log.docName}} , <span ng-if="log.apiName">接口</span> <span ng-if="log.apiName&&!log.del">
+                    <a ng-href="{{log.docId}}/{{log.apiId}}">{{log.apiName}} </a></span><span ng-if="log.apiName&&log.del">{{log.apiName}} </span> 时间: {{log.time}}
                 </li>
             </ul>
         </div>

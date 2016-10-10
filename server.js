@@ -42,18 +42,20 @@ app.use(session({
     saveUninitialized: true,
     resave: false
 }));
-function addLog(action, target, user, apiName, apiIndex) {
+function addLog(action, user, docName, docId, apiName, apiId, del) {
     var time = new Date();
-    if (apiIndex === 0) {
-        apiIndex = "0";
+    if (!apiId) {
+        apiId = "";
     }
     var log = {
         action: action,
         time: time.toLocaleString(),
-        target: target,
         user: user,
         apiName: apiName || "",
-        apiIndex: apiIndex || ""
+        apiId: apiId || "",
+        docId: docId || "",
+        docName: docName || "",
+        del: del || false
     };
     var errs;
     dbopt.insert("logs", log, function (result) {
@@ -63,7 +65,6 @@ function addLog(action, target, user, apiName, apiIndex) {
             errs = false;
         }
     });
-    return errs;
 }
 app.post("/getAllDocs", function (req, res) {
     var logined = true;
@@ -110,14 +111,10 @@ app.post("/newDocument", function (req, res) {
         description: description
     };
     dbopt.insert("docs", body, function (result) {
+        // console.log(result.insertedId);
         if (result.result.ok === 1) {
-            var errs = addLog("创建文档", label, req.session.username);
-            if (!errs) {
-                res.status(200).send({status: true, msg: "文档创建成功"});
-            } else {
-                console.log(errs);
-                res.status(200).send({status: false, msg: "添加操作日志失败", model: errs})
-            }
+            addLog("创建文档", req.session.username, label, result.insertId);
+            res.status(200).send({status: true, msg: "文档创建成功"});
         } else {
             res.status(200).send({
                 status: -1,
@@ -138,6 +135,8 @@ app.post("/editDocs", function (req, res) {
     };
     var newData = {$set: newInfo};
     dbopt.update("docs", query, newData, function (result) {
+        // console.log(newInfo);
+        addLog("编辑文档", req.session.username, newInfo.label, doc_id);
         res.status(200).send({
             status: true,
             model: result,
@@ -157,25 +156,32 @@ app.post("/delDocument", function (req, res) {
     var apiQuery = {
         doc_id: doc_id
     };
-    dbopt.delete("docs", query, function (result) {
-        if (result.result.ok === 1) {
-            dbopt.delete("apis", apiQuery, function (results) {
-                if (result.result.ok === 1) {
-                    res.status(200).send({
-                        status: true,
-                        msg: "删除成功"
-                    });
-                } else {
-                    res.status(200).send({
-                        status: -1,
-                        msg: "服务器异常",
-                        model: result
-                    });
-                }
-            });
+    var docName;
+    dbopt.find("docs", query, function (res1) {
+        docName = res1[0].label;
+        dbopt.delete("docs", query, function (result) {
+            if (result.result.ok === 1) {
+                dbopt.delete("apis", apiQuery, function (results) {
+                    // console.log(result);
+                    if (result.result.ok === 1) {
+                        addLog("删除文档", req.session.username, docName, doc_id, false, false, true);
+                        res.status(200).send({
+                            status: true,
+                            msg: "删除成功", result: result
+                        });
+                    } else {
+                        res.status(200).send({
+                            status: -1,
+                            msg: "服务器异常",
+                            model: result
+                        });
+                    }
+                });
 
-        }
+            }
+        });
     });
+
 });
 app.post("/editErrorCode", function (req, res) {
     if (!isLogin(req)) {
@@ -207,13 +213,10 @@ app.post("/addApi", function (req, res) {
     api.createTime = new Date();
     dbopt.insert("apis", api, function (result) {
         if (result.result.ok === 1) {
-            var errs = addLog("创建接口", api.label, req.session.username);
-            if (!errs) {
+            dbopt.find("docs", {_id: new mongo.ObjectId(api.doc_id)}, function (res1) {
+                addLog("创建接口", req.session.username, res1[0].label, res1[0]._id, api.label, result.insertId);
                 res.status(200).send({status: true, msg: "Api添加成功"});
-            } else {
-                console.log(errs);
-                res.status(200).send({status: false, msg: "添加操作日志失败", model: errs})
-            }
+            });
         } else {
             res.status(200).send({
                 status: -1,
@@ -231,12 +234,22 @@ app.post("/delApi", function (req, res) {
     var query = {
         _id: new mongo.ObjectId(id)
     };
-    dbopt.delete("apis", query, function (results) {
-        res.status(200).send({
-            status: true,
-            msg: "删除成功"
+    var apiName, docName, docId;
+    dbopt.find("apis", query, function (res11) {
+        apiName = res11[0].label;
+        docId = res11[0].doc_id;
+        dbopt.find("docs", {_id: new mongo.ObjectId(docId)}, function (res1) {
+            docName = res1[0].label;
+            dbopt.delete("apis", query, function (results) {
+                addLog("删除接口", req.session.username, docName, docId, apiName, id, true);
+                res.status(200).send({
+                    status: true,
+                    msg: "删除成功"
+                });
+            });
         });
     });
+
 });
 app.post("/selectApi", function (req, res) {
     var id = req.body.id;
@@ -279,14 +292,18 @@ app.post("/editApi", function (req, res) {
         _id: new mongo.ObjectId(id)
     };
     var newData = {$set: newInfo};
-    console.log("1", query, newInfo);
+    var docName, docId;
     try {
-        dbopt.update("apis", query, newData, function (result) {
-            console.log(result);
-            res.status(200).send({
-                status: true,
-                model: result,
-                msg: "修改成功"
+        dbopt.find("docs", {_id: new mongo.ObjectId(newInfo.doc_id)}, function (res1) {
+            docName = res1[0].label;
+            docId = res1[0]._id;
+            dbopt.update("apis", query, newData, function (result) {
+                addLog("修改接口", req.session.username, docName, docId, newInfo.label, id);
+                res.status(200).send({
+                    status: true,
+                    model: result,
+                    msg: "修改成功"
+                });
             });
         });
     } catch (err) {
@@ -334,11 +351,10 @@ function isLogin(req) {
     }
     return true;
 }
-
 app.use(function (req, res) {
     res.sendFile(__dirname + "/index.html");
 });
-app.listen(8084, function () {
+app.listen(8086, function () {
     console.log("It's express,welcome!  127.0.0.1:8084");
 });
 
