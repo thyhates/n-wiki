@@ -2,15 +2,12 @@
  * Created by thyhates on 2016/10/9.
  */
 "use strict";
-var fs = require("fs");
 var assert = require("assert");
-var session = require("express-session");
-var crypto = require("crypto");
 const mongoClient = require("mongodb").MongoClient;
 const mongo = require("mongodb");
-const mongoUrl = "mongodb://127.0.0.1:27017/wiki";
+const mongoUrl = "mongodb://23.105.195.227:27017/wiki";
 const mongoUser = "thyhates";
-const mongoPwd = "123";
+const mongoPwd = "forgetpwd?8";
 let dbopt = {
     find: function (co, query, callback) {
         mongoClient.connect(mongoUrl, function (err, db) {

@@ -338,7 +338,7 @@ function isLogin(req) {
 app.use(function (req, res) {
     res.sendFile(__dirname + "/index.html");
 });
-app.listen(8086, function () {
+app.listen(8084, function () {
     console.log("It's express,welcome!  127.0.0.1:8084");
 });
 
