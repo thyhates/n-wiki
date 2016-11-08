@@ -19,21 +19,4 @@ angular.module("app")
                 }
             }
         }
-    }])
-    .directive("onListReady",["$timeout","$stateParams",function($timeout,$stateParams){
-        return {
-            "restrict":"A",
-            link:function(scope){
-               $timeout(function(){
-                   console.log(scope.docs);
-                   scope.docs.forEach(function(doc){
-                      if(doc.name===$stateParams.docName){
-                          doc.isOpen=true;
-                      }else{
-                          doc.isOpen=false;
-                      }
-                   });
-               })
-            }
-        }
     }]);

@@ -5,9 +5,9 @@
 var assert = require("assert");
 const mongoClient = require("mongodb").MongoClient;
 const mongo = require("mongodb");
-const mongoUrl = "mongodb://23.105.195.227:27017/wiki";
+const mongoUrl = "mongodb://127.0.0.1:27017/wiki";
 const mongoUser = "thyhates";
-const mongoPwd = "forgetpwd?8";
+const mongoPwd = "123";
 let dbopt = {
     find: function (co, query, callback) {
         mongoClient.connect(mongoUrl, function (err, db) {
@@ -64,4 +64,4 @@ let dbopt = {
         });
     }
 };
-module.exports=dbopt;
+module.exports = dbopt;

@@ -6,6 +6,10 @@ angular.module("app")
         function ($rootScope, $http, $location, $stateParams, $scope, toastr, $state, $uibModal) {
             $scope.docs = [];
             $scope.my_tree = {};
+            let temArray = [];
+            $scope.search = {
+                key: ""
+            };
             function getLog() {
                 $http({
                     url: "getLog",
@@ -56,22 +60,24 @@ angular.module("app")
                         if (data.data.status) {
                             $scope.apis = data.data.model;
                             doc.children = getApiList($scope.apis);
+                            temArray = angular.copy($scope.docs);
+                            console.log("copy result:", temArray);
                         } else {
                             toastr.warning(data.data.msg);
                         }
                     });
                 });
+
             }
 
             function getApiList(doc) {
                 var titls = [];
                 for (var i = 0; i < doc.length; i++) {
-                    console.log("1", doc[i]);
+                    // console.log("1", doc[i]);
                     var doc_id = doc[i].doc_id;
                     var api_id = doc[i]._id;
                     titls.push({
                         label: doc[i].label, onSelect: function (api) {
-                            console.log(api);
                             $state.go("home.doc", {
                                 id: api.doc_id,
                                 aid: api.api_id
@@ -94,6 +100,26 @@ angular.module("app")
                 }
             }
 
+            $scope.filterByName = function () {
+                $scope.docs = angular.copy(temArray);
+                if ($scope.docs.length > 0) {
+                    $scope.docs.forEach(function (item) {
+                        item.expand = true;
+                        if (item.children.length > 0) {
+                            item.children.forEach(function (childItem, j) {
+                                console.log(childItem.label, $scope.search.key);
+                                if (childItem.label.indexOf($scope.search.key) == -1) {
+                                    console.log(item.children);
+                                    item.children.splice(j, 1);
+                                }
+                            });
+                        }
+                    });
+                }
+                if (!$scope.search.key) {
+                    $scope.docs = angular.copy(temArray);
+                }
+            };
             $scope.deleteDoc = function () {
                 if (!isCanShow()) {
                     toastr.warning("请选中要删除的文档");

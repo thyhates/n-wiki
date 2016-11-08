@@ -14,32 +14,41 @@
 </header>
 <div class="container" ui-view="main-container">
     <div class="row">
-        <div class="col-xs-3" on-list-ready>
-            <div class="list" >
+        <div class="col-xs-3">
+            <div class="list">
                 <h3>目录</h3>
                 <div ng-if="docs"
-                     style="-webkit-border-radius:5px ;-moz-border-radius: 5px;border-radius: 5px;max-height: 600px;overflow: auto;background: #eeeeee;" >
-                   <!-- <uib-accordion>
-                        <uib-accordion-group heading="{{doc.name}}" ng-repeat="doc in docs" is-open="doc.isOpen">
-                            <ul class="list-group">
-                                <li class="list-group-item" ng-repeat="api  in doc.apiList ">
-                                    <a ng-href="{{api.doc_id}}/{{api._id}}" style="cursor: pointer;">{{api.name}}</a>
-                                </li>
-                            </ul>
-                        </uib-accordion-group>
-                    </uib-accordion>-->
-                    <abn-tree tree-data= "docs" tree-control= "my_tree"></abn-tree>
+                     style="-webkit-border-radius:5px ;-moz-border-radius: 5px;border-radius: 5px;max-height: 600px;overflow: auto;background: #eeeeee;">
+                    <!-- <uib-accordion>
+                         <uib-accordion-group heading="{{doc.name}}" ng-repeat="doc in docs" is-open="doc.isOpen">
+                             <ul class="list-group">
+                                 <li class="list-group-item" ng-repeat="api  in doc.apiList ">
+                                     <a ng-href="{{api.doc_id}}/{{api._id}}" style="cursor: pointer;">{{api.name}}</a>
+                                 </li>
+                             </ul>
+                         </uib-accordion-group>
+                     </uib-accordion>-->
+                    <div class="form-group" style="margin-bottom: 5px;">
+                        <input type="text" class="form-control" ng-model="search.key" ng-change="filterByName()">
+                    </div>
+                    <abn-tree tree-data="docs" tree-control="my_tree"
+                              style="margin-top: 5px;"></abn-tree>
+                    <!--<ul>
+                        <li ng-repeat="n in ns|filter:{visible:true}">{{n.name}}</li>
+                    </ul>-->
                 </div>
             </div>
         </div>
-        <div class="col-xs-9 " ui-view="apiContent" >
+        <div class="col-xs-9 " ui-view="apiContent">
             <div class="page-header">
                 <h3>文档操作日志</h3>
             </div>
             <ul class="list-group">
                 <li class="list-group-item list-group-item-success" ng-repeat="log in logs">
-                    用户：{{log.user}} ; 操作:{{log.action}} ; 文档：{{log.docName}} , <span ng-if="log.apiName">接口</span> <span ng-if="log.apiName&&!log.del">
-                    <a ng-href="{{log.docId}}/{{log.apiId}}">{{log.apiName}} </a></span><span ng-if="log.apiName&&log.del">{{log.apiName}} </span> 时间: {{log.time}}
+                    用户：{{log.user}} ; 操作:{{log.action}} ; 文档：{{log.docName}} , <span ng-if="log.apiName">接口</span> <span
+                        ng-if="log.apiName&&!log.del">
+                    <a ng-href="{{log.docId}}/{{log.apiId}}">{{log.apiName}} </a></span><span
+                        ng-if="log.apiName&&log.del">{{log.apiName}} </span> 时间: {{log.time}}
                 </li>
             </ul>
         </div>
