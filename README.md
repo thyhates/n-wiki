@@ -1,6 +1,6 @@
 # n-wiki
 API & SDK 文档管理
-使用mongodb座位数据库
+使用mongodb作为数据库
 
 ##Start
 
