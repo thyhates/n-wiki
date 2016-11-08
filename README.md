@@ -1,5 +1,6 @@
 # n-wiki
 API & SDK 文档管理
+使用mongodb座位数据库
 
 ##Start
 
@@ -19,3 +20,5 @@ node server.js
   ]
 }
 ```
+####数据库
+在config.js中配置mongodb数据地址，用户名和密码
