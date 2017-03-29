@@ -5,6 +5,12 @@ angular.module("app").factory("authorInterceptor", ["$log", "$injector","$q","$r
     function ($log,$injector, $q,$rootScope, $location) {
         var myInterceptor = {
             request: function (config) {
+                if(config.data){
+                    var token=sessionStorage.getItem('token');
+                    config.headers["token"]='Wiki '+token||'';
+                    console.log(config);
+                }
+
                 return config;
             },
             response: function (res) {
