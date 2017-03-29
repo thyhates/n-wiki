@@ -2,16 +2,17 @@
  * Created by zhipu.liao on 2016/3/10.
  */
 "use strict";
-var express = require("express");
-var body_parser = require("body-parser");
-var app = express();
-var fs = require("fs");
-var assert = require("assert");
-var session = require("express-session");
-var crypto = require("crypto");
-const mongoClient = require("mongodb").MongoClient;
+const express = require("express");
+const body_parser = require("body-parser");
+const app = express();
+const fs = require("fs");
+const assert = require("assert");
+const session = require("express-session");
+const crypto = require("crypto");
+const compression = require('compression');
 const mongo = require("mongodb");
-var dbopt = require("./dbopt");
+const dbopt = require("./dbopt");
+app.use(compression());
 app.use(express.static(__dirname + "/node_modules"));
 app.use(express.static(__dirname + "/src"));
 app.use(express.static(__dirname + "/dist"));
@@ -355,6 +356,6 @@ app.use(function (req, res) {
     res.sendFile(__dirname + "/index.html");
 });
 app.listen(8089, function () {
-    console.log("It's express,welcome!  127.0.0.1:8084");
+    console.log("It's express,welcome!  http://127.0.0.1:8089");
 });
 
