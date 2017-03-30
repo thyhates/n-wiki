@@ -7,7 +7,7 @@ angular.module("app").factory("authorInterceptor", ["$log", "$injector","$q","$r
             request: function (config) {
                 if(config.data){
                     var token=sessionStorage.getItem('token');
-                    config.headers["user"]=token||'';
+                    config.headers["authorization"]='Bearer '+token||'';
                     console.log(config);
                 }
 
