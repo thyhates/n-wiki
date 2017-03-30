@@ -13,7 +13,6 @@ const mongo = require("mongodb");
 const dbopt = require("./dbopt");
 const compression = require('compression');
 const expressJwt = require('express-jwt');
-const shortid = require('shortid');
 const jwt = require('jsonwebtoken');
 app.use(compression());
 app.use(express.static(__dirname + "/node_modules"));
@@ -31,16 +30,14 @@ app.get("/favicon.ico", function (req, res) {
 
 
 const hs = crypto.createHash("md5").update("abcdefg").digest("hex");
-const getToken = function (req) {
-    if (req.headers.token && req.headers.token.split(' ')[0] === 'Wiki') {
-        console.log(req.headers.token.split(' ')[1])
-        return req.headers.token.split(' ')[1];
-    }
-    return null;
-};
+// const getToken = function (req) {
+//     if (req.headers.token && req.headers.token.split(' ')[0] === 'Wiki') {
+//         return req.headers.token.split(' ')[1];
+//     }
+//     return null;
+// };
 app.use(expressJwt({
-    secret: hs,
-    getToken: getToken
+    secret: hs
 }).unless({
     path: ['/login', '/getAllDocs', '/getLog', '/getDocument', '/selectApi']
 }));
