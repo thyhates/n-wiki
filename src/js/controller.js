@@ -496,8 +496,8 @@ angular.module("app")
                 });
             };
         }])
-    .controller("LoginController", ["$scope", "$http", "$rootScope", "toastr", "$state",
-        function ($scope, $http, $rootScope, toastr, $state) {
+    .controller("LoginController", ["$scope", "$http", "$rootScope", "toastr", "$state","authService",
+        function ($scope, $http, $rootScope, toastr, $state,authService) {
 
             $scope.login = function (form) {
                 if (form.$valid) {
@@ -509,6 +509,7 @@ angular.module("app")
                         console.log(res.data);
                         if (res.data.status) {
                             sessionStorage.setItem("isLogin", true);
+                            sessionStorage.setItem("token", res.data.token);
                             $rootScope.isLogin = sessionStorage.isLogin;
                             $state.go("home");
                         } else {

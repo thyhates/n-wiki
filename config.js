@@ -6,7 +6,7 @@ const config = {
     mongodbConfig: {
         url: 'mongodb://127.0.0.1:27017/wiki',
         user: 'thyhates',
-        pwd: '123'
+        pwd: 'forgetpwd?8'
     }
 };
 module.exports = config;

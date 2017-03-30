@@ -9,9 +9,12 @@ const fs = require("fs");
 const assert = require("assert");
 const session = require("express-session");
 const crypto = require("crypto");
-const compression = require('compression');
 const mongo = require("mongodb");
 const dbopt = require("./dbopt");
+const compression = require('compression');
+const expressJwt = require('express-jwt');
+const shortid = require('shortid');
+const jwt = require('jsonwebtoken');
 app.use(compression());
 app.use(express.static(__dirname + "/node_modules"));
 app.use(express.static(__dirname + "/src"));
@@ -19,36 +22,46 @@ app.use(express.static(__dirname + "/dist"));
 app.use(body_parser.json());
 app.use(body_parser.urlencoded({extended: true}));
 
-
 app.get("/", function (req, res) {
     res.sendFile(__dirname + "/index.html");
 });
 app.get("/favicon.ico", function (req, res) {
     res.sendFile(__dirname + "/favicon.ico");
 });
-/*fs.readFile("doc/document.json", function (err, data) {
- if (err) {
- console.log(err);
- } else {
- console.log(JSON.parse(data).api);
- }
- });*/
-function getAllFiles() {
-    var file = fs.readdirSync("doc");
-    return file;
-}
-var hs = crypto.createHash("md5").update("abcdefg").digest("hex");
-app.use(session({
+
+
+const hs = crypto.createHash("md5").update("abcdefg").digest("hex");
+const getToken = function (req) {
+    if (req.headers.token && req.headers.token.split(' ')[0] === 'Wiki') {
+        console.log(req.headers.token.split(' ')[1])
+        return req.headers.token.split(' ')[1];
+    }
+    return null;
+};
+app.use(expressJwt({
     secret: hs,
-    saveUninitialized: true,
-    resave: false
+    getToken: getToken
+}).unless({
+    path: ['/login', '/getAllDocs', '/getLog', '/getDocument', '/selectApi']
 }));
+
+app.use(function (err, req, res, next) {
+    if (err.name === 'UnauthorizedError') {
+        res.status(401).send('invalid token');
+    }
+});
+
+// app.use(session({
+//     secret: hs,
+//     saveUninitialized: true,
+//     resave: false
+// }));
 function addLog(action, user, docName, docId, apiName, apiId, del) {
-    var time = new Date();
+    let time = new Date();
     if (!apiId) {
         apiId = "";
     }
-    var log = {
+    let log = {
         action: action,
         time: time.toLocaleString(),
         user: user,
@@ -58,7 +71,7 @@ function addLog(action, user, docName, docId, apiName, apiId, del) {
         docName: docName || "",
         del: del || false
     };
-    var errs;
+    let errs;
     dbopt.insert("logs", log, function (result) {
         if (result.result.ok === 1) {
             errs = true;
@@ -68,23 +81,18 @@ function addLog(action, user, docName, docId, apiName, apiId, del) {
     });
 }
 app.post("/getAllDocs", function (req, res) {
-    var logined = true;
-    if (!isLogin(req)) {
-        logined = false;
-    }
     dbopt.find("docs", {}, function (result) {
         res.status(200).send({
             status: 1,
-            model: result,
-            logined: logined
+            model: result
         });
     });
 });
 app.post("/getDocument", function (req, res) {
-    var query = {
+    let query = {
         doc_id: req.body.id
     };
-    var docQuery = {
+    let docQuery = {
         _id: new mongo.ObjectId(req.body.id)
     };
     dbopt.find("docs", docQuery, function (result1) {
@@ -99,14 +107,10 @@ app.post("/getDocument", function (req, res) {
 
 });
 app.post("/newDocument", function (req, res) {
-    if (!isLogin(req)) {
-        res.status(401).send({msg: "请先登录"});
-        return false;
-    }
-    var label = req.body.label,
+    let label = req.body.label,
         type = req.body.type,
         description = req.body.description;
-    var body = {
+    let body = {
         label: label,
         type: type,
         description: description
@@ -125,16 +129,12 @@ app.post("/newDocument", function (req, res) {
     });
 });
 app.post("/editDocs", function (req, res) {
-    if (!isLogin(req)) {
-        res.status(401).send({msg: "请先登录"});
-        return false;
-    }
-    var doc_id = req.body.id;
-    var newInfo = req.body.info;
-    var query = {
+    let doc_id = req.body.id;
+    let newInfo = req.body.info;
+    let query = {
         _id: new mongo.ObjectId(doc_id)
     };
-    var newData = {$set: newInfo};
+    let newData = {$set: newInfo};
     dbopt.update("docs", query, newData, function (result) {
         // console.log(newInfo);
         addLog("编辑文档", req.session.username, newInfo.label, doc_id);
@@ -146,18 +146,14 @@ app.post("/editDocs", function (req, res) {
     });
 });
 app.post("/delDocument", function (req, res) {
-    if (!isLogin(req)) {
-        res.status(401).send({msg: "请先登录"});
-        return false;
-    }
-    var doc_id = req.body.doc_id;
-    var query = {
+    let doc_id = req.body.doc_id;
+    let query = {
         _id: new mongo.ObjectId(doc_id)
     };
-    var apiQuery = {
+    let apiQuery = {
         doc_id: doc_id
     };
-    var docName;
+    let docName;
     dbopt.find("docs", query, function (res1) {
         docName = res1[0].label;
         dbopt.delete("docs", query, function (result) {
@@ -185,17 +181,13 @@ app.post("/delDocument", function (req, res) {
 
 });
 app.post("/editErrorCode", function (req, res) {
-    if (!isLogin(req)) {
-        res.status(401).send({msg: "请先登录"});
-        return false;
-    }
-    var id = req.body.id;
-    var body = req.body.body;
+    let id = req.body.id;
+    let body = req.body.body;
 
-    var query = {
+    let query = {
         _id: new mongo.ObjectId(id)
     };
-    var newData = {$set: {errorCodeLst: body}};
+    let newData = {$set: {errorCodeLst: body}};
     dbopt.update("docs", query, newData, function (result) {
         res.status(200).send({
             status: true,
@@ -205,11 +197,7 @@ app.post("/editErrorCode", function (req, res) {
     });
 });
 app.post("/addApi", function (req, res) {
-    if (!isLogin(req)) {
-        res.status(401).send({msg: "请先登录"});
-        return false;
-    }
-    var api = req.body.body;
+    let api = req.body.body;
     api.createUser = req.session.username;
     api.createTime = new Date();
     dbopt.insert("apis", api, function (result) {
@@ -227,15 +215,11 @@ app.post("/addApi", function (req, res) {
     });
 });
 app.post("/delApi", function (req, res) {
-    if (!isLogin(req)) {
-        res.status(401).send({msg: "请先登录"});
-        return false;
-    }
-    var id = req.body.id;
-    var query = {
+    let id = req.body.id;
+    let query = {
         _id: new mongo.ObjectId(id)
     };
-    var apiName, docName, docId;
+    let apiName, docName, docId;
     dbopt.find("apis", query, function (res11) {
         apiName = res11[0].label;
         docId = res11[0].doc_id;
@@ -253,13 +237,13 @@ app.post("/delApi", function (req, res) {
 
 });
 app.post("/selectApi", function (req, res) {
-    var id = req.body.id;
+    let id = req.body.id;
     if (id) {
         var query = {
             _id: new mongo.ObjectId(id)
         };
     }
-    var docQuery = {
+    let docQuery = {
         _id: new mongo.ObjectId(req.body.doc_id)
     };
     dbopt.find("docs", docQuery, function (result1) {
@@ -281,19 +265,15 @@ app.post("/selectApi", function (req, res) {
 
 });
 app.post("/editApi", function (req, res) {
-    if (!isLogin(req)) {
-        res.status(401).send({msg: "请先登录"});
-        return false;
-    }
-    var id = req.body.id;
-    var newInfo = req.body.api;
+    let id = req.body.id;
+    let newInfo = req.body.api;
     newInfo.update = req.session.username;
     newInfo.lastTime = new Date();
-    var query = {
+    let query = {
         _id: new mongo.ObjectId(id)
     };
-    var newData = {$set: newInfo};
-    var docName, docId;
+    let newData = {$set: newInfo};
+    let docName, docId;
     try {
         dbopt.find("docs", {_id: new mongo.ObjectId(newInfo.doc_id)}, function (res1) {
             docName = res1[0].label;
@@ -322,36 +302,26 @@ app.post("/getLog", function (req, res) {
 });
 app.post("/login", function (req, res) {
     fs.readFile("config.json", function (err, data) {
-        var users = JSON.parse(data).user;
-        var reqName = req.body.name;
-        var psd = crypto.createHash("md5").update(req.body.password).digest("hex");
-        var isRight = false;
+        let users = JSON.parse(data).user;
+        let reqName = req.body.name;
+        let psd = crypto.createHash("md5").update(req.body.password).digest("hex");
+        let isRight = false;
         users.forEach(function (user) {
             if (reqName === user.name && psd === user.password) {
                 isRight = true;
             }
         });
         if (isRight) {
-            req.session.isLogin = true;
-            req.session.username = reqName;
-            res.status(200).send({status: true, msg: "登录成功"});
+            let authToken = jwt.sign({username: reqName}, psd);
+            res.status(200).send({status: true, msg: "登录成功", token: authToken});
         } else {
-            res.status(401).send({status: false, msg: "用户名或密码不正确！"});
+            res.status(400).send({status: false, msg: "用户名或密码不正确！"});
         }
     });
 });
 app.post("/logout", function (req, res) {
-    req.session.isLogin = false;
-    req.session.username = null;
-    console.log(req.session.isLogin);
     res.status(200).send({msg: "退出成功"});
 });
-function isLogin(req) {
-    if (!req.session.isLogin) {
-        return false;
-    }
-    return true;
-}
 app.use(function (req, res) {
     res.sendFile(__dirname + "/index.html");
 });
