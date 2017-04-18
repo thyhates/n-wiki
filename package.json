@@ -20,7 +20,7 @@
     "angular-schema-form": "^0.8.13",
     "angular-toastr": "^1.7.0",
     "angular-ui-bootstrap": "^1.2.4",
-    "angular-ui-router": "^0.2.18",
+    "angular-ui-router": "^0.4.2",
     "body-parser": "^1.15.0",
     "bootstrap": "^3.3.6",
     "express": "^4.13.4",
@@ -33,6 +33,9 @@
   },
   "dependencies": {
     "angular-bootstrap-nav-tree": "^0.2.1",
+    "angular-toastr": "^2.1.1",
+    "angular-ui-bootstrap": "^2.5.0",
+    "angular-ui-router": "^0.4.2",
     "compression": "^1.6.2",
     "gulp-sass": "^3.1.0"
   }

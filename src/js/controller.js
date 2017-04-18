@@ -29,13 +29,7 @@ angular.module("app")
                     method: "POST"
                 }).then(function (data) {
                     $scope.docs = data.data.model;
-                    if (data.data.logined) {
-                        sessionStorage.setItem("isLogin", true);
-                        $rootScope.isLogin = sessionStorage.isLogin;
-                    } else {
-                        sessionStorage.setItem("isLogin", false);
-                        $rootScope.isLogin = undefined;
-                    }
+                    console.log('dos',$scope.docs);
                     getDocList();
                 }, function (data) {
                 });
@@ -43,13 +37,6 @@ angular.module("app")
 
             function getDocList() {
                 $scope.docs.forEach(function (doc) {
-                    doc.onSelect = function (branch) {
-                        this.expanded = true;
-                        $state.go("home.doc", {
-                            id: branch._id,
-                            aid: ""
-                        });
-                    };
                     $http({
                         url: "getDocument",
                         method: "POST",
@@ -61,7 +48,6 @@ angular.module("app")
                             $scope.apis = data.data.model;
                             doc.children = getApiList($scope.apis);
                             temArray = angular.copy($scope.docs);
-                            console.log("copy result:", temArray);
                         } else {
                             toastr.warning(data.data.msg);
                         }
@@ -73,18 +59,10 @@ angular.module("app")
             function getApiList(doc) {
                 var titls = [];
                 for (var i = 0; i < doc.length; i++) {
-                    // console.log("1", doc[i]);
                     var doc_id = doc[i].doc_id;
                     var api_id = doc[i]._id;
                     titls.push({
-                        label: doc[i].label, onSelect: function (api) {
-                            $state.go("home.doc", {
-                                id: api.doc_id,
-                                aid: api.api_id
-                            }, {
-                                reload: "home.doc"
-                            });
-                        },
+                        label: doc[i].label,
                         doc_id: doc_id,
                         api_id: api_id
                     });
