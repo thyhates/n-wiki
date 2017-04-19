@@ -2,24 +2,19 @@
  * Created by zhipu.liao on 2016/3/4.
  */
 angular.module("app")
-    .controller("ListController", ["$rootScope", "$http", "$location", "$stateParams", "$scope", "toastr", "$state", "$uibModal",
-        function ($rootScope, $http, $location, $stateParams, $scope, toastr, $state, $uibModal) {
+    .controller("ListController", ["logService","$rootScope", "$http", "$location", "$stateParams", "$scope", "toastr", "$state", "$uibModal",
+        function (logService,$rootScope, $http, $location, $stateParams, $scope, toastr, $state, $uibModal) {
+            var vm = this;
             $scope.docs = [];
-            $scope.my_tree = {};
             let temArray = [];
             $scope.search = {
                 key: ""
             };
             function getLog() {
-                $http({
-                    url: "getLog",
-                    method: "POST"
-                }).then(function (data) {
-                    if (data.data.status) {
-                        $scope.logs = data.data.model;
-                    } else {
-                        toastr.warning(data.data.msg);
-                    }
+                logService.getLog().then(function (res) {
+                    $scope.logs = res;
+                },function (res) {
+                    toastr.warning(res);
                 });
             }
 
@@ -29,7 +24,7 @@ angular.module("app")
                     method: "POST"
                 }).then(function (data) {
                     $scope.docs = data.data.model;
-                    console.log('dos',$scope.docs);
+                    console.log('dos', $scope.docs);
                     getDocList();
                 }, function (data) {
                 });
@@ -474,25 +469,14 @@ angular.module("app")
                 });
             };
         }])
-    .controller("LoginController", ["$scope", "$http", "$rootScope", "toastr", "$state","authService",
-        function ($scope, $http, $rootScope, toastr, $state,authService) {
-
+    .controller("LoginController", ["$scope", 'toastr', "$state", "authService",
+        function ($scope, toastr, $state, authService) {
             $scope.login = function (form) {
                 if (form.$valid) {
-                    $http({
-                        url: "login",
-                        data: $scope.user,
-                        method: "POST"
-                    }).then(function (res) {
-                        console.log(res.data);
-                        if (res.data.status) {
-                            sessionStorage.setItem("isLogin", true);
-                            sessionStorage.setItem("token", res.data.token);
-                            $rootScope.isLogin = sessionStorage.isLogin;
-                            $state.go("home");
-                        } else {
-                            toastr.warning(res.data.msg);
-                        }
+                    authService.login($scope.user).then(function (res) {
+                        $state.go("home");
+                    }, function (res) {
+                        toastr.warning(res);
                     });
                 } else {
                     toastr.warning("请输入完整登录信息");

@@ -1,75 +1,71 @@
-<header class="navbar navbar-fixed-top" id="top">
-    <div class="container">
-        <div class="navbar-header">
-            <a class="navbar-brand" ng-href="asd">文档管理</a>
+<div ng-controller="ListController as vm">
+    <header class="navbar navbar-fixed-top" id="top">
+        <div class="container">
+            <div class="navbar-header">
+                <a class="navbar-brand" ng-href="asd">文档管理</a>
+            </div>
+            <ul class="nav navbar-nav navbar-right">
+                <li ng-if="isLogin">
+                    <a ng-href="new">新建</a>
+                </li>
+                <li ng-if="!isLogin"><a ng-href="login">登录</a></li>
+                <li ng-if="isLogin"><a ng-click="logout()" href>退出</a></li>
+            </ul>
         </div>
-        <ul class="nav navbar-nav navbar-right">
-            <li ng-if="isLogin">
-                <a ng-href="new">新建</a>
-            </li>
-            <li ng-if="!isLogin"><a ng-href="login">登录</a></li>
-            <li ng-if="isLogin"><a ng-click="logout()" style="cursor: pointer;">退出</a></li>
-        </ul>
-    </div>
-</header>
-<div class="container" ui-view="main-container">
-    <div class="row">
-        <div class="col-xs-3">
-            <div class="list">
-                <h3>目录</h3>
-                <div ng-if="docs" class="doc-list-wrapper">
-                     <uib-accordion close-others="true">
-                         <div uib-accordion-group class="doc-item" heading="{{doc.label}}" ng-repeat="doc in docs" >
-                             <ul class="list-group">
-                                 <li class="list-group-item" ng-repeat="api  in doc.children ">
-                                     <a ng-href="{{api.doc_id}}/{{api.api_id}}" style="cursor: pointer;">{{api.label}}</a>
-                                 </li>
-                             </ul>
-                         </div>
-                     </uib-accordion>
-                    <!--<div class="form-group" style="margin-bottom: 5px;">-->
-                        <!--<input type="text" class="form-control" ng-model="search.key" ng-change="filterByName()">-->
-                    <!--</div>-->
-                    <!--<abn-tree tree-data="docs" tree-control="my_tree"-->
-                              <!--style="margin-top: 5px;"></abn-tree>-->
-                    <!--<ul>
-                        <li ng-repeat="n in ns|filter:{visible:true}">{{n.name}}</li>
-                    </ul>-->
+    </header>
+    <div class="container" ui-view="main-container">
+        <div class="row">
+            <div class="col-xs-3">
+                <div class="list">
+                    <h3>目录</h3>
+                    <div ng-if="docs" class="doc-list-wrapper">
+                        <uib-accordion close-others="true">
+                            <div uib-accordion-group class="doc-item" heading="{{doc.label}}" ng-repeat="doc in docs">
+                                <ul class="list-group">
+                                    <li class="list-group-item" ng-repeat="api  in doc.children ">
+                                        <a ng-href="{{api.doc_id}}/{{api.api_id}}" style="cursor: pointer;">{{api.label}}</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </uib-accordion>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-9 " ui-view="apiContent">
+                <div class="page-header">
+                    <h3>文档操作日志</h3>
+                </div>
+                <ul class="list-group">
+                    <li class="list-group-item list-group-item-success" ng-repeat="log in logs">
+                        用户：{{log.user}} ; 操作:{{log.action}} ; 文档：{{log.docName}} , <span ng-if="log.apiName">接口</span>
+                        <span
+                                ng-if="log.apiName&&!log.del">
+                    <a ng-href="{{log.docId}}/{{log.apiId}}">{{log.apiName}} </a></span><span
+                            ng-if="log.apiName&&log.del">{{log.apiName}} </span> 时间: {{log.time}}
+                    </li>
+                </ul>
+            </div>
+            <div class="col-xs-1" ng-if="isLogin">
+                <div class="tools">
+                    <ul class="list">
+                        <li><a ng-click="editDoc()"><span class="glyphicon glyphicon-pencil" title="编辑"></span></a></li>
+                        <li><a ng-click="deleteDoc()"><span class="glyphicon glyphicon-minus" title="删除"></span></a>
+                        </li>
+                    </ul>
                 </div>
             </div>
         </div>
-        <div class="col-xs-9 " ui-view="apiContent">
-            <div class="page-header">
-                <h3>文档操作日志</h3>
-            </div>
-            <ul class="list-group">
-                <li class="list-group-item list-group-item-success" ng-repeat="log in logs">
-                    用户：{{log.user}} ; 操作:{{log.action}} ; 文档：{{log.docName}} , <span ng-if="log.apiName">接口</span> <span
-                        ng-if="log.apiName&&!log.del">
-                    <a ng-href="{{log.docId}}/{{log.apiId}}">{{log.apiName}} </a></span><span
-                        ng-if="log.apiName&&log.del">{{log.apiName}} </span> 时间: {{log.time}}
-                </li>
-            </ul>
-        </div>
-        <div class="col-xs-1" ng-if="isLogin">
-            <div class="tools">
-                <ul class="list">
-                    <li><a ng-click="editDoc()"><span class="glyphicon glyphicon-pencil" title="编辑"></span></a></li>
-                    <li><a ng-click="deleteDoc()"><span class="glyphicon glyphicon-minus" title="删除"></span></a></li>
-                </ul>
-            </div>
-        </div>
     </div>
+    <script type="text/ng-template" id="confirm.html">
+        <div class="modal-header">
+            <h3 class="modal-title">警告</h3>
+        </div>
+        <div class="modal-body">
+            <p>确定删除该文档？</p>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-primary" type="button" ng-click="ok()">OK</button>
+            <button class="btn btn-warning" type="button" ng-click="cancel()">Cancel</button>
+        </div>
+    </script>
 </div>
-<script type="text/ng-template" id="confirm.html">
-    <div class="modal-header">
-        <h3 class="modal-title">警告</h3>
-    </div>
-    <div class="modal-body">
-        <p>确定删除该文档？</p>
-    </div>
-    <div class="modal-footer">
-        <button class="btn btn-primary" type="button" ng-click="ok()">OK</button>
-        <button class="btn btn-warning" type="button" ng-click="cancel()">Cancel</button>
-    </div>
-</script>

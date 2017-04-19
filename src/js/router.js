@@ -10,7 +10,7 @@ angular.module("app").config(["$stateProvider", "$urlRouterProvider",
                 templateUrl: function () {
                   return  "page/list.html?"+Math.random();
                 },
-                controller: "ListController"
+                controller: ""
             })
             .state("home.doc", {
                 url: ":id/:aid",
