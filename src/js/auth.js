@@ -6,6 +6,8 @@ angular.module("app")
         function ($log, $injector, $q,$http,$cookies) {
             var authService=this;
             authService.login=login;
+            authService.logout=logout;
+            authService.checkLogin=checkLogin;
             function login(params){
                 var deferred=$q.defer();
                 var promise=deferred.promise;
@@ -21,9 +23,21 @@ angular.module("app")
                 return promise;
             }
             function logout() {
-
+                var deferred=$q.defer();
+                var promise=deferred.promise;
+                $http.post('logout',{}).then(function (res) {
+                    if(res.data.status){
+                        $cookies.remove('token');
+                        deferred.resolve();
+                    }else{
+                        deferred.reject();
+                    }
+                });
+                return promise;
             }
             function checkLogin() {
+                var token=$cookies.get('token');
+                return !!token;
             }
 
         }]);

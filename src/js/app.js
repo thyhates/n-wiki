@@ -3,7 +3,7 @@
  */
 "use strict";
 var app = angular.module("app", ["angular-loading-bar", "ngAnimate",
-    'ui.router', "toastr", "ui.bootstrap", "schemaForm", "angularBootstrapNavTree"])
+    'ui.router', "toastr", "ui.bootstrap", "schemaForm", "angularBootstrapNavTree","ngCookies"])
     .run(function () {
             console.log("app started...");
         });

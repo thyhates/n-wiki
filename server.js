@@ -47,7 +47,7 @@ app.use(expressJwt({
 }));
 app.use(function (err, req, res, next) {
     if (err.name === 'UnauthorizedError') {
-        res.status(401).sendFile(__dirname + "/index.html");;
+        res.status(401).sendFile(__dirname + "/index.html");
     }
 });
 function addLog(action, user, docName, docId, apiName, apiId, del) {
@@ -77,7 +77,7 @@ function addLog(action, user, docName, docId, apiName, apiId, del) {
 app.post("/getAllDocs", function (req, res) {
     dbopt.find("docs", {}, function (result) {
         res.status(200).send({
-            status: 1,
+            status: true,
             model: result
         });
     });
@@ -162,7 +162,7 @@ app.post("/delDocument", function (req, res) {
                         });
                     } else {
                         res.status(200).send({
-                            status: -1,
+                            status:false,
                             msg: "服务器异常",
                             model: result
                         });
@@ -232,8 +232,9 @@ app.post("/delApi", function (req, res) {
 });
 app.post("/selectApi", function (req, res) {
     let id = req.body.id;
+    let query;
     if (id) {
-        var query = {
+        query = {
             _id: new mongo.ObjectId(id)
         };
     }

@@ -18,9 +18,9 @@
             <div class="col-xs-3">
                 <div class="list">
                     <h3>目录</h3>
-                    <div ng-if="docs" class="doc-list-wrapper">
+                    <div ng-if="vm.docs" class="doc-list-wrapper">
                         <uib-accordion close-others="true">
-                            <div uib-accordion-group class="doc-item" heading="{{doc.label}}" ng-repeat="doc in docs">
+                            <div uib-accordion-group class="doc-item" heading="{{doc.label}}" ng-repeat="doc in vm.docs">
                                 <ul class="list-group">
                                     <li class="list-group-item" ng-repeat="api  in doc.children ">
                                         <a ng-href="{{api.doc_id}}/{{api.api_id}}" style="cursor: pointer;">{{api.label}}</a>
@@ -36,7 +36,7 @@
                     <h3>文档操作日志</h3>
                 </div>
                 <ul class="list-group">
-                    <li class="list-group-item list-group-item-success" ng-repeat="log in logs">
+                    <li class="list-group-item list-group-item-success" ng-class="{'list-group-item-success':!log.del,'list-group-item-success':log.del}" ng-repeat="log in vm.logs">
                         用户：{{log.user}} ; 操作:{{log.action}} ; 文档：{{log.docName}} , <span ng-if="log.apiName">接口</span>
                         <span
                                 ng-if="log.apiName&&!log.del">
@@ -48,8 +48,8 @@
             <div class="col-xs-1" ng-if="isLogin">
                 <div class="tools">
                     <ul class="list">
-                        <li><a ng-click="editDoc()"><span class="glyphicon glyphicon-pencil" title="编辑"></span></a></li>
-                        <li><a ng-click="deleteDoc()"><span class="glyphicon glyphicon-minus" title="删除"></span></a>
+                        <li><a ng-click="vm.editDoc()"><span class="glyphicon glyphicon-pencil" title="编辑"></span></a></li>
+                        <li><a ng-click="vm.deleteDoc()"><span class="glyphicon glyphicon-minus" title="删除"></span></a>
                         </li>
                     </ul>
                 </div>
@@ -61,7 +61,7 @@
             <h3 class="modal-title">警告</h3>
         </div>
         <div class="modal-body">
-            <p>确定删除该文档？</p>
+            <p>确定删除？</p>
         </div>
         <div class="modal-footer">
             <button class="btn btn-primary" type="button" ng-click="ok()">OK</button>

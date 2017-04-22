@@ -1,102 +1,23 @@
 /**
  * Created by zhipu.liao on 2016/3/4.
  */
+"use strict";
 angular.module("app")
-    .controller("ListController", ["logService","$rootScope", "$http", "$location", "$stateParams", "$scope", "toastr", "$state", "$uibModal",
-        function (logService,$rootScope, $http, $location, $stateParams, $scope, toastr, $state, $uibModal) {
+    .controller("ListController", ["docService", "authService", "logService", "$location", "$stateParams", "$scope", "toastr", "$state", "$uibModal",
+        function (docService, authService, logService, $location, $stateParams, $scope, toastr, $state, $uibModal) {
             var vm = this;
-            $scope.docs = [];
-            let temArray = [];
-            $scope.search = {
-                key: ""
+            vm.docs = [];
+            $scope.isLogin = authService.checkLogin();
+            vm.logout = function () {
+                authService.logout().then(function (res) {
+                    $state.go("home");
+                })
             };
-            function getLog() {
-                logService.getLog().then(function (res) {
-                    $scope.logs = res;
-                },function (res) {
-                    toastr.warning(res);
-                });
-            }
-
-            function getAllDocList() {
-                $http({
-                    url: "getAllDocs",
-                    method: "POST"
-                }).then(function (data) {
-                    $scope.docs = data.data.model;
-                    console.log('dos', $scope.docs);
-                    getDocList();
-                }, function (data) {
-                });
-            }
-
-            function getDocList() {
-                $scope.docs.forEach(function (doc) {
-                    $http({
-                        url: "getDocument",
-                        method: "POST",
-                        data: {
-                            id: doc._id
-                        }
-                    }).then(function (data) {
-                        if (data.data.status) {
-                            $scope.apis = data.data.model;
-                            doc.children = getApiList($scope.apis);
-                            temArray = angular.copy($scope.docs);
-                        } else {
-                            toastr.warning(data.data.msg);
-                        }
-                    });
-                });
-
-            }
-
-            function getApiList(doc) {
-                var titls = [];
-                for (var i = 0; i < doc.length; i++) {
-                    var doc_id = doc[i].doc_id;
-                    var api_id = doc[i]._id;
-                    titls.push({
-                        label: doc[i].label,
-                        doc_id: doc_id,
-                        api_id: api_id
-                    });
-                }
-                return titls;
-            }
-
-            function isCanShow() {
-                if ($state.includes("home.edit") || $state.includes("home.doc") || $state.includes("home.newApi") || $state.includes("home.error") || $state.includes("home.editErr")) {
-                    return true;
-                } else {
-                    return false;
-                }
-            }
-
-            $scope.filterByName = function () {
-                $scope.docs = angular.copy(temArray);
-                if ($scope.docs.length > 0) {
-                    $scope.docs.forEach(function (item) {
-                        item.expand = true;
-                        if (item.children.length > 0) {
-                            item.children.forEach(function (childItem, j) {
-                                console.log(childItem.label, $scope.search.key);
-                                if (childItem.label.indexOf($scope.search.key) == -1) {
-                                    console.log(item.children);
-                                    item.children.splice(j, 1);
-                                }
-                            });
-                        }
-                    });
-                }
-                if (!$scope.search.key) {
-                    $scope.docs = angular.copy(temArray);
-                }
-            };
-            $scope.deleteDoc = function () {
-                if (!isCanShow()) {
-                    toastr.warning("请选中要删除的文档");
-                    return false;
+            vm.deleteDoc = function () {
+                var did = $stateParams.id;
+                if (!did) {
+                    toastr.warning('请选中要删除的文档');
+                    return;
                 }
                 var delInstance = $uibModal.open({
                     animation: true,
@@ -105,36 +26,24 @@ angular.module("app")
                     keyboard: false,
                     backdrop: "static"
                 });
-                delInstance.result.then(function (docName) {
-                    if (docName) {
-                        $http({
-                            url: "delDocument",
-                            method: "POST",
-                            data: {
-                                doc_id: docName
-                            }
-                        }).then(function (data) {
-                            if (data.data.status) {
-                                getAllDocList();
-                                getLog();
-                                $state.go("home");
-                                toastr.success(data.data.msg);
-
-                            } else {
-                                toastr.warning(data.data.msg);
-                            }
-                        });
-                    } else {
-                        console.log("dismiss");
-                    }
+                delInstance.result.then(function () {
+                    docService.delDocument(did).then(function (res) {
+                        getAllDocList();
+                        getLog();
+                        $state.go("home");
+                        toastr.success(res);
+                    }, function (res) {
+                        toastr.warning(res);
+                    })
+                }, function () {
+                    console.log("delete document rejected");
                 });
             };
-            $scope.editDoc = function () {
-                if (!isCanShow()) {
-                    toastr.warning("请选中要编辑的文档");
-                    return false;
+            vm.editDoc = function () {
+                var did = $stateParams.id;
+                if (!did) {
+                    toastr.warning('请选中要编辑的文档');
                 }
-                console.log($state.includes("home.doc"));
                 var editInstance = $uibModal.open({
                     animation: true,
                     templateUrl: "page/editDoc.html",
@@ -147,47 +56,37 @@ angular.module("app")
                 }, function (data) {
                 });
             };
+            function getLog() {
+                logService.getLog().then(function (res) {
+                    vm.logs = res;
+                }, function (res) {
+                    toastr.warning(res);
+                });
+            }
+
+            function getAllDocList() {
+                docService.getAllDoc().then(function (res) {
+                    vm.docs = res;
+                    vm.docs.forEach(function (doc) {
+                        docService.getDocument(doc._id).then(function (res) {
+                            doc.children = docService.getApiList(res.model || []);
+                        })
+                    });
+                }, function (res) {
+                    toastr.warning(res || '文档获取失败');
+                })
+            }
+
             getAllDocList();
             getLog();
-            $scope.logout = function () {
-                $http({
-                    url: "/logout",
-                    method: "POST"
-                }).then(function (res) {
-                    sessionStorage.clear();
-                    $rootScope.isLogin = sessionStorage.isLogin;
-                    $state.go("home");
-                })
-            };
+
         }])
-    .controller("MainController", ["$http", "$scope", "$stateParams", "toastr", "$state", "$uibModal",
-        function ($http, $scope, $stateParams, toastr, $state, $uibModal) {
-            $scope.apis = [];
-            $scope.docId = $stateParams.id;
-            $scope.apiId = $stateParams.aid;
-            $http({
-                url: "selectApi",
-                method: "POST",
-                data: {
-                    id: $stateParams.aid,
-                    doc_id: $stateParams.id
-                }
-            }).then(function (data) {
-                if (data.data.status) {
-                    if (data.data.model) {
-                        $scope.api = data.data.model[0];
-                    }
-                    if ($scope.apis.length == 0) {
-                        $scope.apis = false;
-                    }
-                    $scope.documentInfo = data.data.documentInfo[0];
-                } else {
-                    if ($scope.apiId) {
-                        toastr.warning(data.data.msg);
-                    }
-                }
-            });
-            $scope.delApi = function () {
+    .controller("MainController", [ "$scope", "$stateParams", "toastr", "$state", "$uibModal", "apiService",
+        function ( $scope, $stateParams, toastr, $state, $uibModal, apiService) {
+            var vm = this;
+            vm.docId = $stateParams.id;
+            vm.apiId = $stateParams.aid;
+            vm.delApi = function () {
                 var delApiInstance = $uibModal.open({
                     animation: true,
                     templateUrl: "confirm.html",
@@ -195,31 +94,35 @@ angular.module("app")
                     keyboard: false,
                     backdrop: "static"
                 });
-                delApiInstance.result.then(function (aid) {
-                    if (aid) {
-                        $http({
-                            url: "delApi",
-                            method: "POST",
-                            data: {
-                                id: aid
-                            }
-                        }).then(function (data) {
-                            toastr.success(data.data.msg);
-                            $state.transitionTo("home.doc", {
-                                id: aid,
-                                aid: ""
-                            }, {
-                                reload: "home.doc"
-                            });
-                        }, function (data) {
-                            toastr.warning(data.data.msg);
-                        })
-                    } else {
-                        console.log("dismiss");
-                    }
+                delApiInstance.result.then(function () {
+                    apiService.deleteApi(vm.apiId).then(function () {
+                        toastr.success("删除成功");
+                        $state.transitionTo("home.doc", {
+                            id: vm.docId,
+                            aid: ""
+                        }, {
+                            reload: "home.doc"
+                        });
+                    }, function (res) {
+                        toastr.warning(res);
+                    })
+                }, function () {
+                    console.log('delete api rejected');
                 });
 
             };
+            function getApi() {
+                if (!vm.apiId) {
+                    return;
+                }
+                apiService.getApi(vm.apiId, vm.docId).then(function (res) {
+                    vm.api = res.model[0];
+                    vm.documentInfo = res.documentInfo[0];
+                }, function (res) {
+                    toastr.warning(res);
+                })
+            }
+            getApi();
         }])
     .controller("NewDocumentController", ["$scope", "$http", "toastr", "$state",
         function ($scope, $http, toastr, $state) {
@@ -310,19 +213,10 @@ angular.module("app")
                 return n % 1 === 0;
             }
         }])
-    .controller("delDocumentCtl", ["$uibModalInstance", "$scope", "$stateParams", "toastr",
-        function ($uibModalInstance, $scope, $stateParams, toastr) {
-            if (!$stateParams.id) {
-                $uibModalInstance.dismiss();
-                toastr.warning("请选中要删除的文档");
-                return false;
-            }
+    .controller("delDocumentCtl", ["$uibModalInstance", "$scope",
+        function ($uibModalInstance, $scope) {
             $scope.ok = function () {
-                if ($stateParams.aid) {
-                    $uibModalInstance.close($stateParams.aid);
-                } else {
-                    $uibModalInstance.close($stateParams.id);
-                }
+                $uibModalInstance.close(true);
             };
             $scope.cancel = function () {
                 $uibModalInstance.dismiss();
@@ -474,7 +368,9 @@ angular.module("app")
             $scope.login = function (form) {
                 if (form.$valid) {
                     authService.login($scope.user).then(function (res) {
-                        $state.go("home");
+                        $state.go("home", {}, {
+                            reload: "home"
+                        });
                     }, function (res) {
                         toastr.warning(res);
                     });

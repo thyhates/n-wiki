@@ -9,10 +9,14 @@ angular.module("app").config(["$stateProvider", "$urlRouterProvider",
                 url: "/",
                 templateUrl: function () {
                   return  "page/list.html?"+Math.random();
-                },
-                controller: ""
+                }
             })
             .state("home.doc", {
+                /**
+                 * @id 文档id
+                 * @aid api id
+                 */
+
                 url: ":id/:aid",
                 views: {
                     "apiContent": {
