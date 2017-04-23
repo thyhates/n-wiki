@@ -1,7 +1,7 @@
-<div class="document-container" style="border: 1px solid #ddd;" ng-controller="ErrorController">
+<div class="document-container" style="border: 1px solid #ddd;" ng-controller="ErrorController as vm">
     <h4 style="border-bottom: 1px solid #ddd;">错误码列表</h4>
     <div class="opt">
-        <a  ng-if="isLogin" ng-href="{{docId}}/{{apiId}}/edit/err" class="btn btn-default pull-right" style="margin: 15px 15px;">编辑</a>
+        <a  ng-if="isLogin" ng-href="{{vm.docId}}/{{vm.apiId}}/edit/err" class="btn btn-default pull-right" style="margin: 15px 15px;">编辑</a>
         <a href="javascript:history.go(-1);" class="btn btn-default pull-right" style="margin: 15px 15px;">返回</a>
     </div>
     <table class="table table-bordered">
@@ -17,7 +17,7 @@
         </th>
         </thead>
         <tbody>
-        <tr ng-repeat="err in errors">
+        <tr ng-repeat="err in vm.errors">
             <td>
                 {{err.name}}
             </td>

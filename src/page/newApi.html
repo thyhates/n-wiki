@@ -1,158 +1,160 @@
-<uib-tabset active="activeJustified" justified="true">
-    <uib-tab index="0" heading="编辑">
-        <div style="padding: 30px;border: 1px solid #ddd;" on-new-form-ready class="editContainer">
-            <form sf-schema="addSchema" sf-form="addForm" sf-model="addModel" ng-submit="addApi()">
-            </form>
-            <input type="button" class="btn btn-primary" value="输入JSON" ng-click="showJSONinput()">
-        </div>
-    </uib-tab>
-    <uib-tab index="1" heading="预览">
-        <div style="padding: 30px;" on-new-form-ready class="editContainer">
-            <div class="apiBody" ng-if="docType==0">
-                <p>
-                    请求名称：{{newApi.name}}
-                </p>
-                <p>
-                    请求路径: {{newApi.api}}
-                </p>
-                <p>
-                    请求模式: {{newApi.method}}
-                </p>
-                <p>请求参数(header):
-                </p>
-                <table class="table table-bordered">
-                    <thead>
-                    <th style="width:20%;word-wrap: break-word;">参数名称</th>
-                    <th style="width:20%;word-wrap: break-word;">类型</th>
-                    <th style="width:20%;word-wrap: break-word;">必填</th>
-                    <th style="width:40%;word-wrap: break-word;">说明</th>
-                    </thead>
-                    <tbody>
-                    <tr ng-repeat="param in newApi.params" ng-if="newApi.params">
-                        <td>{{param.apiName}}
-                        </td>
-                        <td>{{param.type}}
-                        </td>
-                        <td>{{param.require}}</td>
-                        <td>{{param.apiValue}}</td>
-                    </tr>
-                    </tbody>
-                </table>
-
-                <p>请求参数(urlParam):
-                </p>
-                <table class="table table-bordered">
-                    <thead>
-                    <th style="width:20%;word-wrap: break-word;">参数名称</th>
-                    <th style="width:20%;word-wrap: break-word;">类型</th>
-                    <th style="width:20%;word-wrap: break-word;">必填</th>
-                    <th style="width:40%;word-wrap: break-word;">说明</th>
-                    </thead>
-                    <tbody>
-                    <tr ng-repeat="res in newApi.res" ng-if="newApi.res">
-                        <td>
-                            {{res.key}}
-                        </td>
-                        <td>
-                            {{res.type}}
-                        </td>
-                        <td>{{res.require}}</td>
-                        <td>
-                            {{res.revalue}}
-                        </td>
-                    </tr>
-                    </tbody>
-                </table>
-
-                <p>
-                    JSON返回示例:
-                </p>
-                <pre>{{newApi.demo}}</pre>
-                <br/>
-                <p>
-                    接口说明:
-                </p>
-                <pre>{{newApi.description}}</pre>
+<div ng-controller="AddApiController as vm">
+    <uib-tabset active="activeJustified" justified="true">
+        <uib-tab index="0" heading="编辑">
+            <div style="padding: 30px;border: 1px solid #ddd;" on-new-form-ready class="editContainer">
+                <form sf-schema="vm.addSchema" sf-form="vm.addForm" sf-model="vm.addModel" ng-submit="vm.addApi()">
+                </form>
+                <input type="button" class="btn btn-primary" value="输入JSON" ng-click="vm.showJSONinput()">
             </div>
-            <div class="apiBody" ng-if="docType==1">
-                <h3>{{newApi.name}}</h3>
-                <p>
-                    接口定义:&nbsp;&nbsp;{{newApi.api}}
-                </p>
-                <p>功能描述:&nbsp;&nbsp;{{newApi.description}}</p>
-                <p>参数:</p>
-                <table class="table table-bordered">
-                    <thead>
-                    <th style="width:20%;word-wrap: break-word;">参数名称</th>
-                    <th style="width:20%;word-wrap: break-word;">类型</th>
-                    <th style="width:20%">必填</th>
-                    <th style="width:30%;word-wrap: break-word;">描述</th>
-                    <th style="width:10%;word-wrap: break-word;">默认值</th>
-                    </thead>
-                    <tbody>
-                    <tr ng-repeat="param in newApi.params" ng-if="newApi.params">
-                        <td>{{param.apiName}}</td>
-                        <td>{{param.type}}</td>
-                        <td>{{param.require}}</td>
-                        <td>{{param.apiValue}}</td>
-                        <td>{{param.defaultValue}}</td>
-                    </tr>
-                    </tbody>
-                </table>
-                <p>返回值:</p>
-                <table class="table table-bordered">
-                    <thead>
-                    <th style="width:20%;word-wrap: break-word;">名称</th>
-                    <th style="width:40%;word-wrap: break-word;">类型</th>
-                    <th style="word-wrap: break-word;">描述</th>
-                    </thead>
-                    <tbody>
-                    <tr ng-repeat="res in newApi.res" ng-if="newApi.res">
-                        <td>
-                            {{res.key}}
-                        </td>
-                        <td>{{res.type}}</td>
-                        <td>
-                            {{res.revalue}}
-                        </td>
-                    </tr>
+        </uib-tab>
+        <uib-tab index="1" heading="预览">
+            <div style="padding: 30px;" on-new-form-ready class="editContainer">
+                <div class="apiBody" ng-if="vm.docType==0">
+                    <p>
+                        请求名称：{{vm.newApi.name}}
+                    </p>
+                    <p>
+                        请求路径: {{vm.newApi.api}}
+                    </p>
+                    <p>
+                        请求模式: {{vm.newApi.method}}
+                    </p>
+                    <p>请求参数(header):
+                    </p>
+                    <table class="table table-bordered">
+                        <thead>
+                        <th style="width:20%;word-wrap: break-word;">参数名称</th>
+                        <th style="width:20%;word-wrap: break-word;">类型</th>
+                        <th style="width:20%;word-wrap: break-word;">必填</th>
+                        <th style="width:40%;word-wrap: break-word;">说明</th>
+                        </thead>
+                        <tbody>
+                        <tr ng-repeat="param in vm.newApi.params" ng-if="vm.newApi.params">
+                            <td>{{param.apiName}}
+                            </td>
+                            <td>{{param.type}}
+                            </td>
+                            <td>{{param.require}}</td>
+                            <td>{{param.apiValue}}</td>
+                        </tr>
+                        </tbody>
+                    </table>
 
-                    </tbody>
-                </table>
-                <p>回调参数:</p>
-                <table class="table table-bordered">
-                    <thead>
-                    <th style="width:20%;word-wrap: break-word;">参数名称</th>
-                    <th style="width:20%;word-wrap: break-word;">类型</th>
-                    <th style="width:20%">必填</th>
-                    <th style="width:30%;word-wrap: break-word;">描述</th>
-                    <th style="width:10%;word-wrap: break-word;">默认值</th>
-                    </thead>
-                    <tbody>
-                    <tr ng-repeat="param in newApi.callbackParams" ng-if="newApi.callbackParams">
-                        <td>
-                            {{param.apiName}}
-                        </td>
-                        <td>{{param.type}}</td>
-                        <td>{{param.require}}</td>
-                        <td>
-                            {{param.apiValue}}
-                        </td>
-                        <td>{{param.defaultValue}}</td>
-                    </tr>
-                    </tbody>
-                </table>
-                <p>
-                    示例:
-                </p>
-            <pre>
-{{newApi.demo}}
+                    <p>请求参数(urlParam):
+                    </p>
+                    <table class="table table-bordered">
+                        <thead>
+                        <th style="width:20%;word-wrap: break-word;">参数名称</th>
+                        <th style="width:20%;word-wrap: break-word;">类型</th>
+                        <th style="width:20%;word-wrap: break-word;">必填</th>
+                        <th style="width:40%;word-wrap: break-word;">说明</th>
+                        </thead>
+                        <tbody>
+                        <tr ng-repeat="res in vm.newApi.res" ng-if="vm.newApi.res">
+                            <td>
+                                {{res.key}}
+                            </td>
+                            <td>
+                                {{res.type}}
+                            </td>
+                            <td>{{res.require}}</td>
+                            <td>
+                                {{res.revalue}}
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+
+                    <p>
+                        JSON返回示例:
+                    </p>
+                    <pre>{{vm.newApi.demo}}</pre>
+                    <br/>
+                    <p>
+                        接口说明:
+                    </p>
+                    <pre>{{vm.newApi.description}}</pre>
+                </div>
+                <div class="apiBody" ng-if="vm.docType==1">
+                    <h3>{{vm.newApi.name}}</h3>
+                    <p>
+                        接口定义:&nbsp;&nbsp;{{vm.newApi.api}}
+                    </p>
+                    <p>功能描述:&nbsp;&nbsp;{{vm.newApi.description}}</p>
+                    <p>参数:</p>
+                    <table class="table table-bordered">
+                        <thead>
+                        <th style="width:20%;word-wrap: break-word;">参数名称</th>
+                        <th style="width:20%;word-wrap: break-word;">类型</th>
+                        <th style="width:20%">必填</th>
+                        <th style="width:30%;word-wrap: break-word;">描述</th>
+                        <th style="width:10%;word-wrap: break-word;">默认值</th>
+                        </thead>
+                        <tbody>
+                        <tr ng-repeat="param in vm.newApi.params" ng-if="vm.newApi.params">
+                            <td>{{param.apiName}}</td>
+                            <td>{{param.type}}</td>
+                            <td>{{param.require}}</td>
+                            <td>{{param.apiValue}}</td>
+                            <td>{{param.defaultValue}}</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                    <p>返回值:</p>
+                    <table class="table table-bordered">
+                        <thead>
+                        <th style="width:20%;word-wrap: break-word;">名称</th>
+                        <th style="width:40%;word-wrap: break-word;">类型</th>
+                        <th style="word-wrap: break-word;">描述</th>
+                        </thead>
+                        <tbody>
+                        <tr ng-repeat="res in vm.newApi.res" ng-if="vm.newApi.res">
+                            <td>
+                                {{res.key}}
+                            </td>
+                            <td>{{res.type}}</td>
+                            <td>
+                                {{res.revalue}}
+                            </td>
+                        </tr>
+
+                        </tbody>
+                    </table>
+                    <p>回调参数:</p>
+                    <table class="table table-bordered">
+                        <thead>
+                        <th style="width:20%;word-wrap: break-word;">参数名称</th>
+                        <th style="width:20%;word-wrap: break-word;">类型</th>
+                        <th style="width:20%">必填</th>
+                        <th style="width:30%;word-wrap: break-word;">描述</th>
+                        <th style="width:10%;word-wrap: break-word;">默认值</th>
+                        </thead>
+                        <tbody>
+                        <tr ng-repeat="param in vm.newApi.callbackParams" ng-if="vm.newApi.callbackParams">
+                            <td>
+                                {{param.apiName}}
+                            </td>
+                            <td>{{param.type}}</td>
+                            <td>{{param.require}}</td>
+                            <td>
+                                {{param.apiValue}}
+                            </td>
+                            <td>{{param.defaultValue}}</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                    <p>
+                        示例:
+                    </p>
+                    <pre>
+{{vm.newApi.demo}}
         </pre>
-                <p>
-                    补充说明:
-                </p>
-                <pre>{{newApi.extractComment}}</pre>
+                    <p>
+                        补充说明:
+                    </p>
+                    <pre>{{vm.newApi.extractComment}}</pre>
+                </div>
             </div>
-        </div>
-    </uib-tab>
-</uib-tabset>
+        </uib-tab>
+    </uib-tabset>
+</div>

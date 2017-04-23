@@ -44,8 +44,7 @@ angular.module("app").config(["$stateProvider", "$urlRouterProvider",
                     "main-container": {
                         templateUrl: function () {
                             return  "page/newDocument.html?"+Math.random();
-                        },
-                        controller: "NewDocumentController"
+                        }
                     }
                 }
             })
@@ -66,8 +65,7 @@ angular.module("app").config(["$stateProvider", "$urlRouterProvider",
                     "apiContent": {
                         templateUrl: function () {
                             return  "page/newApi.html?"+Math.random();
-                        },
-                        controller: "AddApiController"
+                        }
                     }
                 }
             })
@@ -77,8 +75,7 @@ angular.module("app").config(["$stateProvider", "$urlRouterProvider",
                     "apiContent": {
                         templateUrl: function () {
                             return  "page/errorCode.html?"+Math.random();
-                        },
-                        controller: "ErrorController"
+                        }
                     }
                 }
             })
@@ -88,8 +85,7 @@ angular.module("app").config(["$stateProvider", "$urlRouterProvider",
                     "apiContent": {
                         templateUrl: function () {
                             return  "page/errorForm.html?"+Math.random();
-                        },
-                        controller: "EditErrController"
+                        }
                     }
                 }
             });

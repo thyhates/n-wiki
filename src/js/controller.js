@@ -81,8 +81,8 @@ angular.module("app")
             getLog();
 
         }])
-    .controller("MainController", [ "$scope", "$stateParams", "toastr", "$state", "$uibModal", "apiService",
-        function ( $scope, $stateParams, toastr, $state, $uibModal, apiService) {
+    .controller("MainController", ["$scope", "$stateParams", "toastr", "$state", "$uibModal", "apiService",
+        function ($scope, $stateParams, toastr, $state, $uibModal, apiService) {
             var vm = this;
             vm.docId = $stateParams.id;
             vm.apiId = $stateParams.aid;
@@ -122,63 +122,55 @@ angular.module("app")
                     toastr.warning(res);
                 })
             }
+
             getApi();
         }])
-    .controller("NewDocumentController", ["$scope", "$http", "toastr", "$state",
-        function ($scope, $http, toastr, $state) {
-            $scope.newDocument = function () {
-                $http({
-                    url: "newDocument",
-                    method: "POST",
-                    data: $scope.newDocs
-                }).then(function (data) {
-                    if (data.data.status) {
-                        toastr.success(data.data.msg);
+    .controller("NewDocumentController", ["$scope", "toastr", "$state", "docService",
+        function ($scope, toastr, $state, docService) {
+            var vm = this;
+            vm.newDocs = {
+                type: 0
+            };
+            vm.newDocument = function () {
+                docService.newDocument(vm.newDocs)
+                    .then(function (res) {
+                        toastr.success(res);
                         $state.transitionTo("home", {}, {
                             reload: true
                         });
-                    } else {
-                        toastr.warning(data.data);
-                    }
-                }, function (data) {
-                });
+                    }, function (res) {
+                        toastr.warning(res);
+                    });
             };
         }])
-    .controller("AddApiController", ["$scope", "toastr", "$uibModal", "$stateParams", "$http", "$state",
-        function ($scope, toastr, $uibModal, $stateParams, $http, $state) {
-            $scope.newApi = {
+    .controller("AddApiController", ["$scope", "toastr", "$uibModal", "$stateParams", "apiService", "$state",
+        function ($scope, toastr, $uibModal, $stateParams, apiService, $state) {
+            var vm = this;
+            vm.newApi = {
                 params: [],
                 res: [],
-                callbackParams: []
+                callbackParams: [],
+                method:'POST'
             };
-            $scope.addSchema = formConfig[0].schema;
-            $scope.addForm = formConfig[0].form;
-            $scope.addModel = $scope.newApi;
-            $scope.docType = $stateParams.apiIndex;
-            $scope.addApi = function (form) {
-                $scope.newApi.doc_id = $stateParams.id;
-                console.log($scope.newApi);
-                $http({
-                    url: "addApi",
-                    method: "POST",
-                    data: {
-                        name: $stateParams.docName,
-                        body: $scope.newApi
-                    }
-                }).then(function (data) {
-                    if (data.data.status) {
-                        toastr.success(data.data.msg);
-                        $state.transitionTo("home.doc", {
-                            id: $stateParams.id
-                        }, {
-                            reload: true
-                        });
-                    } else {
-                        toastr.warning(data.data.msg);
-                    }
-                });
+            vm.addSchema = formConfig[0].schema;
+            vm.addForm = formConfig[0].form;
+            vm.addModel = vm.newApi;
+            vm.addApi = function (form) {
+                vm.newApi.doc_id = $stateParams.id;
+                apiService.addApi({
+                    body: $scope.newApi
+                }).then(function (res) {
+                    toastr.success(res);
+                    $state.transitionTo("home.doc", {
+                        id: $stateParams.id
+                    }, {
+                        reload: true
+                    });
+                }, function (res) {
+                    toastr.warning(res);
+                })
             };
-            $scope.showJSONinput = function () {
+            vm.showJSONinput = function () {
                 var inputJson = $uibModal.open({
                     animation: true,
                     templateUrl: "page/jsonInput.html",
@@ -205,7 +197,10 @@ angular.module("app")
                                 obj.type = 'int';
                             }
                         }
-                        $scope.newApi.res.push(obj);
+                        if (typeof resObj[key] === 'object') {
+                            obj.revalue = JSON.stringify(resObj[key]);
+                        }
+                        vm.newApi.res.push(obj);
                     }
                 });
             };
@@ -222,29 +217,25 @@ angular.module("app")
                 $uibModalInstance.dismiss();
             }
         }])
-    .controller("editApiCtrl", ["$scope", "$http", "toastr", "$uibModal", "$stateParams", "$state",
-        function ($scope, $http, toastr, $uibModal, $stateParams, $state) {
+    .controller("editApiCtrl", ["$scope", "apiService", "toastr", "$uibModal", "$stateParams", "$state",
+        function ($scope, apiService, toastr, $uibModal, $stateParams, $state) {
+            var vm = this;
+            var aid = $stateParams.aid;
+            var did = $stateParams.id;
 
-            $http({
-                url: "selectApi",
-                method: "POST",
-                data: {
-                    id: $stateParams.aid
-                }
-            }).then(function (data) {
-                if (data.data.status) {
-                    $scope.api = data.data.model[0];
-                    console.log('form model', $scope.apis);
-                    $scope.documentInfo = data.data.model.documentInfo;
-                    $scope.editSchema = formConfig[0].schema;
-                    $scope.editForm = formConfig[0].form;
-                    $scope.editModel = $scope.api;
-                } else {
-                    toastr.warning(data.data.msg);
-                }
-            });
+            function getApi() {
+                apiService.getApi(aid, did).then(function (res) {
+                    vm.api = res.model[0];
+                    vm.documentInfo = res.model.documentInfo;
+                    vm.editSchema = formConfig[0].schema;
+                    vm.editForm = formConfig[0].form;
+                    vm.editModel = vm.api;
+                }, function (res) {
+                    toastr.warning(res);
+                })
+            }
 
-            $scope.showJSONinput = function () {
+            vm.showJSONinput = function () {
                 var inputJson = $uibModal.open({
                     animation: true,
                     templateUrl: "page/jsonInput.html",
@@ -271,7 +262,10 @@ angular.module("app")
                                 obj.type = 'int';
                             }
                         }
-                        $scope.api.res.push(obj);
+                        if (typeof resObj[key] === 'object') {
+                            obj.revalue = JSON.stringify(resObj[key]);
+                        }
+                        vm.api.res.push(obj);
                     }
                 });
             };
@@ -279,89 +273,64 @@ angular.module("app")
                 return n % 1 === 0;
             }
 
-            $scope.submitAdd = function (form) {
-                delete $scope.api._id;
-                $http({
-                    url: "editApi",
-                    method: "POST",
-                    data: {
-                        id: $stateParams.aid,
-                        api: $scope.api
-                    }
-                }).then(function (data) {
-                    if (data.data.status) {
-                        toastr.success(data.data.msg);
-                        $state.transitionTo("home.doc", {
-                            id: $stateParams.id,
-                            aid: ""
-                        }, {
-                            reload: "home.doc"
-                        });
-                    } else {
-                        toastr.warning(data.data.msg);
-                    }
-                });
-            };
-        }])
-    .controller("ErrorController", ["$stateParams", "$http", "$scope",
-        function ($stateParams, $http, $scope) {
-            $scope.docId = $stateParams.id;
-            $scope.apiId = $stateParams.aid;
-            $scope.errors = [];
-            $http({
-                url: "getDocument",
-                method: "POST",
-                data: {
-                    id: $stateParams.id
-                }
-            }).then(function (data) {
-                if (data.data.status) {
-                    //if (typeof data.data.model.errorCodeLst!="undefined") {
-                    //    $scope.errors = data.data.model.errorCodeLst;
-                    //} else {
-                    //    $scope.errors = [];
-                    //}
-                    $scope.errors = data.data.documentInfo[0].errorCodeLst || [];
-                }
-            });
-        }])
-    .controller("EditErrController", ["$stateParams", "$http", "toastr", "$scope",
-        function ($stateParams, $http, toastr, $scope) {
-            $http({
-                url: "getDocument",
-                method: "POST",
-                data: {
-                    id: $stateParams.id
-                }
-            }).then(function (data) {
-                if (data.data.status) {
-                    //if (typeof data.data.model.errorCodeLst!="undefined") {
-                    //    $scope.errors = data.data.model.errorCodeLst;
-                    //} else {
-                    //    $scope.errors = [];
-                    //}
-                    $scope.errors = data.data.documentInfo[0].errorCodeLst || [];
-                }
-            });
-
-            $scope.addErrs = function () {
-                console.log($scope.errors);
-                $http({
-                    url: "editErrorCode",
-                    method: "POST",
-                    data: {
+            vm.submitAdd = function (form) {
+                delete vm.api._id;
+                apiService.editApi({
+                    id: $stateParams.aid,
+                    api: vm.api
+                }).then(function (res) {
+                    toastr.success(res);
+                    $state.transitionTo("home.doc", {
                         id: $stateParams.id,
-                        body: $scope.errors
-                    }
-                }).then(function (data) {
-                    if (data.data.status) {
-                        toastr.success("res", data);
-                        history.go(-1);
-                    } else {
-                        toastr.warning("服务器异常");
-                    }
+                        aid: $stateParams.aid
+                    }, {
+                        reload: "home.doc"
+                    });
+                }, function (res) {
+                    toastr.warning(res);
                 });
             };
+            getApi();
+        }])
+    .controller("ErrorController", ["$stateParams", "docService", "$scope",
+        function ($stateParams, docService, $scope) {
+            var vm = this;
+            vm.docId = $stateParams.id;
+            vm.apiId = $stateParams.aid;
+            vm.errors = [];
+            docService.getDocument($stateParams.id)
+                .then(function (res) {
+                    vm.errors = res.documentInfo[0].errorCodeLst || [];
+                });
+        }])
+    .controller("EditErrController", ["$stateParams", "docService", "toastr", "$scope",
+        function ($stateParams, docService, toastr, $scope) {
+            var vm = this;
+
+            function getError() {
+                docService.getDocument($stateParams.id)
+                    .then(function (res) {
+                        vm.errors = res.documentInfo[0].errorCodeLst || [];
+                    });
+            }
+            vm.addErrs = function () {
+                docService.editError({
+                    id:$stateParams.id,
+                    body:vm.errors
+                }).then(function (res) {
+                    toastr.success(res);
+                    history.go(-1);
+                },function (res) {
+                    toastr.warning(res);
+                });
+            };
+            vm.addErr=function () {
+                vm.errors.push({});
+            };
+            vm.delErr=function (index) {
+                vm.errors.splice(index,1);
+            };
+            getError();
         }])
     .controller("LoginController", ["$scope", 'toastr', "$state", "authService",
         function ($scope, toastr, $state, authService) {
@@ -380,22 +349,15 @@ angular.module("app")
             };
 
         }])
-    .controller("editDocInfoCtrl", ["$scope", "$uibModalInstance", "$http", "toastr", "$stateParams",
-        function ($scope, $uibModalInstance, $http, toastr, $stateParams) {
-            $http({
-                url: "getDocument",
-                method: "POST",
-                data: {
-                    id: $stateParams.id
-                }
-            }).then(function (data) {
-                if (data.data.status) {
-                    $scope.documentInfo = data.data.documentInfo[0];
+    .controller("editDocInfoCtrl", ["$scope", "$uibModalInstance", "docService", "toastr", "$stateParams",
+        function ($scope, $uibModalInstance, docService, toastr, $stateParams) {
+            docService.getDocument($stateParams.id)
+                .then(function (res) {
+                    $scope.documentInfo =res.documentInfo[0];
                     $scope.add_model = $scope.documentInfo;
-                } else {
-                    toastr.warning(data.data.msg);
-                }
-            });
+                },function (res) {
+                    toastr.warning(res);
+                });
             $scope.add_schema = {
                 type: "object",
                 properties: {
@@ -439,22 +401,16 @@ angular.module("app")
                 $scope.$broadcast('schemaFormValidate');
                 delete $scope.add_model._id;
                 if (form.$valid && form.$dirty) {
-                    $http({
-                        url: "editDocs",
-                        method: "POST",
-                        data: {
-                            id: $stateParams.id,
-                            info: $scope.add_model
-                        }
-                    }).then(function (data) {
-                        if (data.data.status) {
-                            toastr.success(data.data.msg);
-                            $uibModalInstance.close($scope.add_model);
-                        } else {
-                            toastr.warning(data.data.msg);
-                            $uibModalInstance.dismiss();
-                        }
-                    });
+                    docService.editDocment({
+                        id: $stateParams.id,
+                        info: $scope.add_model
+                    }).then(function (res) {
+                        toastr.success(res);
+                        $uibModalInstance.close($scope.add_model);
+                    },function (res) {
+                        toastr.warning(res);
+                        $uibModalInstance.dismiss();
+                    })
                 } else {
                     toastr.warning("请把表单填完整后在提交")
                 }

@@ -1,10 +1,10 @@
-<div class="document-container" style="border: 1px solid #ddd;" ng-controller="EditErrController" on-err-ready>
+<div class="document-container" style="border: 1px solid #ddd;" ng-controller="EditErrController as vm" on-err-ready>
     <h4 style="border-bottom: 1px solid #ddd;">错误码列表</h4>
     <div class="opt">
-        <a ng-click="addErr()" class="btn btn-primary" style="margin: 15px 0;">新增</a>
+        <a ng-click="vm.addErr()" class="btn btn-primary" style="margin: 15px 0;">新增</a>
         <a href="javascript:history.go(-1);" class="btn btn-default pull-right" style="margin: 15px 0;">返回</a>
     </div>
-    <form name="EditForm" ng-submit="addErrs()">
+    <form name="EditForm" ng-submit="vm.addErrs()">
         <table class="table table-bordered">
             <thead>
             <th style="width:25%;word-wrap: break-word;">
@@ -22,7 +22,7 @@
             </thead>
             <tbody>
 
-            <tr ng-repeat="err in errors">
+            <tr ng-repeat="err in vm.errors">
                 <td>
                     <input type="text" ng-model="err.name">
                 </td>
@@ -33,7 +33,7 @@
                     <input type="text" ng-model="err.description">
                 </td>
                 <td>
-                    <input type="button" ng-click="delErr($index)" class="btn btn-danger" value="删除"
+                    <input type="button" ng-click="vm.delErr($index)" class="btn btn-danger" value="删除"
                            style="padding:2px 12px;">
                 </td>
             </tr>

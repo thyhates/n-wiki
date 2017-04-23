@@ -51,8 +51,39 @@ angular.module("app")
             getAllDoc:getAllDoc,
             getDocument:getDocument,
             getApiList:getApiList,
-            delDocument:delDocument
+            delDocument:delDocument,
+            newDocument:newDocument,
+            editDocument:editDocument,
+            editError:editError
         };
+        function newDocument(params) {
+            var deferred=$q.defer();
+            var promise=deferred.promise;
+            $http.post('newDocument',params)
+                .then(function (res) {
+                    if(res.data.status){
+                        deferred.resolve(res.data.msg);
+                    }else{
+                        deferred.reject(res.data.msg||'创建失败');
+                    }
+
+                });
+            return promise;
+        }
+        function editDocument(params) {
+            var deferred=$q.defer();
+            var promise=deferred.promise;
+            $http.post('editDocs',params)
+                .then(function (res) {
+                    if(res.data.status){
+                        deferred.resolve(res.data.msg);
+                    }else{
+                        deferred.reject(res.data.msg||'创建失败');
+                    }
+
+                });
+            return promise;
+        }
         function getAllDoc() {
             var deferred=$q.defer();
             var promise=deferred.promise;
@@ -103,12 +134,27 @@ angular.module("app")
                 });
             return promise;
         }
+        function editError(params) {
+            var deferred=$q.defer();
+            var promise=deferred.promise;
+            $http.post('editErrorCode',params)
+                .then(function (res) {
+                    if(res.data.status){
+                        deferred.resolve(res.data.msg);
+                    }else{
+                        deferred.reject('编辑失败');
+                    }
+                });
+            return promise;
+        }
         return docService;
     }])
     .factory("apiService",["$q","$http",function ($q, $http) {
         var apiService={
             getApi:getApi,
-            deleteApi:deleteApi
+            deleteApi:deleteApi,
+            addApi:addApi,
+            editApi:editApi
         };
         function getApi(id, did) {
             /**
@@ -148,6 +194,36 @@ angular.module("app")
                     }
                 },function (res) {
                     deferred.reject(res.data.msg||'接口删除失败');
+                });
+            return promise;
+        }
+        function addApi(params) {
+            var deferred=$q.defer();
+            var promise=deferred.promise;
+            $http.post('addApi',params)
+                .then(function (res) {
+                    if(res.data.status){
+                        deferred.resolve(res.data);
+                    }else{
+                        deferred.reject(res.data.msg||'接口添加失败');
+                    }
+                },function (res) {
+                    deferred.reject(res.data.msg||'接口添加失败');
+                });
+            return promise;
+        }
+        function editApi(params) {
+            var deferred=$q.defer();
+            var promise=deferred.promise;
+            $http.post('editApi',params)
+                .then(function (res) {
+                    if(res.data.status){
+                        deferred.resolve(res.data);
+                    }else{
+                        deferred.reject(res.data.msg||'接口添加失败');
+                    }
+                },function (res) {
+                    deferred.reject(res.data.msg||'接口添加失败');
                 });
             return promise;
         }
