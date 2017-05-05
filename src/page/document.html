@@ -1,30 +1,30 @@
-<div class="document-container" style="border: 1px solid #ddd;">
+<div class="document-container" style="border: 1px solid #ddd;" ng-controller="MainController as vm">
     <div class="title">
-        <h2>{{documentInfo.label}}
-            <a ng-if="documentInfo.type==0" ng-href="{{docId}}/{{apiId}}/errCode" class="btn btn-default btn-sm pull-right"
+        <h2>{{vm.documentInfo.label}}
+            <a ng-if="vm.documentInfo.type==0" ng-href="{{vm.docId}}/{{vm.apiId}}/errCode" class="btn btn-default btn-sm pull-right"
                style="margin-left: 10px;">错误码</a>
-            <a ng-href="{{docId}}/{{apiId}}/newApi" ng-if="isLogin" class="btn btn-default btn-sm pull-right">新加接口
+            <a ng-href="{{vm.docId}}/{{vm.apiId}}/newApi" ng-if="isLogin" class="btn btn-default btn-sm pull-right">添加接口
             </a>
         </h2>
-        <span>{{ documentInfo.description}}</span>
+        <span>{{ vm.documentInfo.description}}</span>
     </div>
     <div ui-view="editContent">
-        <div ng-if="api&&documentInfo.type==0" class="apiBody">
-            <h3>{{api.name}}
-                <span class="pull-right" style="font-size:14px;">最后编辑：{{api.update}},时间：{{api.lastTime|date:'yyyy-MM-dd HH:mm:ss'}}</span>
-                <span class="pull-right" style="margin-right: 15px;font-size:14px;">创建人：{{api.createUser}}</span>
+        <div ng-if="vm.api" class="apiBody">
+            <h3>{{vm.api.name}}
+                <span class="pull-right" style="font-size:14px;">最后编辑：{{vm.api.update}},时间：{{vm.api.lastTime|date:'yyyy-MM-dd HH:mm:ss'}}</span>
+                <span class="pull-right" style="margin-right: 15px;font-size:14px;">创建人：{{vm.api.createUser}}</span>
             </h3>
             <div style="display: block;clear: both;margin-top: 10px;">
-                <a ng-if="isLogin" style="cursor: pointer;margin-left: 10px;" ng-click="delApi(documentInfo.index,documentInfo.name)"
+                <a ng-if="isLogin" style="cursor: pointer;margin-left: 10px;" ng-click="vm.delApi()"
                   class="btn btn-default pull-right">删除</a>
-                <a ng-if="isLogin" style="cursor: pointer;" ng-href="{{docId}}/{{apiId}}/edit"
+                <a ng-if="isLogin" style="cursor: pointer;" ng-href="{{vm.docId}}/{{vm.apiId}}/edit"
                    class="btn btn-default pull-right">编辑</a>
             </div>
             <p>
-                请求路径:&nbsp;&nbsp;{{api.api}}
+                请求路径:&nbsp;&nbsp;{{vm.api.api}}
             </p>
             <p>
-                请求模式:&nbsp;&nbsp;{{api.method}}
+                请求模式:&nbsp;&nbsp;{{vm.api.method}}
             </p>
             <p>请求头(header):</p>
             <table class="table table-bordered">
@@ -35,7 +35,7 @@
                 <th style="width:40%;word-wrap: break-word;">说明</th>
                 </thead>
                 <tbody>
-                <tr ng-repeat="param in api.params" ng-if="api.params">
+                <tr ng-repeat="param in vm.api.params" ng-if="vm.api.params">
                     <td>{{param.apiName}}</td>
                     <td>{{param.type}}</td>
                     <td>{{param.require}}</td>
@@ -52,7 +52,7 @@
                 <th style="width:40%;word-wrap: break-word;">说明</th>
                 </thead>
                 <tbody>
-                <tr ng-repeat="res in api.res" ng-if="api.res">
+                <tr ng-repeat="res in vm.api.res" ng-if="vm.api.res">
                     <td>
                         {{res.key}}
                     </td>
@@ -68,97 +68,13 @@
                 JSON返回示例:
             </p>
             <p style="height: 300px;">
-{{api.demo}}
+{{vm.api.demo}}
         </p>
             <p>
                 接口说明:
             </p>
-            <p style="height: 300px;word-break: break-all;border: 1px solid #ccc;border-radius:3px;padding: 5px;">{{api.description}}</p>
+            <p style="height: 300px;word-break: break-all;border: 1px solid #ccc;border-radius:3px;padding: 5px;">{{vm.api.description}}</p>
         </div>
-    </div>
-    <div ng-if="api&&documentInfo.type==1" class="apiBody" ng-repeat="api in apis">
-        <h3>{{api.name}}</h3>
-        <a ng-if="isLogin" style="cursor: pointer;margin-left: 10px;" ng-click="delApi(documentInfo.index,documentInfo.name)"
-           class="btn btn-default pull-right">删除</a>
-        <a ng-if="isLogin" style="cursor: pointer;" ng-href="{{documentInfo.name}}/{{documentInfo.index}}/edit"
-           class="btn btn-default pull-right">编辑</a>
-        <br>
-        <p>
-            接口定义:&nbsp;&nbsp;{{api.api}}
-        </p>
-        <p>功能描述:&nbsp;&nbsp;{{api.description}}</p>
-        <p>参数:</p>
-        <table class="table table-bordered">
-            <thead>
-            <th style="width:20%;word-wrap: break-word;">参数名称</th>
-            <th style="width:20%;word-wrap: break-word;">类型</th>
-            <th style="width:20%">必填</th>
-            <th style="width:30%;word-wrap: break-word;">描述</th>
-            <th style="width:10%;word-wrap: break-word;">默认值</th>
-            </thead>
-            <tbody>
-            <tr ng-repeat="param in api.params" ng-if="api.params">
-                <td>{{param.apiName}}</td>
-                <td>{{param.type}}</td>
-                <td>{{param.require}}</td>
-                <td>{{param.apiValue}}</td>
-                <td>{{param.defaultValue}}</td>
-            </tr>
-            </tbody>
-        </table>
-        <p>返回值:</p>
-        <table class="table table-bordered">
-            <thead>
-            <th style="width:20%;word-wrap: break-word;">名称</th>
-            <th style="width:40%;word-wrap: break-word;">类型</th>
-            <th style="word-wrap: break-word;">描述</th>
-            </thead>
-            <tbody>
-            <tr ng-repeat="res in api.res" ng-if="api.res">
-                <td>
-                    {{res.key}}
-                </td>
-                <td>{{res.type}}</td>
-                <td>
-                    {{res.revalue}}
-                </td>
-            </tr>
-
-            </tbody>
-        </table>
-        <p>回调参数:</p>
-        <table class="table table-bordered">
-            <thead>
-            <th style="width:20%;word-wrap: break-word;">参数名称</th>
-            <th style="width:20%;word-wrap: break-word;">类型</th>
-            <th style="width:20%">必填</th>
-            <th style="width:30%;word-wrap: break-word;">描述</th>
-            <th style="width:10%;word-wrap: break-word;">默认值</th>
-            </thead>
-            <tbody>
-            <tr ng-repeat="param in api.callbackParams" ng-if="api.callbackParams">
-                <td>
-                    {{param.apiName}}
-                </td>
-                <td>{{param.type}}</td>
-                <td>{{param.require}}</td>
-                <td>
-                    {{param.apiValue}}
-                </td>
-                <td>{{param.defaultValue}}</td>
-            </tr>
-            </tbody>
-        </table>
-        <p>
-            示例:
-        </p>
-            <pre>
-{{api.demo}}
-        </pre>
-        <p>
-            补充说明:
-        </p>
-        <pre>{{api.extractComment}}</pre>
     </div>
 </div>
 </div>

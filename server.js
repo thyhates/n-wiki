@@ -7,7 +7,6 @@ const body_parser = require("body-parser");
 const app = express();
 const fs = require("fs");
 const assert = require("assert");
-const session = require("express-session");
 const crypto = require("crypto");
 const mongo = require("mongodb");
 const dbopt = require("./dbopt");
@@ -30,30 +29,28 @@ app.get("/favicon.ico", function (req, res) {
 
 
 const hs = crypto.createHash("md5").update("abcdefg").digest("hex");
-// const getToken = function (req) {
-//     if (req.headers.token && req.headers.token.split(' ')[0] === 'Wiki') {
-//         return req.headers.token.split(' ')[1];
-//     }
-//     return null;
-// };
+
 app.use(expressJwt({
-    secret: hs
+    secret: hs,
+    credentialsRequired: false,
+    getToken: function fromHeaderOrQuerystring (req) {
+        if (req.headers.authorization && req.headers.authorization.split(' ')[0] === 'Bearer') {
+            console.log(req.headers.authorization.split(' ')[1]);
+            return req.headers.authorization.split(' ')[1];
+        } else if (req.query && req.query.token) {
+            return req.query.token;
+        }
+        return null;
+    }
 }).unless({
     path: ['/login', '/getAllDocs', '/getLog', '/getDocument', '/selectApi'],
     method:'GET'
 }));
-
 app.use(function (err, req, res, next) {
     if (err.name === 'UnauthorizedError') {
-        res.status(401).send('invalid token');
+        res.status(401).sendFile(__dirname + "/index.html");
     }
 });
-
-// app.use(session({
-//     secret: hs,
-//     saveUninitialized: true,
-//     resave: false
-// }));
 function addLog(action, user, docName, docId, apiName, apiId, del) {
     let time = new Date();
     if (!apiId) {
@@ -81,7 +78,7 @@ function addLog(action, user, docName, docId, apiName, apiId, del) {
 app.post("/getAllDocs", function (req, res) {
     dbopt.find("docs", {}, function (result) {
         res.status(200).send({
-            status: 1,
+            status: true,
             model: result
         });
     });
@@ -116,7 +113,7 @@ app.post("/newDocument", function (req, res) {
     dbopt.insert("docs", body, function (result) {
         // console.log(result.insertedId);
         if (result.result.ok === 1) {
-            addLog("创建文档", req.session.username, label, result.insertId);
+            addLog("创建文档", req.user.username, label, result.insertId);
             res.status(200).send({status: true, msg: "文档创建成功"});
         } else {
             res.status(200).send({
@@ -135,7 +132,7 @@ app.post("/editDocs", function (req, res) {
     let newData = {$set: newInfo};
     dbopt.update("docs", query, newData, function (result) {
         // console.log(newInfo);
-        addLog("编辑文档", req.session.username, newInfo.label, doc_id);
+        addLog("编辑文档", req.user.username, newInfo.label, doc_id);
         res.status(200).send({
             status: true,
             model: result,
@@ -159,14 +156,14 @@ app.post("/delDocument", function (req, res) {
                 dbopt.delete("apis", apiQuery, function (results) {
                     // console.log(result);
                     if (result.result.ok === 1) {
-                        addLog("删除文档", req.session.username, docName, doc_id, false, false, true);
+                        addLog("删除文档", req.user.username, docName, doc_id, false, false, true);
                         res.status(200).send({
                             status: true,
                             msg: "删除成功", result: result
                         });
                     } else {
                         res.status(200).send({
-                            status: -1,
+                            status:false,
                             msg: "服务器异常",
                             model: result
                         });
@@ -196,12 +193,12 @@ app.post("/editErrorCode", function (req, res) {
 });
 app.post("/addApi", function (req, res) {
     let api = req.body.body;
-    api.createUser = req.session.username;
+    api.createUser = req.user.username;
     api.createTime = new Date();
     dbopt.insert("apis", api, function (result) {
         if (result.result.ok === 1) {
             dbopt.find("docs", {_id: new mongo.ObjectId(api.doc_id)}, function (res1) {
-                addLog("创建接口", req.session.username, res1[0].label, res1[0]._id, api.label, result.insertId);
+                addLog("创建接口", req.user.username, res1[0].label, res1[0]._id, api.label, result.insertId);
                 res.status(200).send({status: true, msg: "Api添加成功"});
             });
         } else {
@@ -224,7 +221,7 @@ app.post("/delApi", function (req, res) {
         dbopt.find("docs", {_id: new mongo.ObjectId(docId)}, function (res1) {
             docName = res1[0].label;
             dbopt.delete("apis", query, function (results) {
-                addLog("删除接口", req.session.username, docName, docId, apiName, id, true);
+                addLog("删除接口", req.user.username, docName, docId, apiName, id, true);
                 res.status(200).send({
                     status: true,
                     msg: "删除成功"
@@ -236,8 +233,9 @@ app.post("/delApi", function (req, res) {
 });
 app.post("/selectApi", function (req, res) {
     let id = req.body.id;
+    let query;
     if (id) {
-        var query = {
+        query = {
             _id: new mongo.ObjectId(id)
         };
     }
@@ -265,7 +263,7 @@ app.post("/selectApi", function (req, res) {
 app.post("/editApi", function (req, res) {
     let id = req.body.id;
     let newInfo = req.body.api;
-    newInfo.update = req.session.username;
+    newInfo.update = req.user.username;
     newInfo.lastTime = new Date();
     let query = {
         _id: new mongo.ObjectId(id)
@@ -277,7 +275,7 @@ app.post("/editApi", function (req, res) {
             docName = res1[0].label;
             docId = res1[0]._id;
             dbopt.update("apis", query, newData, function (result) {
-                addLog("修改接口", req.session.username, docName, docId, newInfo.label, id);
+                addLog("修改接口", req.user.username, docName, docId, newInfo.label, id);
                 res.status(200).send({
                     status: true,
                     model: result,
@@ -310,7 +308,7 @@ app.post("/login", function (req, res) {
             }
         });
         if (isRight) {
-            let authToken = jwt.sign({username: reqName}, psd);
+            let authToken = jwt.sign({username: reqName}, hs);
             res.status(200).send({status: true, msg: "登录成功", token: authToken});
         } else {
             res.status(400).send({status: false, msg: "用户名或密码不正确！"});

@@ -6,7 +6,7 @@ var gulp = require('gulp');
 var concat = require('gulp-concat');//文件合并
 var uglify = require('gulp-uglify');//js文件压缩
 var livereload = require("gulp-livereload");//刷新
-var sass = require("gulp-sass");
+// var sass = require("gulp-sass");
 
 gulp.task("default", function () {
     return gulp.src("src/js/**.**")
@@ -15,14 +15,14 @@ gulp.task("default", function () {
         .pipe(gulp.dest("dist/js"))
         .pipe(livereload());
 });
-gulp.task("sass", function () {
-    return gulp.src("src/css/**.scss")
-        .pipe(sass({
-            outputStyle: 'compressed'
-        }).on('error', sass.logError))
-        .pipe(concat("style.min.css"))
-        .pipe(gulp.dest("dist/css"));
-});
+// gulp.task("sass", function () {
+//     return gulp.src("src/css/**.scss")
+//         .pipe(sass({
+//             outputStyle: 'compressed'
+//         }).on('error', sass.logError))
+//         .pipe(concat("style.min.css"))
+//         .pipe(gulp.dest("dist/css"));
+// });
 gulp.task("demo", function () {
     return gulp.src(["demo.js", "demo.html", "demo.css"])
         .pipe(livereload());
