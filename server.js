@@ -39,7 +39,8 @@ const hs = crypto.createHash("md5").update("abcdefg").digest("hex");
 app.use(expressJwt({
     secret: hs
 }).unless({
-    path: ['/login', '/getAllDocs', '/getLog', '/getDocument', '/selectApi']
+    path: ['/login', '/getAllDocs', '/getLog', '/getDocument', '/selectApi'],
+    method:'GET'
 }));
 
 app.use(function (err, req, res, next) {
