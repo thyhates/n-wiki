@@ -1,21 +1,49 @@
-import React, { Component } from 'react';
+import React, {Component} from 'react';
 import logo from './logo.svg';
+import Notify from "react-notification-system"
+import utils from './utils/utils'
+import {BrowserRouter as Router, Route, Link} from 'react-router-dom'
+import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
+import Auth from './utils/auth'
+import routes from './router/route'
+import SubRoute from './component/subRoute'
+//CSS
 import './App.css';
 
+
 class App extends Component {
-  render() {
-    return (
-      <div className="App">
-        <div className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <h2>Welcome to React</h2>
-        </div>
-        <p className="App-intro">
-          To get started, edit <code>src/App.js</code> and save to reload.
-        </p>
-      </div>
-    );
-  }
+    constructor(props) {
+        super(props);
+        this.state = {
+            isLogged: true
+        }
+    }
+
+    componentDidMount() {
+        this.setState({
+            isLogged: Auth.checkLoginState()
+        });
+        console.log('App has mounted...')
+    }
+
+    handleClick(event) {
+    }
+
+    render() {
+        return (
+            <Router>
+                <div className="App">
+                    <MuiThemeProvider>
+                        <SubRoute routes={routes} isLogged={this.state.isLogged}>
+                        </SubRoute>
+
+                    </MuiThemeProvider>
+                </div>
+            </Router>
+        );
+    }
+
 }
+
 
 export default App;

@@ -2,52 +2,60 @@
  * Created by zhipu.liao on 2016/3/10.
  */
 "use strict";
-var express = require("express");
-var body_parser = require("body-parser");
-var app = express();
-var fs = require("fs");
-var assert = require("assert");
-var session = require("express-session");
-var crypto = require("crypto");
-const mongoClient = require("mongodb").MongoClient;
+const express = require("express");
+const body_parser = require("body-parser");
+const app = express();
+const fs = require("fs");
+const assert = require("assert");
+const crypto = require("crypto");
 const mongo = require("mongodb");
-var dbopt = require("./dbopt");
+const dbopt = require("./dbopt");
+const compression = require('compression');
+const expressJwt = require('express-jwt');
+const jwt = require('jsonwebtoken');
+app.use(compression());
 app.use(express.static(__dirname + "/node_modules"));
 app.use(express.static(__dirname + "/src"));
-app.use(express.static(__dirname + "/dist"));
+app.use(express.static(__dirname + "/build"));
 app.use(body_parser.json());
 app.use(body_parser.urlencoded({extended: true}));
 
-
 app.get("/", function (req, res) {
-    res.sendFile(__dirname + "/index.html");
+    res.sendFile(__dirname + "/build/index.html");
 });
 app.get("/favicon.ico", function (req, res) {
     res.sendFile(__dirname + "/favicon.ico");
 });
-/*fs.readFile("doc/document.json", function (err, data) {
- if (err) {
- console.log(err);
- } else {
- console.log(JSON.parse(data).api);
- }
- });*/
-function getAllFiles() {
-    var file = fs.readdirSync("doc");
-    return file;
-}
-var hs = crypto.createHash("md5").update("abcdefg").digest("hex");
-app.use(session({
+
+
+const hs = crypto.createHash("md5").update("abcdefg").digest("hex");
+
+app.use(expressJwt({
     secret: hs,
-    saveUninitialized: true,
-    resave: false
+    credentialsRequired: false,
+    getToken: function fromHeaderOrQuerystring (req) {
+        if (req.headers.authorization && req.headers.authorization.split(' ')[0] === 'Bearer') {
+            console.log(req.headers.authorization.split(' ')[1]);
+            return req.headers.authorization.split(' ')[1];
+        } else if (req.query && req.query.token) {
+            return req.query.token;
+        }
+        return null;
+    }
+}).unless({
+    path: ['/login', '/getAllDocs', '/getLog', '/getDocument', '/selectApi']
 }));
+app.use(function (err, req, res, next) {
+    if (err.name === 'UnauthorizedError') {
+        res.status(401).sendFile(__dirname + "/index.html");
+    }
+});
 function addLog(action, user, docName, docId, apiName, apiId, del) {
-    var time = new Date();
+    let time = new Date();
     if (!apiId) {
         apiId = "";
     }
-    var log = {
+    let log = {
         action: action,
         time: time.toLocaleString(),
         user: user,
@@ -57,7 +65,7 @@ function addLog(action, user, docName, docId, apiName, apiId, del) {
         docName: docName || "",
         del: del || false
     };
-    var errs;
+    let errs;
     dbopt.insert("logs", log, function (result) {
         if (result.result.ok === 1) {
             errs = true;
@@ -67,23 +75,18 @@ function addLog(action, user, docName, docId, apiName, apiId, del) {
     });
 }
 app.post("/getAllDocs", function (req, res) {
-    var logined = true;
-    if (!isLogin(req)) {
-        logined = false;
-    }
     dbopt.find("docs", {}, function (result) {
         res.status(200).send({
-            status: 1,
-            model: result,
-            logined: logined
+            status: true,
+            model: result
         });
     });
 });
 app.post("/getDocument", function (req, res) {
-    var query = {
+    let query = {
         doc_id: req.body.id
     };
-    var docQuery = {
+    let docQuery = {
         _id: new mongo.ObjectId(req.body.id)
     };
     dbopt.find("docs", docQuery, function (result1) {
@@ -98,14 +101,10 @@ app.post("/getDocument", function (req, res) {
 
 });
 app.post("/newDocument", function (req, res) {
-    if (!isLogin(req)) {
-        res.status(401).send({msg: "请先登录"});
-        return false;
-    }
-    var label = req.body.label,
+    let label = req.body.label,
         type = req.body.type,
         description = req.body.description;
-    var body = {
+    let body = {
         label: label,
         type: type,
         description: description
@@ -113,7 +112,7 @@ app.post("/newDocument", function (req, res) {
     dbopt.insert("docs", body, function (result) {
         // console.log(result.insertedId);
         if (result.result.ok === 1) {
-            addLog("创建文档", req.session.username, label, result.insertId);
+            addLog("创建文档", req.user.username, label, result.insertId);
             res.status(200).send({status: true, msg: "文档创建成功"});
         } else {
             res.status(200).send({
@@ -124,19 +123,15 @@ app.post("/newDocument", function (req, res) {
     });
 });
 app.post("/editDocs", function (req, res) {
-    if (!isLogin(req)) {
-        res.status(401).send({msg: "请先登录"});
-        return false;
-    }
-    var doc_id = req.body.id;
-    var newInfo = req.body.info;
-    var query = {
+    let doc_id = req.body.id;
+    let newInfo = req.body.info;
+    let query = {
         _id: new mongo.ObjectId(doc_id)
     };
-    var newData = {$set: newInfo};
+    let newData = {$set: newInfo};
     dbopt.update("docs", query, newData, function (result) {
         // console.log(newInfo);
-        addLog("编辑文档", req.session.username, newInfo.label, doc_id);
+        addLog("编辑文档", req.user.username, newInfo.label, doc_id);
         res.status(200).send({
             status: true,
             model: result,
@@ -145,18 +140,14 @@ app.post("/editDocs", function (req, res) {
     });
 });
 app.post("/delDocument", function (req, res) {
-    if (!isLogin(req)) {
-        res.status(401).send({msg: "请先登录"});
-        return false;
-    }
-    var doc_id = req.body.doc_id;
-    var query = {
+    let doc_id = req.body.doc_id;
+    let query = {
         _id: new mongo.ObjectId(doc_id)
     };
-    var apiQuery = {
+    let apiQuery = {
         doc_id: doc_id
     };
-    var docName;
+    let docName;
     dbopt.find("docs", query, function (res1) {
         docName = res1[0].label;
         dbopt.delete("docs", query, function (result) {
@@ -164,14 +155,14 @@ app.post("/delDocument", function (req, res) {
                 dbopt.delete("apis", apiQuery, function (results) {
                     // console.log(result);
                     if (result.result.ok === 1) {
-                        addLog("删除文档", req.session.username, docName, doc_id, false, false, true);
+                        addLog("删除文档", req.user.username, docName, doc_id, false, false, true);
                         res.status(200).send({
                             status: true,
                             msg: "删除成功", result: result
                         });
                     } else {
                         res.status(200).send({
-                            status: -1,
+                            status:false,
                             msg: "服务器异常",
                             model: result
                         });
@@ -184,17 +175,13 @@ app.post("/delDocument", function (req, res) {
 
 });
 app.post("/editErrorCode", function (req, res) {
-    if (!isLogin(req)) {
-        res.status(401).send({msg: "请先登录"});
-        return false;
-    }
-    var id = req.body.id;
-    var body = req.body.body;
+    let id = req.body.id;
+    let body = req.body.body;
 
-    var query = {
+    let query = {
         _id: new mongo.ObjectId(id)
     };
-    var newData = {$set: {errorCodeLst: body}};
+    let newData = {$set: {errorCodeLst: body}};
     dbopt.update("docs", query, newData, function (result) {
         res.status(200).send({
             status: true,
@@ -204,17 +191,13 @@ app.post("/editErrorCode", function (req, res) {
     });
 });
 app.post("/addApi", function (req, res) {
-    if (!isLogin(req)) {
-        res.status(401).send({msg: "请先登录"});
-        return false;
-    }
-    var api = req.body.body;
-    api.createUser = req.session.username;
+    let api = req.body.body;
+    api.createUser = req.user.username;
     api.createTime = new Date();
     dbopt.insert("apis", api, function (result) {
         if (result.result.ok === 1) {
             dbopt.find("docs", {_id: new mongo.ObjectId(api.doc_id)}, function (res1) {
-                addLog("创建接口", req.session.username, res1[0].label, res1[0]._id, api.label, result.insertId);
+                addLog("创建接口", req.user.username, res1[0].label, res1[0]._id, api.label, result.insertId);
                 res.status(200).send({status: true, msg: "Api添加成功"});
             });
         } else {
@@ -226,22 +209,18 @@ app.post("/addApi", function (req, res) {
     });
 });
 app.post("/delApi", function (req, res) {
-    if (!isLogin(req)) {
-        res.status(401).send({msg: "请先登录"});
-        return false;
-    }
-    var id = req.body.id;
-    var query = {
+    let id = req.body.id;
+    let query = {
         _id: new mongo.ObjectId(id)
     };
-    var apiName, docName, docId;
+    let apiName, docName, docId;
     dbopt.find("apis", query, function (res11) {
         apiName = res11[0].label;
         docId = res11[0].doc_id;
         dbopt.find("docs", {_id: new mongo.ObjectId(docId)}, function (res1) {
             docName = res1[0].label;
             dbopt.delete("apis", query, function (results) {
-                addLog("删除接口", req.session.username, docName, docId, apiName, id, true);
+                addLog("删除接口", req.user.username, docName, docId, apiName, id, true);
                 res.status(200).send({
                     status: true,
                     msg: "删除成功"
@@ -252,13 +231,14 @@ app.post("/delApi", function (req, res) {
 
 });
 app.post("/selectApi", function (req, res) {
-    var id = req.body.id;
+    let id = req.body.id;
+    let query;
     if (id) {
-        var query = {
+        query = {
             _id: new mongo.ObjectId(id)
         };
     }
-    var docQuery = {
+    let docQuery = {
         _id: new mongo.ObjectId(req.body.doc_id)
     };
     dbopt.find("docs", docQuery, function (result1) {
@@ -280,25 +260,21 @@ app.post("/selectApi", function (req, res) {
 
 });
 app.post("/editApi", function (req, res) {
-    if (!isLogin(req)) {
-        res.status(401).send({msg: "请先登录"});
-        return false;
-    }
-    var id = req.body.id;
-    var newInfo = req.body.api;
-    newInfo.update = req.session.username;
+    let id = req.body.id;
+    let newInfo = req.body.api;
+    newInfo.update = req.user.username;
     newInfo.lastTime = new Date();
-    var query = {
+    let query = {
         _id: new mongo.ObjectId(id)
     };
-    var newData = {$set: newInfo};
-    var docName, docId;
+    let newData = {$set: newInfo};
+    let docName, docId;
     try {
         dbopt.find("docs", {_id: new mongo.ObjectId(newInfo.doc_id)}, function (res1) {
             docName = res1[0].label;
             docId = res1[0]._id;
             dbopt.update("apis", query, newData, function (result) {
-                addLog("修改接口", req.session.username, docName, docId, newInfo.label, id);
+                addLog("修改接口", req.user.username, docName, docId, newInfo.label, id);
                 res.status(200).send({
                     status: true,
                     model: result,
@@ -321,40 +297,30 @@ app.post("/getLog", function (req, res) {
 });
 app.post("/login", function (req, res) {
     fs.readFile("config.json", function (err, data) {
-        var users = JSON.parse(data).user;
-        var reqName = req.body.name;
-        var psd = crypto.createHash("md5").update(req.body.password).digest("hex");
-        var isRight = false;
+        let users = JSON.parse(data).user;
+        let reqName = req.body.name;
+        let psd = crypto.createHash("md5").update(req.body.password).digest("hex");
+        let isRight = false;
         users.forEach(function (user) {
             if (reqName === user.name && psd === user.password) {
                 isRight = true;
             }
         });
         if (isRight) {
-            req.session.isLogin = true;
-            req.session.username = reqName;
-            res.status(200).send({status: true, msg: "登录成功"});
+            let authToken = jwt.sign({username: reqName}, hs);
+            res.status(200).send({status: true, msg: "登录成功", token: authToken,userName:reqName});
         } else {
-            res.status(401).send({status: false, msg: "用户名或密码不正确！"});
+            res.status(400).send({status: false, msg: "用户名或密码不正确！"});
         }
     });
 });
 app.post("/logout", function (req, res) {
-    req.session.isLogin = false;
-    req.session.username = null;
-    console.log(req.session.isLogin);
     res.status(200).send({msg: "退出成功"});
 });
-function isLogin(req) {
-    if (!req.session.isLogin) {
-        return false;
-    }
-    return true;
-}
 app.use(function (req, res) {
     res.sendFile(__dirname + "/index.html");
 });
 app.listen(8089, function () {
-    console.log("It's express,welcome!  127.0.0.1:8084");
+    console.log("It's express,welcome!  http://127.0.0.1:8089");
 });
 

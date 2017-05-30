@@ -4,7 +4,7 @@ API & SDK 文档管理
 
 ##Start
 
-```javascript
+```code
 npm install
 node server.js
 ```
