@@ -34,12 +34,12 @@ class Login extends Component{
         return (
             <div className="login-box">
                 <TextField name="name" value={this.state.name} fullWidth onChange={this.handleInputChange.bind(this)} floatingLabelText="用户名"
-                    hintText="用户名" type="text"
+                    hintText="用户名" type="text" required
                 />
                 <TextField value={this.state.password} style={inputStyle} fullWidth onChange={this.handleInputChange.bind(this)} floatingLabelText="密码"
-                    hintText="密码"  name="password" type="password"
+                    hintText="密码"  name="password" type="password" required
                 />
-                <RaisedButton label="登录" onTouchTap={this.login.bind(this)} primary fullWidth/>
+                <RaisedButton type="submit" label="登录" onTouchTap={this.login.bind(this)} primary fullWidth/>
             </div>
         )
     }

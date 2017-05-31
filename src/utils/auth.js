@@ -13,7 +13,7 @@ function login({name,password}) {
     return new Promise((resolve,reject)=>{
         axios.post('/login',{
             name:name,
-            pwd:password
+            password:password
         }).then((res)=>{
             resolve(res);
         }).catch((res)=>{

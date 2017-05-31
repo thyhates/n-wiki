@@ -14,6 +14,13 @@ const compression = require('compression');
 const expressJwt = require('express-jwt');
 const jwt = require('jsonwebtoken');
 app.use(compression());
+app.use(function(req, res, next) {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Headers", "X-Requested-With");
+    res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
+    res.header('Access-Control-Allow-Headers', 'Content-Type');
+    next();
+});
 app.use(express.static(__dirname + "/node_modules"));
 app.use(express.static(__dirname + "/src"));
 app.use(express.static(__dirname + "/build"));
@@ -299,6 +306,10 @@ app.post("/login", function (req, res) {
     fs.readFile("config.json", function (err, data) {
         let users = JSON.parse(data).user;
         let reqName = req.body.name;
+        if(!reqName||!req.body.password){
+            res.status(400).send({status: false, msg: "请输入用户名或密码！"});
+            return false;
+        }
         let psd = crypto.createHash("md5").update(req.body.password).digest("hex");
         let isRight = false;
         users.forEach(function (user) {
@@ -318,7 +329,7 @@ app.post("/logout", function (req, res) {
     res.status(200).send({msg: "退出成功"});
 });
 app.use(function (req, res) {
-    res.sendFile(__dirname + "/index.html");
+    res.sendFile(__dirname + "/build/index.html");
 });
 app.listen(8089, function () {
     console.log("It's express,welcome!  http://127.0.0.1:8089");

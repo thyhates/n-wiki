@@ -11,8 +11,7 @@ import axios from 'axios'
 //CSS
 import './App.css';
 
-axios.defaults.baseURL = 'http://nwiki.thyhates.com';
-axios.defaults.headers.common['Access-Control-Allow-Origin']="*";
+axios.defaults.baseURL = 'http://127.0.0.1:8089';
 class App extends Component {
     constructor(props) {
         super(props);
