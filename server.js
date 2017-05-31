@@ -43,7 +43,8 @@ app.use(expressJwt({
         return null;
     }
 }).unless({
-    path: ['/login', '/getAllDocs', '/getLog', '/getDocument', '/selectApi']
+    path: ['/login', '/getAllDocs', '/getLog', '/getDocument', '/selectApi'],
+    method:'GET'
 }));
 app.use(function (err, req, res, next) {
     if (err.name === 'UnauthorizedError') {
