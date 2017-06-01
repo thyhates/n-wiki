@@ -9,25 +9,27 @@ function checkLoginState() {
     return !!utils.getCookie('token');
 }
 
-function login({name,password}) {
-    return new Promise((resolve,reject)=>{
-        axios.post('/login',{
+function login({name, password}) {
+    utils.post({
+        url:'/login',
+        data:{
             name:name,
             password:password
-        }).then((res)=>{
-            resolve(res);
-        }).catch((res)=>{
-            reject(res);
-        })
+        }
+    }).then(res=>{
+        utils.showMessage(res.msg);
+        utils.myRouter.history.replace('/');
+    }).catch(res=>{
+        utils.showMessage(res.msg);
     })
 }
 
 function logout() {
 
 }
-let Auth={
-    checkLoginState:checkLoginState,
-    login:login,
-    logout:logout
+let Auth = {
+    checkLoginState: checkLoginState,
+    login: login,
+    logout: logout
 };
 export default Auth;
