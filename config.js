@@ -4,7 +4,7 @@
 "use strict";
 const config = {
     mongodbConfig: {
-        url: 'mongodb://127.0.0.1:27017/wiki',
+        url: 'mongodb://23.105.195.227:27017/wiki',
         user: 'thyhates',
         pwd: 'forgetpwd?8'
     }

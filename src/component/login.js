@@ -24,9 +24,7 @@ class Login extends Component {
     login() {
         auth.login(this.state);
     }
-    componentDidUpdate(){
-        console.log('app updated')
-    }
+
     render() {
 
         const inputStyle = {

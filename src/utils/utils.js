@@ -15,7 +15,7 @@ function post({url, data}) {
             } else if (error.request) {
                 reject({status:false,msg:'服务器未响应'});
             } else {
-                reject({status:false,msg:'检查是否代码有误'});
+                reject({status:false,msg:'无法连接服务器'});
             }
         })
     })

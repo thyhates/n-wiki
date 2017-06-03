@@ -1,5 +1,4 @@
 import React, {Component} from 'react';
-import logo from './logo.svg';
 import Notify from "react-notification-system"
 import utils from './utils/utils'
 import {BrowserRouter as Router, Route, Link, Redirect} from 'react-router-dom'
@@ -9,7 +8,6 @@ import routes from './router/route'
 import SubRoute from './component/subRoute'
 import axios from 'axios'
 import Snackbar from 'material-ui/Snackbar';
-import RaisedButton from 'material-ui/RaisedButton';
 
 
 //CSS
@@ -35,14 +33,17 @@ class App extends Component {
 
     componentDidMount() {
         this.setState({
-            isLogged: Auth.checkLoginState()
+            isLogged: Auth.checkLoginState(),
         });
         console.log('App has mounted...');
     }
 
     handleClick(event) {
     }
+    componentDidUpdate(){
+        console.log('App updated');
 
+    }
     render() {
         return (
             <div>

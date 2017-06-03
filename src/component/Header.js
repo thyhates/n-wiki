@@ -9,6 +9,7 @@ import IconMenu from 'material-ui/IconMenu'
 import Auth from '../utils/auth'
 import propTypes from 'prop-types'
 import {Link} from 'react-router-dom'
+import utils from '../utils/utils'
 
 class Logged extends Component {
 
@@ -21,7 +22,6 @@ class Logged extends Component {
 
     handleItemClick(event, child) {
         const selectedValue = child.props.value;
-        console.log(typeof selectedValue);
         if (selectedValue === '1') {
             Auth.logout();
         }
