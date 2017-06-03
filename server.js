@@ -33,7 +33,7 @@ const hs = crypto.createHash("md5").update("abcdefg").digest("hex");
 app.use(expressJwt({
     secret: hs,
     credentialsRequired: false,
-    getToken: function fromHeaderOrQuerystring (req) {
+    getToken: function fromHeaderOrQuerystring(req) {
         if (req.headers.authorization && req.headers.authorization.split(' ')[0] === 'Bearer') {
             console.log(req.headers.authorization.split(' ')[1]);
             return req.headers.authorization.split(' ')[1];
@@ -44,7 +44,7 @@ app.use(expressJwt({
     }
 }).unless({
     path: ['/login', '/getAllDocs', '/getLog', '/getDocument', '/selectApi'],
-    method:'GET'
+    method: 'GET'
 }));
 app.use(function (err, req, res, next) {
     if (err.name === 'UnauthorizedError') {
@@ -163,7 +163,7 @@ app.post("/delDocument", function (req, res) {
                         });
                     } else {
                         res.status(200).send({
-                            status:false,
+                            status: false,
                             msg: "服务器异常",
                             model: result
                         });
@@ -308,7 +308,7 @@ app.post("/login", function (req, res) {
             }
         });
         if (isRight) {
-            let authToken = jwt.sign({username: reqName}, hs);
+            let authToken = jwt.sign({username: reqName,exp:Math.floor(Date.now()/1000)+(60*60)}, hs);
             res.status(200).send({status: true, msg: "登录成功", token: authToken});
         } else {
             res.status(400).send({status: false, msg: "用户名或密码不正确！"});
@@ -316,7 +316,7 @@ app.post("/login", function (req, res) {
     });
 });
 app.post("/logout", function (req, res) {
-    res.status(200).send({msg: "退出成功"});
+    res.status(200).send({msg: "退出成功", status: true});
 });
 app.use(function (req, res) {
     res.sendFile(__dirname + "/index.html");

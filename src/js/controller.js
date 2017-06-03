@@ -10,7 +10,9 @@ angular.module("app")
             $scope.isLogin = authService.checkLogin();
             vm.logout = function () {
                 authService.logout().then(function (res) {
-                    $state.go("home");
+                    window.location.href='/'
+                },function (res) {
+                    toastr.warning(res);
                 })
             };
             vm.deleteDoc = function () {

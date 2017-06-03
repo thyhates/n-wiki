@@ -9,7 +9,7 @@
                     <a ng-href="new">新建</a>
                 </li>
                 <li ng-if="!isLogin"><a ng-href="login">登录</a></li>
-                <li ng-if="isLogin"><a ng-click="logout()" href>退出</a></li>
+                <li ng-if="isLogin"><a ng-click="vm.logout()" href>退出</a></li>
             </ul>
         </div>
     </header>
