@@ -9,7 +9,6 @@ import IconMenu from 'material-ui/IconMenu'
 import Auth from '../utils/auth'
 import propTypes from 'prop-types'
 import {Link} from 'react-router-dom'
-import utils from '../utils/utils'
 
 class Logged extends Component {
 
@@ -35,7 +34,7 @@ class Logged extends Component {
                 >
                     <MenuItem value="0" to="/login">
                         <i className="fa fa-user"></i>
-                        {this.props.userName}
+                         {' '+this.props.userName}
                     </MenuItem>
                     <MenuItem value="1">
                         <i className="fa fa-sign-out"></i> 登出
@@ -60,7 +59,6 @@ class Login extends Component {
             <div style={style}>
                 <Link to="/login" style={AStyle}>登录</Link>
             </div>
-
         )
     }
 }
@@ -69,7 +67,7 @@ class Header extends Component {
 
     render() {
         return (
-            <div>
+            <div className="header-container">
                 <AppBar title="文档管理"
                         showMenuIconButton={false}
                         iconElementRight={this.props.logged ? <Logged {...this.props} /> : <Login />}>

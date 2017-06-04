@@ -3,7 +3,6 @@
  */
 import Cookies from 'js-cookie'
 import axios from 'axios'
-import createBrowserHistory from 'history/createBrowserHistory'
 
 function post({url, data}) {
     return new Promise((resolve, reject) => {
@@ -24,7 +23,7 @@ function post({url, data}) {
 let utils = {
     setCookie: Cookies.set,
     getCookie:Cookies.get,
-    post:post,
-    history:createBrowserHistory()
+    removeCookie:Cookies.remove,
+    post:post
 };
 export default utils;

@@ -14,7 +14,7 @@ const compression = require('compression');
 const expressJwt = require('express-jwt');
 const jwt = require('jsonwebtoken');
 app.use(compression());
-app.use(function(req, res, next) {
+app.use(function (req, res, next) {
     res.header("Access-Control-Allow-Origin", "*");
     res.header("Access-Control-Allow-Headers", "X-Requested-With");
     res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
@@ -40,7 +40,7 @@ const hs = crypto.createHash("md5").update("abcdefg").digest("hex");
 app.use(expressJwt({
     secret: hs,
     credentialsRequired: false,
-    getToken: function fromHeaderOrQuerystring (req) {
+    getToken: function fromHeaderOrQuerystring(req) {
         if (req.headers.authorization && req.headers.authorization.split(' ')[0] === 'Bearer') {
             console.log(req.headers.authorization.split(' ')[1]);
             return req.headers.authorization.split(' ')[1];
@@ -169,13 +169,12 @@ app.post("/delDocument", function (req, res) {
                         });
                     } else {
                         res.status(200).send({
-                            status:false,
+                            status: false,
                             msg: "服务器异常",
                             model: result
                         });
                     }
                 });
-
             }
         });
     });
@@ -245,26 +244,19 @@ app.post("/selectApi", function (req, res) {
             _id: new mongo.ObjectId(id)
         };
     }
-    let docQuery = {
-        _id: new mongo.ObjectId(req.body.doc_id)
-    };
-    dbopt.find("docs", docQuery, function (result1) {
-        if (id) {
-            dbopt.find("apis", query, function (results) {
-                res.status(200).send({
-                    status: true,
-                    model: results,
-                    documentInfo: result1
-                });
-            });
-        } else {
+    if (id) {
+        dbopt.find("apis", query, function (results) {
             res.status(200).send({
                 status: true,
-                documentInfo: result1
+                model: results
             });
-        }
-    });
-
+        });
+    } else {
+        res.status(200).send({
+            status: false,
+            msg:'缺少参数：id'
+        });
+    }
 });
 app.post("/editApi", function (req, res) {
     let id = req.body.id;
@@ -306,7 +298,7 @@ app.post("/login", function (req, res) {
     fs.readFile("config.json", function (err, data) {
         let users = JSON.parse(data).user;
         let reqName = req.body.name;
-        if(!reqName||!req.body.password){
+        if (!reqName || !req.body.password) {
             res.status(400).send({status: false, msg: "请输入用户名或密码！"});
             return false;
         }
@@ -318,15 +310,15 @@ app.post("/login", function (req, res) {
             }
         });
         if (isRight) {
-            let authToken = jwt.sign({username: reqName}, hs);
-            res.status(200).send({status: true, msg: "登录成功", token: authToken,userName:reqName});
+            let authToken = jwt.sign({username: reqName}, hs, {expiresIn: '1h'});
+            res.status(200).send({status: true, msg: "登录成功", token: authToken, userName: reqName});
         } else {
             res.status(400).send({status: false, msg: "用户名或密码不正确！"});
         }
     });
 });
 app.post("/logout", function (req, res) {
-    res.status(200).send({msg: "退出成功"});
+    res.status(200).send({msg: "退出成功", status: true});
 });
 app.use(function (req, res) {
     res.sendFile(__dirname + "/build/index.html");
