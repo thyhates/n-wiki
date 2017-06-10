@@ -48,9 +48,27 @@ function getLogs() {
     })
 }
 
+
+function getApiDetail({id}) {
+    return new Promise((resolve, reject) => {
+        utils.post({
+            url:'/selectApi',
+            data:{
+                id
+            }
+        })
+            .then(res => {
+                resolve(res);
+            }).catch(res => {
+            reject(res);
+        })
+    })
+}
+
 let data = {
     getDocumentList: getDocumentList,
     getLogs:getLogs,
-    getApis:getApis
+    getApis:getApis,
+    getApiDetail:getApiDetail
 };
 export default data;

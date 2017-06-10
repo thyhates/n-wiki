@@ -44,8 +44,8 @@ class Log extends Component {
                                     用户：{log.user} ;
                                     操作：{log.action} ;
                                     文档：{log.docName};
-                                    {log.apiName ? log.del ? <span> 接口: {log.apiName}; </span> :
-                                        <span> 接口: <Link to={'/api/view/'+log.docId}>{log.apiName}</Link>;</span> : ' '}
+                                    {log.apiId ? log.del ? <span> 接口: {log.apiName}; </span> :
+                                        <span> 接口: <Link to={'/api/view/'+log.apiId}>{log.apiName}</Link>;</span> : ' '}
                                     时间：{log.time}
                                 </p>
                             </div>

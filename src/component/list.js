@@ -7,6 +7,7 @@ import Subheader from 'material-ui/Subheader'
 import data from '../dataSource/data'
 import PropTypes from 'prop-types'
 import Divider from 'material-ui/Divider'
+import utils from '../utils/utils'
 
 let SelectableList = makeSelectable(List);
 
@@ -60,19 +61,24 @@ class Lists extends Component {
     getList() {
         data.getDocumentList().then(res => {
 
-            res.model.forEach(item=>{
+            res.model.forEach(item => {
                 data.getApis({
-                    id:item._id
-                }).then(res=>{
-                    console.log('success',res);
-                    item.apis=res.model||[];
-                }).catch(res=>{
-                    item.apis=[];
-                    console.log('error',res);
+                    id: item._id
+                }).then(res1 => {
+                    // console.log('success', res1);
+                    item.apis = res1.model || [];
+                    this.setState({
+                        docs: res.model || []
+                    });
+                }).catch(res => {
+                    item.apis = [];
+                    utils.showMessage(res.msg);
+                    // console.log('error', res);
+                    this.setState({
+                        docs: res.model || []
+                    });
                 });
-                this.setState({
-                    docs: res.model || []
-                });
+
             })
 
         }).catch(res => {
@@ -95,9 +101,15 @@ class Lists extends Component {
                     {
                         this.state.docs.map(doc => {
                             return (
-                                <ListItem innerDivStyle={itemStyle} value={{child: false, id: doc._id}}
+                                <ListItem primaryTogglesNestedList innerDivStyle={itemStyle}
+                                          value={{child: false, id: doc._id}}
                                           secondaryText={doc.description } primaryText={doc.label}
-                                          key={doc._id}/>
+                                          key={doc._id} nestedItems={
+                                    doc.apis ? doc.apis.map(api => {
+                                        return <ListItem value={{child: true, id: api._id}} key={api._id}
+                                                         primaryText={api.label}/>;
+                                    }) : []
+                                }/>
                             );
                         })
                     }

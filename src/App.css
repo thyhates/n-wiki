@@ -20,7 +20,7 @@
     padding:0;
 }
 .container-list{
-    border:1px solid #ccc;
+    border:1px solid #eee;
     border-radius:5px;
     width:20%;
     height:100%;
@@ -29,7 +29,7 @@
     margin-left:3%;
     width:75%;
     height:100%;
-    border:1px solid #ccc;
+    border:1px solid #eee;
     border-radius:5px;
     padding:0 5px;
     overflow: auto;
@@ -53,4 +53,10 @@
 .log-item p a{
     color: #337ab7;
     text-decoration: none;
+}
+.view-api{
+    padding:0 15px;
+}
+.param-header{
+    margin-top:35px;
 }
