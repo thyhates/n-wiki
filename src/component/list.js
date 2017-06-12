@@ -8,6 +8,7 @@ import data from '../dataSource/data'
 import PropTypes from 'prop-types'
 import Divider from 'material-ui/Divider'
 import utils from '../utils/utils'
+import {Link} from 'react-router-dom'
 
 let SelectableList = makeSelectable(List);
 
@@ -92,6 +93,9 @@ class Lists extends Component {
         const itemStyle = {
             padding: '10px'
         };
+        const apiStyle={
+            padding:'0px'
+        };
         return (
             <div className="container-list">
                 <SelectableList defaultValue={{}}>
@@ -106,8 +110,7 @@ class Lists extends Component {
                                           secondaryText={doc.description } primaryText={doc.label}
                                           key={doc._id} nestedItems={
                                     doc.apis ? doc.apis.map(api => {
-                                        return <ListItem value={{child: true, id: api._id}} key={api._id}
-                                                         primaryText={api.label}/>;
+                                        return <ListItem innerDivStyle={apiStyle} children={<Link key={api._id} to={'/api/view/'+api._id}>{api.label}</Link>} value={{child: true, id: api._id}} key={api._id}/>;
                                     }) : []
                                 }/>
                             );

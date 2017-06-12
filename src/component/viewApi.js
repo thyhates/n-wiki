@@ -58,7 +58,10 @@ class ViewApi extends Component {
                 <h1>{this.state.apiDetails.label}</h1>
                 <Divider/>
                 <p className="api-desc">{this.state.apiDetails.description}</p>
-                <p>请求头：</p>
+                <p className="api-update">创建人：{this.state.apiDetails.createUser} ; 最后编辑：{ this.state.apiDetails.update},时间：{new Date(this.state.apiDetails.lastTime).toLocaleString()}</p>
+                <p>地址：{this.state.apiDetails.api}</p>
+                <p>请求方式：{this.state.apiDetails.method}</p>
+                <p>请求头(header)：</p>
                 <div className="api-header">
                     <Table selectable={false}>
                         <TableHeader displaySelectAll={false}
@@ -81,7 +84,7 @@ class ViewApi extends Component {
                         </TableBody>
                     </Table>
                 </div>
-                <p className="param-header">请求参数：</p>
+                <p className="param-header">参数：</p>
                 <div className="api-header">
                     <Table selectable={false}>
                         <TableHeader displaySelectAll={false}
@@ -106,6 +109,31 @@ class ViewApi extends Component {
                         </TableBody>
                     </Table>
                 </div>
+                <p className="param-header">返回值：</p>
+                <div className="api-header">
+                    <Table selectable={false}>
+                        <TableHeader displaySelectAll={false}
+                                     adjustForCheckbox={false} style={headerStyle}>
+                            <TableRow style={tableStyle}>
+                                <TableHeaderColumn style={tableHeaderStyle}>参数</TableHeaderColumn>
+                                <TableHeaderColumn style={tableHeaderStyle}>类型</TableHeaderColumn>
+                                <TableHeaderColumn style={tableHeaderStyle}>说明</TableHeaderColumn>
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody displayRowCheckbox={false}>
+                            {this.state.apiDetails.callbackParams ? this.state.apiDetails.callbackParams.map((param, i) => (
+                                <TableRow key={i}>
+                                    <TableRowColumn style={tableRowStyle}>{param.key}</TableRowColumn>
+                                    <TableRowColumn style={tableRowStyle}>{param.type}</TableRowColumn>
+                                    <TableRowColumn style={tableRowStyle}>{param.revalue}</TableRowColumn>
+                                </TableRow>
+                            )) : ''
+                            }
+                        </TableBody>
+                    </Table>
+                </div>
+                <p>返回说明：</p>
+                <p>{this.state.apiDetails.demo}</p>
             </div>
         )
     }

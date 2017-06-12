@@ -29,7 +29,7 @@
     margin-left:3%;
     width:75%;
     height:100%;
-    border:1px solid #eee;
+    /*border:1px solid #eee;*/
     border-radius:5px;
     padding:0 5px;
     overflow: auto;
@@ -59,4 +59,13 @@
 }
 .param-header{
     margin-top:35px;
+}
+.api-update{
+    text-align: right;
+}
+.container-list a{
+    text-decoration: none;
+    color: #000;
+    display: block;
+    padding:12px;
 }
