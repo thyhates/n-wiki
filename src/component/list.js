@@ -110,7 +110,7 @@ class Lists extends Component {
                                           secondaryText={doc.description } primaryText={doc.label}
                                           key={doc._id} nestedItems={
                                     doc.apis ? doc.apis.map(api => {
-                                        return <ListItem innerDivStyle={apiStyle} children={<Link key={api._id} to={'/api/view/'+api._id}>{api.label}</Link>} value={{child: true, id: api._id}} key={api._id}/>;
+                                        return <ListItem innerDivStyle={apiStyle} children={<Link key={api._id} to={'/api/view/'+doc._id+'/'+api._id}>{api.label}</Link>} value={{child: true, id: api._id}} key={api._id}/>;
                                     }) : []
                                 }/>
                             );

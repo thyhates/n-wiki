@@ -5,6 +5,7 @@ import React, {Component} from 'react'
 import data from '../dataSource/data'
 import utils from  '../utils/utils'
 import Divider from 'material-ui/Divider'
+import RaisedButton from 'material-ui/RaisedButton'
 import {
     Table,
     TableBody,
@@ -13,6 +14,9 @@ import {
     TableRow,
     TableRowColumn,
 } from 'material-ui/Table';
+import {Link } from 'react-router-dom'
+
+
 class ViewApi extends Component {
     constructor(props) {
         super(props);
@@ -20,14 +24,9 @@ class ViewApi extends Component {
             apiDetails: {}
         }
     }
-
     componentDidMount() {
         this.getApiDetail();
     }
-
-    componentDidUpdate() {
-    }
-
     getApiDetail() {
         data.getApiDetail({id: this.props.match.params.id})
             .then(res => {
@@ -38,7 +37,6 @@ class ViewApi extends Component {
             utils.showMessage(res.msg)
         })
     }
-
     render() {
         const headerStyle={
             background:'#eee',
@@ -55,7 +53,8 @@ class ViewApi extends Component {
         };
         return (
             <div className="view-api">
-                <h1>{this.state.apiDetails.label}</h1>
+                <h1>{this.state.apiDetails.label} </h1>
+                <RaisedButton className="error-button"><Link to={"/error/view/"+this.props.match.params.did+"/"+this.state.apiDetails._id}>错误码</Link></RaisedButton>
                 <Divider/>
                 <p className="api-desc">{this.state.apiDetails.description}</p>
                 <p className="api-update">创建人：{this.state.apiDetails.createUser} ; 最后编辑：{ this.state.apiDetails.update},时间：{new Date(this.state.apiDetails.lastTime).toLocaleString()}</p>
@@ -138,4 +137,5 @@ class ViewApi extends Component {
         )
     }
 }
+
 export default ViewApi;
