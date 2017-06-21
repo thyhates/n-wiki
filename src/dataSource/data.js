@@ -64,11 +64,26 @@ function getApiDetail({id}) {
         })
     })
 }
-
+function getErrorCode({id}) {
+    return new Promise((resolve, reject) => {
+        utils.post({
+            url:'/getDocument',
+            data:{
+                id
+            }
+        })
+            .then(res => {
+                resolve(res);
+            }).catch(res => {
+            reject(res);
+        })
+    })
+}
 let data = {
     getDocumentList: getDocumentList,
     getLogs:getLogs,
     getApis:getApis,
-    getApiDetail:getApiDetail
+    getApiDetail:getApiDetail,
+    getErrorCode:getErrorCode
 };
 export default data;
