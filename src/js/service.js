@@ -178,13 +178,12 @@ angular.module("app")
                 });
             return promise;
         }
-        function deleteApi(id) {
+        function deleteApi(id,did) {
             var deferred=$q.defer();
             var promise=deferred.promise;
 
             $http.post('delApi',{
                 id:id,
-                doc_id:did
             })
                 .then(function (res) {
                     if(res.data.status){

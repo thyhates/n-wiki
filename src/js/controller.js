@@ -160,9 +160,9 @@ angular.module("app")
             vm.addApi = function (form) {
                 vm.newApi.doc_id = $stateParams.id;
                 apiService.addApi({
-                    body: $scope.newApi
+                    body: vm.newApi
                 }).then(function (res) {
-                    toastr.success(res);
+                    toastr.success(res.msg);
                     $state.transitionTo("home.doc", {
                         id: $stateParams.id
                     }, {

@@ -84,33 +84,7 @@ var formConfig = [{
         }
     },
     form: ["label", "api", "method",
-        {
-            key: "params",
-            add: "添加",
-            items: [
-                {
-                    "type": "section",
-                    "htmlClass": "row",
-                    items: [{
-                        "type": "section",
-                        "htmlClass": "col-xs-6",
-                        items: ["params[].apiName"]
-                    }, {
-                        "type": "section",
-                        "htmlClass": "col-xs-6",
-                        items: ["params[].type"]
-                    }, {
-                        "type": "section",
-                        "htmlClass": "col-xs-6",
-                        items: ["params[].require"]
-                    }, {
-                        "type": "section",
-                        "htmlClass": "col-xs-6",
-                        items: ["params[].apiValue"]
-                    }]
-                }
-            ]
-        },
+
         {
             key: "res",
             add: "添加",
