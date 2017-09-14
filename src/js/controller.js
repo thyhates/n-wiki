@@ -281,7 +281,7 @@ angular.module("app")
                     id: $stateParams.aid,
                     api: vm.api
                 }).then(function (res) {
-                    toastr.success(res);
+                    toastr.success(res.msg);
                     $state.transitionTo("home.doc", {
                         id: $stateParams.id,
                         aid: $stateParams.aid
