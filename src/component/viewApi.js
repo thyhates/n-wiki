@@ -21,11 +21,17 @@ class ViewApi extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            apiDetails: {}
+            apiDetails: {},
+            hasComponentError:false
         }
     }
     componentDidMount() {
         this.getApiDetail();
+    }
+    componentDidCatch(){
+        this.setState({
+            hasComponentError:true
+        })
     }
     getApiDetail() {
         data.getApiDetail({id: this.props.match.params.id})
