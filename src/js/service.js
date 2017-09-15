@@ -20,9 +20,9 @@ angular.module("app")
                     /*if(!$rootScope.isLogin){
                      $injector.get('$state').go("home");
                      }*/
-                    if(err.statusCode===401){
+                    if(err.status===401){
                         alert('请先登录!');
-                        $injector.get('$state').go("home");
+                        $injector.get('$state').go("home.login");
                     }
                     return err;
                 }
