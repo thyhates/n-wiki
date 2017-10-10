@@ -3,9 +3,7 @@ import React,{Component} from 'react';
 import {View,Text,Image} from 'react-native';
 
 class Message extends Component{
-    static navigationOptions = {
-        tabBarLabel: '消息'
-    };
+  y
     constructor(props){
         super();
         this.state={
@@ -14,11 +12,9 @@ class Message extends Component{
     }
     render(){
         return (
-            <View>
                 <Text>
                     消息
                 </Text>
-            </View>
         );
     }
 }

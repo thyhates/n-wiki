@@ -3,9 +3,6 @@ import React,{Component} from 'react';
 import {View,Text,Image} from 'react-native';
 
 class Profile extends Component{
-    static navigationOptions = {
-        tabBarLabel: '我的'
-    };
     constructor(props){
         super();
         this.state={
@@ -14,11 +11,9 @@ class Profile extends Component{
     }
     render(){
         return (
-            <View>
                 <Text>
                     我的
                 </Text>
-            </View>
         );
     }
 }
