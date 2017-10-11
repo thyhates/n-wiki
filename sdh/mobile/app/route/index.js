@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import {
     Button
 } from 'react-native'
-import {StackNavigator, TabNavigator, TabBarBottom} from 'react-navigation';
+import {StackNavigator, TabNavigator, TabBarBottom,DrawerNavigator} from 'react-navigation';
 import Icon from 'react-native-vector-icons/FontAwesome';
 
 
@@ -11,7 +11,8 @@ import Goods from './../container/goods';
 import Order from './../container/order';
 import Message from './../container/message';
 import Profile from './../container/profile';
-import GoodsDetail from './../container/goods/detail'
+import GoodsDetail from './../container/goods/detail';
+import GoodsCat from './../component/goodsCat';
 
 const tabNavigationConfig = {
     tabBarPosition: 'bottom',
@@ -68,7 +69,8 @@ const stateRoute = StackNavigator({
     Home: {screen: route, navigationOptions: {header: null}},
     GoodsDetail: {screen: GoodsDetail}
 },{
-  initialRouteName:'Home'
+  initialRouteName:'Home',
 });
+
 
 export default stateRoute;

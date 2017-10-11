@@ -6,11 +6,7 @@
 
 import React, {Component} from 'react';
 import {
-    AppRegistry,
-    StyleSheet,
-    Text,
-    View, Button,
-    Alert
+    AppRegistry
 } from 'react-native';
 import {default as sdh} from './app/route';
 

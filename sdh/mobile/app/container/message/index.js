@@ -3,7 +3,6 @@ import React,{Component} from 'react';
 import {View,Text,Image} from 'react-native';
 
 class Message extends Component{
-  y
     constructor(props){
         super();
         this.state={

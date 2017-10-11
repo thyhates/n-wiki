@@ -6,7 +6,7 @@ class Goods extends Component{
     constructor(props){
         super();
         this.state={
-            message:'holy'
+            message:'s'
         }
     }
     render(){
@@ -17,7 +17,7 @@ class Goods extends Component{
                     Goods View {this.state.message}.
                     <Image source={require('../../assets/img/failure.png')}/>
                 </Text>
-                <Button title={'detail'} onPress={()=>navigate('GoodsDetail')}/>
+                <Button style={{width:100}} title={'detail'} onPress={()=>navigate('GoodsDetail')}/>
             </View>
         );
     }
