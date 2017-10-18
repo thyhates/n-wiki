@@ -114,30 +114,7 @@ class ViewApi extends Component {
                         </TableBody>
                     </Table>
                 </div>
-                <p className="param-header">返回值：</p>
-                <div className="api-header">
-                    <Table selectable={false}>
-                        <TableHeader displaySelectAll={false}
-                                     adjustForCheckbox={false} style={headerStyle}>
-                            <TableRow style={tableStyle}>
-                                <TableHeaderColumn style={tableHeaderStyle}>参数</TableHeaderColumn>
-                                <TableHeaderColumn style={tableHeaderStyle}>类型</TableHeaderColumn>
-                                <TableHeaderColumn style={tableHeaderStyle}>说明</TableHeaderColumn>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody displayRowCheckbox={false}>
-                            {this.state.apiDetails.callbackParams ? this.state.apiDetails.callbackParams.map((param, i) => (
-                                <TableRow key={i}>
-                                    <TableRowColumn style={tableRowStyle}>{param.key}</TableRowColumn>
-                                    <TableRowColumn style={tableRowStyle}>{param.type}</TableRowColumn>
-                                    <TableRowColumn style={tableRowStyle}>{param.revalue}</TableRowColumn>
-                                </TableRow>
-                            )) : ''
-                            }
-                        </TableBody>
-                    </Table>
-                </div>
-                <p>返回说明：</p>
+                <p>返回示例：</p>
                 <p>{this.state.apiDetails.demo}</p>
             </div>
         )
