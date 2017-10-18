@@ -4,7 +4,7 @@ import {
     StyleSheet,
     Text,
     View, Button,
-    Alert, Dimensions, ScrollView, TextInput, RefreshControl,ActivityIndicator
+    Alert, Dimensions, ScrollView, TextInput, RefreshControl
 } from 'react-native';
 import Carousel from 'react-native-looped-carousel';
 import IndexHeader from './component/indexHeader';
@@ -131,7 +131,7 @@ class Home extends Component {
                         expedita illum ipsa iste, laboriosam molestias, nisi possimus praesentium quae quaerat repellat,
                         unde. Amet expedita laborum veritatis.</Text>
                     {
-                        this.state.loading ? (<View style={{justifyContent:'center'}}><ActivityIndicator animating={this.state.loading}/></View>) : null
+                        this.state.loading ? (<Text>loading...</Text>) : null
                     }
                 </ScrollView>
             </View>

@@ -1,0 +1,1 @@
+export GoodsCat from './goodsCat';
