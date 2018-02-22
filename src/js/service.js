@@ -14,14 +14,16 @@ angular.module("app")
                     return config;
                 },
                 response: function (res) {
-
-
                     return res || $q.when(res);
                 },
                 responseError: function (err) {
                     /*if(!$rootScope.isLogin){
                      $injector.get('$state').go("home");
                      }*/
+                    if(err.status===401){
+                        alert('请先登录!');
+                        $injector.get('$state').go("home.login");
+                    }
                     return err;
                 }
             };
@@ -178,13 +180,12 @@ angular.module("app")
                 });
             return promise;
         }
-        function deleteApi(id) {
+        function deleteApi(id,did) {
             var deferred=$q.defer();
             var promise=deferred.promise;
 
             $http.post('delApi',{
                 id:id,
-                doc_id:did
             })
                 .then(function (res) {
                     if(res.data.status){
